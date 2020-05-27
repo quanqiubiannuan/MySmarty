@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="b3c1e5a1-a122-419f-ad4f-3010b7e188bc" name="虚拟机" url="http://smarty.com">
+        <fileTransfer rootFolder="/usr/share/nginx/html/" accessType="SFTP" host="192.168.1.100" port="22" sshConfigId="be4f2d4f-54b7-4d2b-a42a-b2218020447a" sshConfig="root@192.168.1.100:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

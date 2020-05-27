@@ -1,0 +1,671 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="BRANCH:master" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </select>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4ef00401-124c-4e5e-8a72-da56857df1e9" name="Default Changelist" comment="update" />
+    <list id="54029536-2cbc-4f67-b460-059e8a7d17db" name="Revert &quot;修改版本号&quot;" comment="Revert &quot;修改版本号&quot;&#10;&#10;This reverts commit 7cb4645e" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="PUSH_AUTO_UPDATE" value="true" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="dev" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="PHP" />
+  <component name="ProjectId" id="1Sj1dZhEE2lvgbHdbkiD8eIAVK0" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="add_unversioned_files" value="$PROJECT_DIR$/runtime/templates_c/home/index/3ac425f3178c1a02f94b6e02e4cfac4a.php&#10;E:/projects/MySmarty/.gitignore" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/extend/fonts" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\dev\projects\MySmarty\extend\fonts" />
+      <recent name="E:\projects\MySmarty\extend\fonts" />
+      <recent name="E:\projects\MySmarty\public\static" />
+      <recent name="E:\projects\MySmarty\runtime\cache" />
+      <recent name="E:\projects" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\projects\MySmarty\application\home\view\index" />
+      <recent name="E:\projects\MySmarty\application\home\view" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="PhpLocalRunConfigurationType" factoryName="PHP Console">
+      <CommandLine>
+        <PhpTestInterpreterSettings>
+          <option name="interpreterName" value="PHP" />
+        </PhpTestInterpreterSettings>
+      </CommandLine>
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="StructureViewFactory">
+    <option name="ACTIVE_ACTIONS" value=",ALPHA_COMPARATOR" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration>C:\Users\Administrator\AppData\Roaming\Subversion</configuration>
+    <supportedVersion>125</supportedVersion>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4ef00401-124c-4e5e-8a72-da56857df1e9" name="Default Changelist" comment="" />
+      <created>1572062278401</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1572062278401</updated>
+      <workItem from="1572062279525" duration="26000" />
+      <workItem from="1575700593165" duration="847000" />
+      <workItem from="1575707215804" duration="2737000" />
+      <workItem from="1575710805791" duration="10000" />
+      <workItem from="1575711792862" duration="2000" />
+      <workItem from="1575711969028" duration="5000" />
+      <workItem from="1575712161393" duration="1000" />
+      <workItem from="1575784453002" duration="1219000" />
+      <workItem from="1576312376941" duration="886000" />
+      <workItem from="1576313280429" duration="1285000" />
+      <workItem from="1577512659144" duration="1260000" />
+      <workItem from="1577795358232" duration="847000" />
+      <workItem from="1577796310463" duration="27000" />
+      <workItem from="1577973219849" duration="550000" />
+      <workItem from="1578723151314" duration="87000" />
+      <workItem from="1578723246572" duration="5739000" />
+      <workItem from="1578734571617" duration="607000" />
+      <workItem from="1578817725784" duration="1841000" />
+      <workItem from="1578819952369" duration="3100000" />
+      <workItem from="1578832162701" duration="5509000" />
+      <workItem from="1578920436018" duration="3631000" />
+      <workItem from="1579007692457" duration="1147000" />
+      <workItem from="1579008851547" duration="2678000" />
+      <workItem from="1579094135015" duration="2374000" />
+      <workItem from="1579273636739" duration="702000" />
+      <workItem from="1579313526731" duration="12000" />
+      <workItem from="1579348762156" duration="3073000" />
+      <workItem from="1579616658866" duration="10000" />
+      <workItem from="1579616843005" duration="1000" />
+      <workItem from="1579683466004" duration="5380000" />
+      <workItem from="1579768269012" duration="3107000" />
+      <workItem from="1579856024137" duration="7269000" />
+      <workItem from="1579929959886" duration="23000" />
+      <workItem from="1579930057151" duration="8809000" />
+      <workItem from="1580027580402" duration="5956000" />
+      <workItem from="1580110614423" duration="7729000" />
+      <workItem from="1580690792249" duration="19990000" />
+      <workItem from="1580777470156" duration="14249000" />
+      <workItem from="1580881845079" duration="11280000" />
+      <workItem from="1582440573480" duration="234000" />
+      <workItem from="1582636123702" duration="584000" />
+      <workItem from="1582874627507" duration="47000" />
+      <workItem from="1582984068184" duration="124000" />
+      <workItem from="1583042066622" duration="6000" />
+      <workItem from="1586068851354" duration="328000" />
+      <workItem from="1586069374626" duration="1449000" />
+      <workItem from="1586070852795" duration="4000" />
+      <workItem from="1586071701668" duration="305000" />
+      <workItem from="1586073465898" duration="2069000" />
+      <workItem from="1586135747558" duration="334000" />
+      <workItem from="1586136286849" duration="550000" />
+      <workItem from="1586155924065" duration="134000" />
+      <workItem from="1586167988578" duration="2000" />
+      <workItem from="1586480815010" duration="35000" />
+      <workItem from="1586480883707" duration="377000" />
+      <workItem from="1586487179481" duration="4000" />
+      <workItem from="1587881540649" duration="268000" />
+      <workItem from="1587881830631" duration="25000" />
+      <workItem from="1589363026212" duration="1438000" />
+      <workItem from="1589378842485" duration="24000" />
+      <workItem from="1590294675156" duration="10000" />
+      <workItem from="1590575293184" duration="171000" />
+    </task>
+    <task id="LOCAL-00048" summary="去掉插件目录">
+      <created>1580119380572</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1580119380572</updated>
+    </task>
+    <task id="LOCAL-00049" summary="添加输出格式化">
+      <created>1580693916242</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1580693916242</updated>
+    </task>
+    <task id="LOCAL-00050" summary="修改分配变量方法">
+      <created>1580695306948</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1580695306948</updated>
+    </task>
+    <task id="LOCAL-00051" summary="修改模板配置">
+      <created>1580697065652</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1580697065652</updated>
+    </task>
+    <task id="LOCAL-00052" summary="修改缓存">
+      <created>1580701458816</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1580701458816</updated>
+    </task>
+    <task id="LOCAL-00053" summary="添加缓存删除方法">
+      <created>1580702409379</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1580702409379</updated>
+    </task>
+    <task id="LOCAL-00054" summary="添加缓存">
+      <created>1580702737588</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1580702737588</updated>
+    </task>
+    <task id="LOCAL-00055" summary="测试模板">
+      <created>1580708519166</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1580708519166</updated>
+    </task>
+    <task id="LOCAL-00056" summary="修改缓存">
+      <created>1580709301341</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1580709301341</updated>
+    </task>
+    <task id="LOCAL-00057" summary="修改缓存">
+      <created>1580711058855</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1580711058855</updated>
+    </task>
+    <task id="LOCAL-00058" summary="修改缓存">
+      <created>1580712416384</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1580712416384</updated>
+    </task>
+    <task id="LOCAL-00059" summary="修改缓存">
+      <created>1580712429552</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1580712429552</updated>
+    </task>
+    <task id="LOCAL-00060" summary="修改代码风格">
+      <created>1580716500555</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1580716500555</updated>
+    </task>
+    <task id="LOCAL-00061" summary="修改代码风格">
+      <created>1580717091612</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1580717091612</updated>
+    </task>
+    <task id="LOCAL-00062" summary="修改代码风格">
+      <created>1580788323836</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1580788323836</updated>
+    </task>
+    <task id="LOCAL-00063" summary="修改代码风格">
+      <created>1580788471746</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1580788471746</updated>
+    </task>
+    <task id="LOCAL-00064" summary="修改代码风格">
+      <created>1580799119531</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1580799119531</updated>
+    </task>
+    <task id="LOCAL-00065" summary="修改代码风格">
+      <created>1580799239266</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1580799239266</updated>
+    </task>
+    <task id="LOCAL-00066" summary="修改代码风格">
+      <created>1580799426824</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1580799426825</updated>
+    </task>
+    <task id="LOCAL-00067" summary="修改代码风格">
+      <created>1580799905577</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1580799905577</updated>
+    </task>
+    <task id="LOCAL-00068" summary="修改代码风格">
+      <created>1580799996957</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1580799996957</updated>
+    </task>
+    <task id="LOCAL-00069" summary="修改代码风格">
+      <created>1580882656542</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1580882656543</updated>
+    </task>
+    <task id="LOCAL-00070" summary="修改代码错误">
+      <created>1580884749085</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1580884749085</updated>
+    </task>
+    <task id="LOCAL-00071" summary="修改代码错误">
+      <created>1580885456193</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1580885456193</updated>
+    </task>
+    <task id="LOCAL-00072" summary="修改代码错误">
+      <created>1580886723636</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1580886723636</updated>
+    </task>
+    <task id="LOCAL-00073" summary="修改代码错误">
+      <created>1580886767373</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1580886767373</updated>
+    </task>
+    <task id="LOCAL-00074" summary="修改代码错误">
+      <created>1580891856657</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1580891856657</updated>
+    </task>
+    <task id="LOCAL-00075" summary="修改代码错误">
+      <created>1580892424706</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1580892424706</updated>
+    </task>
+    <task id="LOCAL-00076" summary="修改代码错误">
+      <created>1580893655201</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1580893655201</updated>
+    </task>
+    <task id="LOCAL-00077" summary="修改代码错误">
+      <created>1580893940171</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1580893940171</updated>
+    </task>
+    <task id="LOCAL-00078" summary="修改代码错误">
+      <created>1580894320221</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1580894320221</updated>
+    </task>
+    <task id="LOCAL-00079" summary="修改代码错误">
+      <created>1580894479018</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1580894479018</updated>
+    </task>
+    <task id="LOCAL-00080" summary="修改代码错误">
+      <created>1580895527942</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1580895527942</updated>
+    </task>
+    <task id="LOCAL-00081" summary="test">
+      <created>1582440796795</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1582440796795</updated>
+    </task>
+    <task id="LOCAL-00082" summary="修改验证码过期时间问题">
+      <created>1582874668546</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1582874668546</updated>
+    </task>
+    <task id="LOCAL-00083" summary="修改格式化问题">
+      <created>1582984129778</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1582984129778</updated>
+    </task>
+    <task id="LOCAL-00084" summary="删除">
+      <created>1586069557357</created>
+      <option name="number" value="00084" />
+      <option name="presentableId" value="LOCAL-00084" />
+      <option name="project" value="LOCAL" />
+      <updated>1586069557357</updated>
+    </task>
+    <task id="LOCAL-00085" summary="添加字体">
+      <created>1586070756010</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1586070756010</updated>
+    </task>
+    <task id="LOCAL-00086" summary="优化">
+      <created>1586135886940</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1586135886940</updated>
+    </task>
+    <task id="LOCAL-00087" summary="优化">
+      <created>1586135980020</created>
+      <option name="number" value="00087" />
+      <option name="presentableId" value="LOCAL-00087" />
+      <option name="project" value="LOCAL" />
+      <updated>1586135980020</updated>
+    </task>
+    <task id="LOCAL-00088" summary="优化">
+      <created>1586136713557</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1586136713557</updated>
+    </task>
+    <task id="LOCAL-00089" summary="优化">
+      <created>1586136831647</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1586136831647</updated>
+    </task>
+    <task id="LOCAL-00090" summary="添加 jetbrains mono 字体文件">
+      <created>1586481245864</created>
+      <option name="number" value="00090" />
+      <option name="presentableId" value="LOCAL-00090" />
+      <option name="project" value="LOCAL" />
+      <updated>1586481245866</updated>
+    </task>
+    <task id="LOCAL-00091" summary="Default Changelist">
+      <created>1587881845814</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1587881845814</updated>
+    </task>
+    <task id="LOCAL-00092" summary="去掉无用路由">
+      <created>1589363071108</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1589363071108</updated>
+    </task>
+    <task id="LOCAL-00093" summary="去掉加密key">
+      <created>1589363095904</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1589363095920</updated>
+    </task>
+    <task id="LOCAL-00094" summary="update">
+      <created>1589363346345</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1589363346345</updated>
+    </task>
+    <task id="LOCAL-00095" summary="update">
+      <created>1589363395003</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1589363395003</updated>
+    </task>
+    <task id="LOCAL-00096" summary="update">
+      <created>1589364361646</created>
+      <option name="number" value="00096" />
+      <option name="presentableId" value="LOCAL-00096" />
+      <option name="project" value="LOCAL" />
+      <updated>1589364361646</updated>
+    </task>
+    <option name="localTasksCounter" value="97" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ORDER">
+      <list>
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list />
+          </value>
+        </entry>
+        <entry key="User">
+          <value>
+            <list />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <ignored-roots>
+      <path value="$PROJECT_DIR$" />
+    </ignored-roots>
+    <MESSAGE value="redis缓存" />
+    <MESSAGE value="elasticsearch缓存" />
+    <MESSAGE value="mongodb缓存" />
+    <MESSAGE value="修改插件方法" />
+    <MESSAGE value="去掉插件目录" />
+    <MESSAGE value="添加输出格式化" />
+    <MESSAGE value="修改分配变量方法" />
+    <MESSAGE value="修改模板配置" />
+    <MESSAGE value="添加缓存删除方法" />
+    <MESSAGE value="添加缓存" />
+    <MESSAGE value="测试模板" />
+    <MESSAGE value="修改缓存" />
+    <MESSAGE value="修改代码风格" />
+    <MESSAGE value="修改代码错误" />
+    <MESSAGE value="test" />
+    <MESSAGE value="修改验证码过期时间问题" />
+    <MESSAGE value="修改格式化问题" />
+    <MESSAGE value="删除" />
+    <MESSAGE value="添加字体" />
+    <MESSAGE value="优化" />
+    <MESSAGE value="添加 jetbrains mono 字体文件" />
+    <MESSAGE value="Default Changelist" />
+    <MESSAGE value="去掉无用路由" />
+    <MESSAGE value="去掉加密key" />
+    <MESSAGE value="update" />
+    <option name="LAST_COMMIT_MESSAGE" value="update" />
+    <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="249" y="0" key="#CLI_Interpreters" timestamp="1586070370041">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="249" y="0" key="#CLI_Interpreters/0.0.1536.824@0.0.1536.824" timestamp="1586070370041" />
+    <state x="241" y="0" key="#SSH_Configurations" timestamp="1587881583905">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="241" y="0" key="#SSH_Configurations/0.0.1536.824@0.0.1536.824" timestamp="1587881583905" />
+    <state x="223" y="61" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1586070404480">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="223" y="61" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1586070404480" />
+    <state x="261" y="0" key="#部署" timestamp="1587881776399">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="261" y="0" key="#部署/0.0.1536.824@0.0.1536.824" timestamp="1587881776399" />
+    <state x="303" y="0" key="CommitChangelistDialog2" timestamp="1589364361061">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="303" y="0" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1589364361061" />
+    <state x="499" y="111" key="FileChooserDialogImpl" timestamp="1586079082796">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="499" y="111" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1586079082796" />
+    <state x="147" y="64" key="MergeDialog" timestamp="1586069503773">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="147" y="64" key="MergeDialog/0.0.1536.824@0.0.1536.824" timestamp="1586069503773" />
+    <state x="402" y="59" key="MultipleFileMergeDialog" timestamp="1586069509211">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="402" y="59" key="MultipleFileMergeDialog/0.0.1536.824@0.0.1536.824" timestamp="1586069509211" />
+    <state x="604" y="52" key="RollbackChangesDialog" timestamp="1586481192379">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="604" y="52" key="RollbackChangesDialog/0.0.1536.824@0.0.1536.824" timestamp="1586481192379" />
+    <state x="154" y="0" key="SettingsEditor" timestamp="1590294679171">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="154" y="0" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1590294679171" />
+    <state x="261" y="76" key="Vcs.Push.Dialog.v2" timestamp="1589364362589">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="261" y="76" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1589364362589" />
+    <state x="93" y="93" width="1350" height="638" key="com.intellij.history.integration.ui.views.DirectoryHistoryDialog" timestamp="1586136412926">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="93" y="93" width="1350" height="638" key="com.intellij.history.integration.ui.views.DirectoryHistoryDialog/0.0.1536.824@0.0.1536.824" timestamp="1586136412926" />
+    <state x="386" y="86" width="931" height="738" key="find.popup" timestamp="1586070492558">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="386" y="86" width="931" height="738" key="find.popup/0.0.1536.824@0.0.1536.824" timestamp="1586070492558" />
+    <state x="576" y="79" key="ftp.server.browser" timestamp="1587881675306">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="576" y="79" key="ftp.server.browser/0.0.1536.824@0.0.1536.824" timestamp="1587881675306" />
+    <state x="512" y="59" key="git4idea.branch.GitSmartOperationDialog" timestamp="1586069463613">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="512" y="59" key="git4idea.branch.GitSmartOperationDialog/0.0.1536.824@0.0.1536.824" timestamp="1586069463613" />
+    <state x="379" y="230" key="git4idea.ui.GitUnstashDialog" timestamp="1586069537320">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="379" y="230" key="git4idea.ui.GitUnstashDialog/0.0.1536.824@0.0.1536.824" timestamp="1586069537320" />
+  </component>
+</project>
