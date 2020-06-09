@@ -12,7 +12,7 @@ return [
         // mysql 用户名
         'user' => 'root',
         // mysql 密码
-        'password' => 'a@123456Dj',
+        'password' => '123456',
         // mysql 端口
         'port' => 3306,
         // mysql 默认数据库
