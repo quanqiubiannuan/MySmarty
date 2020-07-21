@@ -131,9 +131,12 @@ class Upload
             return false;
         }
 
-        $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $ext = MimeType::getExt($file['type']);
         if (empty($ext)) {
-            return false;
+            $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+            if (empty($ext)) {
+                return false;
+            }
         }
 
         if (!empty($this->limitExt) && $ext !== $this->limitExt) {
