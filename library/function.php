@@ -1048,7 +1048,7 @@ function getAnalyzingText($text, $minLen = 1, $type = '', $analyzer = 'ik_smart'
     if (!empty($result)) {
         $tokens = $result['tokens'];
         foreach ($tokens as $token) {
-            if (mb_strlen($token['token'], 'utf-8') < $minLen || !isZh($token['token'])) {
+            if (mb_strlen($token['token'], 'utf-8') < $minLen) {
                 continue;
             }
             if (empty($type)) {
