@@ -13,7 +13,7 @@ namespace library\mysmarty;
 class Ckeditor
 {
     private static $obj;
-    private $allowTags = '<p><img><h2><h3><h4><strong><i><a><ul><li><ol><blockquote><table><thead><tbody><tr><th><td>';
+    private $allowTags = '<p><img><h1><h2><h3><h4><h5><h6><strong><i><a><ul><li><ol><blockquote><table><thead><tbody><tr><th><td><pre><code>';
 
     private function __construct()
     {
@@ -66,7 +66,9 @@ class Ckeditor
             if ($v === '<a') {
                 $content = preg_replace('/<a [^>]*(href=[\'"][^\'"]+[\'"])[^>]*>/iU', '<a $1>', $content);
             } else if ($v === '<img') {
-                $content = preg_replace('/<img [^>]*(src=[\'"][^\'"]+[\'"])[^>]*>/iU', '<img $1>', $content);
+                $content = $this->replaceImg($content);
+            } else if ($v === '<code') {
+                $content = $this->replaceCode($content);
             } else {
                 $content = preg_replace('/' . preg_quote($v, '/') . ' [^>]*>/iUs', $v . '>', $content);
             }
@@ -75,6 +77,89 @@ class Ckeditor
         //多个换行替换为一个换行
         $content = preg_replace('/(<br[^>]*>){2,}/i', '<br>', $content);
         return myTrim(strip_tags($content, $this->allowTags));
+    }
+
+    /**
+     * 替换内容中的图片
+     * @param string $content 内容
+     * @return mixed
+     */
+    private function replaceImg($content)
+    {
+        $reg = '/<img[^>]*>/iU';
+        if (preg_match_all($reg, $content, $mat)) {
+            foreach ($mat[0] as $k => $v) {
+                $repImg = '<img';
+                $src = $this->getImgAttr($v, 'src');
+                if (empty($src)) {
+                    continue;
+                }
+                $repImg .= ' src="' . $src . '"';
+                $height = $this->getImgAttr($v, 'height');
+                if (!empty($height)) {
+                    $repImg .= ' height="' . $height . '"';
+                }
+                $width = $this->getImgAttr($v, 'width');
+                if (!empty($width)) {
+                    $repImg .= ' width="' . $width . '"';
+                }
+                $repImg .= '>';
+                $content = str_ireplace($v, $repImg, $content);
+            }
+        }
+        return $content;
+    }
+
+    /**
+     * 替换内容中的代码部分
+     * @param string $content 内容
+     * @return mixed
+     */
+    private function replaceCode($content)
+    {
+        $reg = '/<code[^>]*>/iU';
+        if (preg_match_all($reg, $content, $mat)) {
+            foreach ($mat[0] as $k => $v) {
+                $repCode = '<code';
+                $class = $this->getCodeAttr($v, 'class');
+                if (!empty($class)) {
+                    $repCode .= ' class="' . $class . '"';
+                }
+                $repCode .= '>';
+                $content = str_ireplace($v, $repCode, $content);
+            }
+        }
+        return $content;
+    }
+
+    /**
+     * 获取图片的属性标签值
+     * @param string $img img标签代码
+     * @param string $attr img属性值
+     * @return string
+     */
+    private function getImgAttr($img, $attr)
+    {
+        $reg = '/<img [^>]*' . $attr . '=[\'"]([^\'"]+)[\'"][^>]*>/iU';
+        if (preg_match($reg, $img, $mat)) {
+            return myTrim($mat[1]);
+        }
+        return '';
+    }
+
+    /**
+     * 获取code标签的属性标签值
+     * @param string $code img标签代码
+     * @param string $attr img属性值
+     * @return string
+     */
+    private function getCodeAttr($code, $attr)
+    {
+        $reg = '/<code [^>]*' . $attr . '=[\'"]([^\'"]+)[\'"][^>]*>/iU';
+        if (preg_match($reg, $code, $mat)) {
+            return myTrim($mat[1]);
+        }
+        return '';
     }
 
     /**
@@ -145,18 +230,18 @@ class Ckeditor
             if (preg_match('/<img/i', $pv)) {
                 if ($downloadImg) {
                     $srcReg = '/src=[\'"]([^\'"]*)[\'"]/iU';
-                    if (preg_match($srcReg, $pv, $mat)) {
-                        if (!preg_match('/' . getDomain() . '/i', $mat[1])) {
-                            $srcDir = downloadImg($mat[1]);
-                            if ($srcDir) {
-                                $pv = preg_replace($srcReg, 'src="' . $srcDir . '"', $pv);
+                    if (preg_match_all($srcReg, $pv, $mat)) {
+                        foreach ($mat[1] as $v) {
+                            if (!preg_match('/' . getDomain() . '/i', $v)) {
+                                $srcDir = downloadImg($v);
+                                if ($srcDir) {
+                                    $pv = str_ireplace($v, $srcDir, $pv);
+                                }
                             }
                         }
                     }
                 }
-                if (preg_match('/(<img[^>]+>)/i', $pv, $mat)) {
-                    return '<p>' . $mat[1] . '</p>';
-                }
+                return '<p>' . $pv . '</p>';
             } else {
                 return '<p>' . $this->getPValue($pv, $isHtmlspecialchars) . '</p>';
             }
