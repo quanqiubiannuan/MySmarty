@@ -13,7 +13,7 @@ namespace library\mysmarty;
 class Ckeditor
 {
     private static $obj;
-    private $allowTags = '<p><img><h1><h2><h3><h4><h5><h6><strong><i><a><ul><li><ol><blockquote><table><thead><tbody><tr><th><td><pre><code>';
+    private $allowTags = '<p><img><h1><h2><h3><h4><h5><h6><strong><i><a><ul><li><ol><blockquote><table><thead><tbody><tr><th><td><pre><code><br>';
 
     private function __construct()
     {
@@ -55,6 +55,8 @@ class Ckeditor
      */
     private function stripTags($content)
     {
+        $content = str_ireplace('<p></p>', '', $content);
+        $content = preg_replace('/<p>([ 　]|&nbsp;)+<\/p>/iUu', '', $content);
         $content = str_ireplace('figure', 'p', $content);
         $content = preg_replace('/<figcaption>.*<\/figcaption>/iU', '', $content);
         //去掉样式标签
@@ -180,7 +182,7 @@ class Ckeditor
                 if (empty($v)) {
                     continue;
                 }
-                $str .= '<p>' . $this->getPValue($v, $isHtmlspecialchars) . '</p>';
+                $str .= $this->repPvalue($v, $downloadImg, false);
             }
         } else {
             $startPnum = substr_count($str, '<p>');
@@ -192,6 +194,66 @@ class Ckeditor
             if (preg_match_all($reg, $str, $mat)) {
                 foreach ($mat[0] as $v) {
                     $str = str_ireplace($v, $this->repPvalue($v, $downloadImg, $isHtmlspecialchars), $str);
+                }
+            }
+        }
+        return $this->afterPaiban($str);
+    }
+
+    /**
+     * 排版后的内容处理
+     * @param string $str
+     * @return string
+     */
+    private function afterPaiban($str)
+    {
+        $splitStr = '_@#@_';
+        $finalStr = '';
+        // 替换内容
+        $str = preg_replace('/(<br[^>]*>){2,}/i', '<br>', $str);
+        $str = preg_replace('/<p><br><\/p>/i', '', $str);
+        // p 标签外的内容处理
+        $reg = '/<p>(.*)<\/p>/iUs';
+        $pArr = [];
+        if (preg_match_all($reg, $str, $mat)) {
+            $pArr = $mat[1];
+        }
+        $str = preg_replace($reg, $splitStr, $str);
+        $strArr = explode($splitStr, $str);
+        if (!empty($strArr)) {
+            $curK = 0;
+            foreach ($strArr as $v) {
+                if (!empty($v)) {
+                    $finalStr .= $this->getPBrValue($v);
+                } else {
+                    if (isset($pArr[$curK])) {
+                        $finalStr .= $this->getPBrValue($pArr[$curK]);
+                        $curK++;
+                    }
+                }
+            }
+        }
+        return $finalStr;
+    }
+
+    /**
+     * 获取br分标签后的内容
+     * @param string $pv
+     * @return string
+     */
+    private function getPBrValue($pv)
+    {
+        $str = '';
+        $pv = myTrim($pv);
+        if (!empty($pv)) {
+            $brArr = explode('<br>', $pv);
+            foreach ($brArr as $v) {
+                if (empty($v)) {
+                    continue;
+                }
+                $v = myTrim($v);
+                if (!empty($v)) {
+                    $str .= '<p>' . $v . '</p>';
                 }
             }
         }
