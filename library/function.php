@@ -992,23 +992,7 @@ function getPostAarray($name)
  */
 function getIp()
 {
-    $realip = '';
-    if (!empty(getServerValue('HTTP_X_FORWARDED_FOR'))) {
-        $arr = explode(',', getServerValue('HTTP_X_FORWARDED_FOR'));
-        foreach ($arr as $ip) {
-            $ip = trim($ip);
-            if ($ip !== 'unknown') {
-                $realip = $ip;
-                break;
-            }
-        }
-    } else if (!empty(getServerValue('HTTP_CLIENT_IP'))) {
-        $realip = getServerValue('HTTP_CLIENT_IP');
-    } else {
-        if (!empty(getServerValue('REMOTE_ADDR'))) {
-            $realip = getServerValue('REMOTE_ADDR');
-        }
-    }
+    $realip = getServerValue('REMOTE_ADDR');
     if (!isValidIp($realip)) {
         $realip = '0.0.0.0';
     }
