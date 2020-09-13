@@ -1009,7 +1009,35 @@ function getIp()
             $realip = getServerValue('REMOTE_ADDR');
         }
     }
+    if (!isValidIp($realip)) {
+        $realip = '0.0.0.0';
+    }
     return $realip;
+}
+
+/**
+ * 检测是否是合法的IP地址
+ *
+ * @param string $ip IP地址
+ * @param string $type IP地址类型 (ipv4, ipv6)
+ *
+ * @return boolean
+ */
+function isValidIp(string $ip, string $type = '')
+{
+    switch (strtolower($type)) {
+        case 'ipv4':
+            $flag = FILTER_FLAG_IPV4;
+            break;
+        case 'ipv6':
+            $flag = FILTER_FLAG_IPV6;
+            break;
+        default:
+            $flag = null;
+            break;
+    }
+
+    return boolval(filter_var($ip, FILTER_VALIDATE_IP, $flag));
 }
 
 /**
