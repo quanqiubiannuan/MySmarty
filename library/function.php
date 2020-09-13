@@ -992,11 +992,7 @@ function getPostAarray($name)
  */
 function getIp()
 {
-    $realip = getServerValue('REMOTE_ADDR');
-    if (!isValidIp($realip)) {
-        $realip = '0.0.0.0';
-    }
-    return $realip;
+    return getServerValue('REMOTE_ADDR');
 }
 
 /**
