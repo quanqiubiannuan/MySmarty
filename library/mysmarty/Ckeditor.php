@@ -71,6 +71,9 @@ class Ckeditor
                 $content = $this->replaceImg($content);
             } else if ($v === '<code') {
                 $content = $this->replaceCode($content);
+            } else if ($v === '<pre') {
+                $content = preg_replace('/<pre[^>]*>/iU', '<p><pre>', $content);
+                $content = preg_replace('/<\/pre>/iU', '</pre></p>', $content);
             } else {
                 $content = preg_replace('/' . preg_quote($v, '/') . ' [^>]*>/iUs', $v . '>', $content);
             }
