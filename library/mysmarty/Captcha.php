@@ -16,7 +16,7 @@ class Captcha
      *
      * @var int
      */
-    private $width = 100;
+    private $width = 0;
 
     /**
      * 图像高度
@@ -107,6 +107,7 @@ class Captcha
     public function setFontFile($fontFile)
     {
         $this->fontFile = $fontFile;
+        return $this;
     }
 
     /**
@@ -138,7 +139,6 @@ class Captcha
      */
     public function setWidth($width)
     {
-        $this->width = $width;
         return $this;
     }
 
@@ -149,7 +149,6 @@ class Captcha
      */
     public function setHeight($height)
     {
-        $this->height = $height;
         return $this;
     }
 
@@ -227,6 +226,17 @@ class Captcha
     }
 
     /**
+     * 获取随机一个字符串
+     *
+     * @return string
+     */
+    private function getOneCode()
+    {
+        $str = '0123456789qwertyuioplkjhgfdsazxcvbnm' . strtoupper('qwertyuioplkjhgfdsazxcvbnm');
+        return substr(str_shuffle($str), 0, 1);
+    }
+
+    /**
      * 获取指定的字符串数据
      * @param integer $str
      * @return string
@@ -292,6 +302,7 @@ class Captcha
      */
     private function generateImage()
     {
+        $kWidth = 20;
         if (empty($this->code)) {
             switch ($this->codeStyle) {
                 case 0:
@@ -305,6 +316,7 @@ class Captcha
                     break;
                 case 3:
                     $this->code = $this->getZhCode();
+                    $kWidth = 30;
                     break;
                 default:
                     $this->code = $this->getCode();
@@ -312,26 +324,28 @@ class Captcha
         }
         Session::getInstance()->set(self::$sessionName, strtolower($this->code));
         // 创建画布
+        $codeArr = preg_split('//u', $this->code);
+        $codeLen = count($codeArr);
+        $this->width = $codeLen * $kWidth;
         $im = @imagecreatetruecolor($this->width, $this->height);
         // 背景颜色
-        $backgroundColor = imagecolorallocatealpha($im, random_int(0, 120), random_int(0, 120), random_int(0, 120), random_int(0, 30));
+        $backgroundColor = imagecolorallocatealpha($im, 243, 251, 254, 0);
         imagefilledrectangle($im, 0, 0, $this->width - 1, $this->height - 1, $backgroundColor);
         // 计算坐标
         $imgInfo = imagettfbbox($this->font, 0, ROOT_DIR . '/extend/fonts/' . $this->fontFile, $this->code);
-        //验证码总长度
-        $len = $imgInfo[2] - $imgInfo[0];
-        //开始x位置
-        $x = ($this->width - $len) / 2;
         //开始y位置
         $y = ($this->height - $imgInfo[3] - $imgInfo[5]) / 2;
         // 写字符串
-        $text_color = imagecolorallocate($im, random_int(200, 230), random_int(200, 230), random_int(200, 230));
-        imagefttext($im, $this->font, 0, $x, $y, $text_color, ROOT_DIR . '/extend/fonts/' . $this->fontFile, $this->code);
-        $num = mb_strlen($this->code, 'utf-8');
-        for ($i = 0; $i < $num; $i++) {
-            //画干扰线
-            $color = imagecolorallocate($im, random_int(100, 150), random_int(100, 150), random_int(100, 150));
-            imageline($im, random_int(0, $this->width), random_int(0, $this->height), random_int(0, $this->width), random_int(0, $this->height), $color);
+        for ($i = 0; $i < $codeLen; $i++) {
+            $angle = random_int(0, 20);
+            $text_color = imagecolorallocate($im, random_int(0, 100), random_int(0, 100), random_int(0, 100));
+            // 画验证码
+            $x = $i * $kWidth;
+            imagefttext($im, $this->font, $angle, $x, $y, $text_color, ROOT_DIR . '/extend/fonts/' . $this->fontFile, $codeArr[$i]);
+            $text_color = imagecolorallocate($im, random_int(150, 255), random_int(150, 255), random_int(150, 255));
+            imagestring($im, 5, $x, $y + random_int(-30, 5), $this->getOneCode(), $text_color);
+            // 画干扰线
+            imageline($im, random_int(0, $this->width), random_int(0, $this->height), random_int(0, $this->width), random_int(0, $this->height), $text_color);
         }
         return $im;
     }
