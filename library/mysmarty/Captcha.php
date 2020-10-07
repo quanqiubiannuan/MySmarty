@@ -337,13 +337,13 @@ class Captcha
         $y = ($this->height - $imgInfo[3] - $imgInfo[5]) / 2;
         // 写字符串
         for ($i = 0; $i < $codeLen; $i++) {
-            $angle = random_int(0, 20);
+            $angle = random_int(-20, 20);
             $text_color = imagecolorallocate($im, random_int(0, 100), random_int(0, 100), random_int(0, 100));
             // 画验证码
             $x = $i * $kWidth;
             imagefttext($im, $this->font, $angle, $x, $y, $text_color, ROOT_DIR . '/extend/fonts/' . $this->fontFile, $codeArr[$i]);
             $text_color = imagecolorallocate($im, random_int(150, 255), random_int(150, 255), random_int(150, 255));
-            imagestring($im, 5, $x, $y + random_int(-30, 5), $this->getOneCode(), $text_color);
+            imagestring($im, 5, $x, $y + random_int(-1 * $y, 5), $this->getOneCode(), $text_color);
             // 画干扰线
             imageline($im, random_int(0, $this->width), random_int(0, $this->height), random_int(0, $this->width), random_int(0, $this->height), $text_color);
         }
