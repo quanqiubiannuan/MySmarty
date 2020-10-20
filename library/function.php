@@ -573,6 +573,34 @@ function getUserBrowser($userAgent = '')
             $browserStr = 'Safari浏览器';
         } else if (false !== stripos($userAgent, 'msie')) {
             $browserStr = 'IE浏览器';
+        } else if (false !== stripos($userAgent, 'Baiduspider')) {
+            $browserStr = '百度蜘蛛';
+        } else if (false !== stripos($userAgent, 'Googlebot')) {
+            $browserStr = '谷歌蜘蛛';
+        } else if (false !== stripos($userAgent, '360Spider')) {
+            $browserStr = '360蜘蛛';
+        } else if (false !== stripos($userAgent, 'Sosospider')) {
+            $browserStr = 'SOSO蜘蛛';
+        } else if (false !== stripos($userAgent, 'Yahoo!')) {
+            $browserStr = '雅虎蜘蛛';
+        } else if (false !== stripos($userAgent, 'Youdao')) {
+            $browserStr = '有道蜘蛛';
+        } else if (false !== stripos($userAgent, 'Sogou')) {
+            $browserStr = '搜狗蜘蛛';
+        } else if (false !== stripos($userAgent, 'msnbot')) {
+            $browserStr = 'MSN蜘蛛';
+        } else if (false !== stripos($userAgent, 'bingbot')) {
+            $browserStr = '必应蜘蛛';
+        } else if (false !== stripos($userAgent, 'YisouSpider')) {
+            $browserStr = '神马蜘蛛';
+        } else if (false !== stripos($userAgent, 'ia_archiver')) {
+            $browserStr = 'Alexa蜘蛛';
+        } else if (false !== stripos($userAgent, 'EasouSpider')) {
+            $browserStr = '宜搜蜘蛛';
+        } else if (false !== stripos($userAgent, 'JikeSpider')) {
+            $browserStr = '即刻蜘蛛';
+        } else if (false !== stripos($userAgent, 'Spider')) {
+            $browserStr = '网页蜘蛛';
         } else {
             $browserStr = '未知';
         }
