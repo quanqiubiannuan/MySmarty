@@ -226,6 +226,7 @@ class Ckeditor
         if (!empty($strArr)) {
             $curK = 0;
             foreach ($strArr as $v) {
+                $v = myTrim($v);
                 if (!empty($v)) {
                     $finalStr .= $this->getPBrValue($v);
                 } else {
@@ -251,11 +252,11 @@ class Ckeditor
         if (!empty($pv)) {
             $brArr = explode('<br>', $pv);
             foreach ($brArr as $v) {
+                $v = myTrim($v);
                 if (empty($v)) {
                     continue;
-                }
-                $v = myTrim($v);
-                if (!empty($v)) {
+                } else {
+                    $v = preg_replace('/<([^>]+)>[\s ]+<\/\1>/iUsu', '', $v);
                     $str .= '<p>' . $v . '</p>';
                 }
             }
