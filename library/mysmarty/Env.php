@@ -19,7 +19,7 @@ class Env
      * @param string $key
      * @param string $defValue
      *            默认值
-     * @return mixed|string
+     * @return mixed
      */
     public static function get($key, $defValue = '')
     {

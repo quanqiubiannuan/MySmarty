@@ -25,13 +25,13 @@ function formatFileSize(int $size, int $decimals = 0): string
     if ($size < 1024) {
         $str = $size . 'bytes';
     } else if ($size < 1048576) {
-        $str = number_format($size / 1024, $decimals, '.', '') . 'KB';
+        $str = int_format($size / 1024, $decimals, '.', '') . 'KB';
     } else if ($size < 1073741824) {
-        $str = number_format($size / 1048576, $decimals, '.', '') . 'MB';
+        $str = int_format($size / 1048576, $decimals, '.', '') . 'MB';
     } else if ($size < 1099511627776) {
-        $str = number_format($size / 1073741824, $decimals, '.', '') . 'GB';
+        $str = int_format($size / 1073741824, $decimals, '.', '') . 'GB';
     } else {
-        $str = number_format($size / 1099511627776, $decimals, '.', '') . 'TB';
+        $str = int_format($size / 1099511627776, $decimals, '.', '') . 'TB';
     }
     return $str;
 }
@@ -39,9 +39,9 @@ function formatFileSize(int $size, int $decimals = 0): string
 /**
  * 获取当前的语言数组
  * @param string $name
- * @return array|mixed
+ * @return array|string
  */
-function getCurrentLang($name = '')
+function getCurrentLang(string $name = ''): string|array
 {
     $data = getRequireOnceData(ROOT_DIR . '/application/' . MODULE . '/lang/' . strtolower(getCurrentBrowserLanguage()) . '.php');
     if (!empty($name)) {
@@ -54,7 +54,7 @@ function getCurrentLang($name = '')
  * 是否为GET请求
  * @return bool
  */
-function isGet()
+function isGet(): bool
 {
     return getServerValue('REQUEST_METHOD') === 'GET';
 }
@@ -63,7 +63,7 @@ function isGet()
  * 是否为POST请求
  * @return bool
  */
-function isPost()
+function isPost(): bool
 {
     return getServerValue('REQUEST_METHOD') === 'POST';
 }
@@ -72,7 +72,7 @@ function isPost()
  * 是否为PUT请求
  * @return bool
  */
-function isPut()
+function isPut(): bool
 {
     return getServerValue('REQUEST_METHOD') === 'PUT';
 }
@@ -81,7 +81,7 @@ function isPut()
  * 是否为DELTE请求
  * @return bool
  */
-function isDelete()
+function isDelete(): bool
 {
     return getServerValue('REQUEST_METHOD') === 'DELETE';
 }
@@ -90,7 +90,7 @@ function isDelete()
  * 是否为HEAD请求
  * @return bool
  */
-function isHead()
+function isHead(): bool
 {
     return getServerValue('REQUEST_METHOD') === 'HEAD';
 }
@@ -99,7 +99,7 @@ function isHead()
  * 是否为PATCH请求
  * @return bool
  */
-function isPatch()
+function isPatch(): bool
 {
     return getServerValue('REQUEST_METHOD') === 'PATCH';
 }
@@ -108,7 +108,7 @@ function isPatch()
  * 是否为OPTIONS请求
  * @return bool
  */
-function isOptions()
+function isOptions(): bool
 {
     return getServerValue('REQUEST_METHOD') === 'OPTIONS';
 }
@@ -117,7 +117,7 @@ function isOptions()
  * 判断当前是否为cgi模式
  * @return bool
  */
-function isCgiMode()
+function isCgiMode(): bool
 {
     return strpos(PHP_SAPI, 'cgi') === 0;
 }
@@ -129,7 +129,7 @@ function isCgiMode()
  * 1 mb = 1024 kb
  * @return int
  */
-function getMemoryUsage()
+function getMemoryUsage(): int
 {
     return memory_get_usage();
 }
@@ -140,7 +140,7 @@ function getMemoryUsage()
  * 1 秒 = 1000 毫秒
  * @return float
  */
-function getCurrentMicroTime()
+function getCurrentMicroTime(): float
 {
     list($usec, $sec) = explode(' ', microtime());
     return ((float)$usec + (float)$sec);
@@ -150,7 +150,7 @@ function getCurrentMicroTime()
  * 判断服务器是否是windows操作系统
  * @return bool
  */
-function isWin()
+function isWin(): bool
 {
     if (stripos(PHP_OS, 'WIN') === 0) {
         return true;
@@ -164,7 +164,7 @@ function isWin()
  * @param bool $downloadImg 自动下载内容中的图片
  * @return string
  */
-function paiban($str, $downloadImg = true)
+function paiban(string $str, bool $downloadImg = true): string
 {
     return Ckeditor::getInstance()->getContent($str, $downloadImg);
 }
@@ -174,7 +174,7 @@ function paiban($str, $downloadImg = true)
  * @param string $imgSrc
  * @return bool|string
  */
-function downloadImg($imgSrc)
+function downloadImg(string $imgSrc): string|bool
 {
     if (0 !== stripos($imgSrc, 'http')) {
         return false;
@@ -211,7 +211,7 @@ function downloadImg($imgSrc)
  * 获取当前主域
  * @return string
  */
-function getDomain()
+function getDomain(): string
 {
     if (isset($_SERVER['SERVER_NAME'])) {
         return $_SERVER['SERVER_NAME'];
@@ -228,7 +228,7 @@ function getDomain()
  * @param int $len
  * @return string
  */
-function getDescriptionforArticle($content, $len = 200)
+function getDescriptionforArticle(string $content, int $len = 200): string
 {
     $content = strip_tags(htmlspecialchars_decode($content));
     $content = myTrim($content);
@@ -244,7 +244,7 @@ function getDescriptionforArticle($content, $len = 200)
  * @param string $str
  * @return string
  */
-function myTrim($str)
+function myTrim(string $str): string
 {
     $str = trim($str);
     $str = preg_replace('/^[　\s]{1,}/u', '', $str);
@@ -257,7 +257,7 @@ function myTrim($str)
  * @param string $url
  * @return bool|string
  */
-function getNoParamUrl($url)
+function getNoParamUrl(string $url): string|bool
 {
     if (false !== strpos($url, '?')) {
         $url = substr($url, 0, strpos($url, '?'));
@@ -273,7 +273,7 @@ function getNoParamUrl($url)
  * @param string $domain
  * @return string
  */
-function getShortcutUrl($domain)
+function getShortcutUrl(string $domain): string
 {
     $url = trim($domain, '/');
     $shortcut = $url . '/favicon.ico';
@@ -301,7 +301,7 @@ function getShortcutUrl($domain)
  * @param string $url
  * @return bool bool
  */
-function isFavicon($url)
+function isFavicon(string $url): bool
 {
     $res = get_headers($url, 1);
     if (false === strpos($res[0], '200') || false === stripos($res['Content-Type'], 'image')) {
@@ -316,7 +316,7 @@ function isFavicon($url)
  * @param string $domain 主域名，以http开头
  * @return string
  */
-function getUrl($path, $domain)
+function getUrl(string $path, string $domain): string
 {
     if (false !== stripos($path, 'http')) {
         return $path;
@@ -333,9 +333,8 @@ function getUrl($path, $domain)
 /**
  * 退出
  * @param string $msg 显示消息内容
- * @throws
  */
-function exitApp($msg = '')
+function exitApp(string $msg = ''): void
 {
     if (!empty($msg)) {
         echoMsg($msg);
@@ -345,9 +344,9 @@ function exitApp($msg = '')
 
 /**
  * 输出带有换行符的消息
- * @param $msg
+ * @param string $msg
  */
-function echoMsg($msg)
+function echoMsg(string $msg): void
 {
     if (isCliMode()) {
         echoCliMsg($msg);
@@ -360,7 +359,7 @@ function echoMsg($msg)
  * 在控制台输出一条消息并换行
  * @param string $msg
  */
-function echoCliMsg($msg)
+function echoCliMsg(string $msg): void
 {
     echo $msg . PHP_EOL;
 }
@@ -369,7 +368,7 @@ function echoCliMsg($msg)
  * 引入一个文件
  * @param string $file
  */
-function requireFile($file)
+function requireFile(string $file): void
 {
     if (file_exists($file)) {
         require_once $file;
@@ -379,24 +378,23 @@ function requireFile($file)
 /**
  * 引入一个带有返回结果的文件
  * @param string $file
- * @return array|mixed
+ * @return mixed
  */
-function requireReturnFile($file)
+function requireReturnFile(string $file)
 {
     return getRequireOnceData($file);
 }
 
 /**
  * 获取中文字符串
- * @param integer $num 多少个
+ * @param int $num 多少个
  * @return string
- * @throws
  */
-function getZhChar($num = 1)
+function getZhChar(int $num = 1): string
 {
     $char = '';
     for ($i = 0; $i < $num; $i++) {
-        $tmp = chr(random_int(0xB0, 0xD0)) . chr(random_int(0xA1, 0xF0));
+        $tmp = chr(mt_rand(0xB0, 0xD0)) . chr(mt_rand(0xA1, 0xF0));
         $char .= iconv('GB2312', 'UTF-8', $tmp);
     }
     return $char;
@@ -404,9 +402,9 @@ function getZhChar($num = 1)
 
 /**
  * 获取当前浏览器的语言
- * @return bool|string
+ * @return string
  */
-function getCurrentBrowserLanguage()
+function getCurrentBrowserLanguage(): string
 {
     $language = getServerValue('HTTP_ACCEPT_LANGUAGE');
     if (!empty($language)) {
@@ -427,7 +425,7 @@ function getCurrentBrowserLanguage()
  * 获取body请求的数据
  * @return false|string
  */
-function getRequestBodyContent()
+function getRequestBodyContent(): string|bool
 {
     return file_get_contents('php://input');
 }
@@ -435,10 +433,9 @@ function getRequestBodyContent()
 /**
  * 刷新页面
  * @param string $url 刷新的网址
- * @param integer $refreshTime 刷新间隔时间，单位秒
- * @throws
+ * @param int $refreshTime 刷新间隔时间，单位秒
  */
-function refresh($url = '', $refreshTime = 1)
+function refresh(string $url = '', int $refreshTime = 1): void
 {
     $url = getFixedUrl($url);
     echo '<meta http-equiv="refresh" content="' . $refreshTime . ';url=' . $url . '">';
@@ -449,17 +446,16 @@ function refresh($url = '', $refreshTime = 1)
  * 是否为控制台模式
  * @return bool
  */
-function isCliMode()
+function isCliMode(): bool
 {
     return PHP_SAPI === 'cli';
 }
 
 /**
  * 获取剩余内存占比
- *
- * @return number 0 - 100
+ * @return int 0 - 100
  */
-function getMemFreeRate()
+function getMemFreeRate(): int
 {
     $data = getMemInfo();
     if (empty($data)) {
@@ -474,7 +470,7 @@ function getMemFreeRate()
  * @param string $ip
  * @return string
  */
-function getIpLocation($ip = '')
+function getIpLocation(string $ip = ''): string
 {
     $location = IpLocation::getInstance()->getlocation($ip);
     return $location['country'] ?? '';
@@ -483,51 +479,42 @@ function getIpLocation($ip = '')
 /**
  * 设置缓存
  *
- * @param string $name
- *            键
- * @param string $value
- *            值
- * @param integer $expire
- *            过期时间
- * @return number
+ * @param string $name 键
+ * @param string $value 值
+ * @param int $expire 过期时间
+ * @return int
  */
-function setCache($name, $value, $expire = 3600)
+function setCache(string $name, string $value, int $expire = 3600): int
 {
     return Cache::set($name, $value, $expire);
 }
 
 /**
  * 获取缓存
- *
- * @param string $name
- *            键
- * @param string $defValue
- *            默认值
+ * @param string $name 键
+ * @param string $defValue 默认值
  * @return string
  */
-function getCache($name, $defValue = '')
+function getCache(string $name, string $defValue = ''): string
 {
     return Cache::get($name, $defValue);
 }
 
 /**
  * 删除缓存
- *
- * @param string $name
- *            键
- * @return number
+ * @param string $name 键
+ * @return int
  */
-function deleteCache($name)
+function deleteCache(string $name): int
 {
     return Cache::rm($name);
 }
 
 /**
  * 获取浏览器useragent
- *
  * @return string
  */
-function getUserAgent()
+function getUserAgent(): string
 {
     return $_SERVER['HTTP_USER_AGENT'] ?? '';
 }
@@ -537,7 +524,7 @@ function getUserAgent()
  * @param string $userAgent 指定浏览器
  * @return string
  */
-function getUserBrowser($userAgent = '')
+function getUserBrowser(string $userAgent = ''): string
 {
     $browserStr = '';
     if (empty($userAgent)) {
@@ -617,7 +604,7 @@ function getUserBrowser($userAgent = '')
  * @param string $defValue
  * @return string
  */
-function getServerValue($name, $defValue = '')
+function getServerValue(string $name, string $defValue = ''): string
 {
     return $_SERVER[$name] ?? $defValue;
 }
@@ -627,9 +614,9 @@ function getServerValue($name, $defValue = '')
  *
  * @param string $key
  * @param string $defValue
- * @return mixed|string
+ * @return mixed
  */
-function getLocalEnv($key, $defValue = '')
+function getLocalEnv(string $key, string $defValue = '')
 {
     return Env::get($key, $defValue);
 }
@@ -640,7 +627,7 @@ function getLocalEnv($key, $defValue = '')
  * @param string $js
  * @return string
  */
-function formatJs($js)
+function formatJs(string $js): string
 {
     // 替换 /* */
     $js = preg_replace('/\/\*.*\*\//Uis', '', $js);
@@ -658,9 +645,9 @@ function formatJs($js)
  * 格式化css
  *
  * @param string $css
- * @return mixed
+ * @return string
  */
-function formatCss($css)
+function formatCss(string $css): string
 {
     $css = preg_replace('/\/\*.*\*\//Uis', '', $css);
     // 替换换行
@@ -675,9 +662,9 @@ function formatCss($css)
  * 格式化html
  *
  * @param string $html
- * @return mixed
+ * @return string
  */
-function formatHtml($html)
+function formatHtml(string $html): string
 {
     $html = preg_replace('/<!--.*-->/Us', '', $html);
     return $html;
@@ -685,30 +672,27 @@ function formatHtml($html)
 
 /**
  * 获取当前模块url
- *
  * @return string
  */
-function getModuleUrl()
+function getModuleUrl(): string
 {
     return getAbsoluteUrl() . '/' . Start::$module;
 }
 
 /**
  * 获取当前控制器的url
- *
  * @return string
  */
-function getControllerUrl()
+function getControllerUrl(): string
 {
     return getModuleUrl() . '/' . toDivideName(Start::$controller);
 }
 
 /**
  * 获取当前方法url
- *
  * @return string
  */
-function getActionUrl()
+function getActionUrl(): string
 {
     return getControllerUrl() . '/' . toDivideName(Start::$action);
 }
@@ -716,10 +700,9 @@ function getActionUrl()
 /**
  * 获取内存信息，单位，字节（kb）
  * 仅支持在Linux系统运行
- *
- * @return number[]
+ * @return array
  */
-function getMemInfo()
+function getMemInfo(): array
 {
     $data = [];
     if (getPlatformName() === 'linux') {
@@ -736,24 +719,20 @@ function getMemInfo()
 
 /**
  * 获取操作系统平台
- *
  * @return string
  */
-function getPlatformName()
+function getPlatformName(): string
 {
     return strtolower(PHP_OS);
 }
 
 /**
  * 获取后台配置项数据
- *
- * @param string $name
- *            数组键名，支持 . 连接的键名
- * @param string $defValue
- *            默认值
+ * @param string $name 数组键名，支持 . 连接的键名
+ * @param string $defValue 默认值
  * @return string|array
  */
-function config($name, $defValue = '')
+function config(string $name, string $defValue = ''): string|array
 {
     return Config::getConfig($name, $defValue);
 }
@@ -761,11 +740,10 @@ function config($name, $defValue = '')
 /**
  * 500服务端错误
  *
- * @param string $msg
- *            错误信息
- * @param integer $code
+ * @param string $msg 错误信息
+ * @param int $code
  */
-function error($msg, $code = 503)
+function error(string $msg, int $code = 503): void
 {
     tip($msg, '/', $code);
 }
@@ -773,7 +751,7 @@ function error($msg, $code = 503)
 /**
  * 文件未找到
  */
-function notFound()
+function notFound(): void
 {
     http_response_code(404);
     $html = <<<HTML
@@ -804,13 +782,10 @@ HTML;
 /**
  * 重定向
  *
- * @param string $url
- *            跳转网址
- * @param integer $code
- *            状态码
- * @throws
+ * @param string $url 跳转网址
+ * @param int $code 状态码
  */
-function redirect($url, $code = 301)
+function redirect(string $url, int $code = 301): void
 {
     $url = getFixedUrl($url);
     header('Location: ' . $url, true, $code);
@@ -819,10 +794,9 @@ function redirect($url, $code = 301)
 
 /**
  * 获取网站网址
- *
  * @return string
  */
-function getAbsoluteUrl()
+function getAbsoluteUrl(): string
 {
     if (defined('URL')) {
         return URL;
@@ -847,13 +821,11 @@ function getAbsoluteUrl()
 
 /**
  * 提示跳转
- *
  * @param string $msg
  * @param string $url
- * @param integer $code
- * @throws
+ * @param int $code
  */
-function tip($msg, $url = '', $code = 200)
+function tip(string $msg, string $url = '', int $code = 200): void
 {
     http_response_code($code);
     $color = '#b8daff';
@@ -888,16 +860,12 @@ HTML;
 
 /**
  * 获取POST\GET参数数据
- *
- * @param string $name
- *            字段
- * @param string $defValue
- *            默认值
- * @param bool $trim
- *            是否去掉空格
+ * @param string $name 字段
+ * @param string $defValue 默认值
+ * @param bool $trim 是否去掉空格
  * @return string
  */
-function input($name, $defValue = '', $trim = true)
+function input(string $name, string $defValue = '', bool $trim = true): string
 {
     if (isset($_POST[$name])) {
         $value = $_POST[$name];
@@ -914,14 +882,11 @@ function input($name, $defValue = '', $trim = true)
 
 /**
  * 获取GET请求参数
- *
- * @param string $name
- *            字段
- * @param bool $trim
- *            是否去掉空格
+ * @param string $name 字段
+ * @param bool $trim 是否去掉空格
  * @return string
  */
-function getString($name, $trim = true)
+function getString(string $name, bool $trim = true): string
 {
     $value = $_GET[$name] ?? '';
     if ($value && $trim) {
@@ -932,12 +897,10 @@ function getString($name, $trim = true)
 
 /**
  * 获取GET请求参数
- *
- * @param string $name
- *            字段
- * @return string
+ * @param string $name 字段
+ * @return int
  */
-function getInt($name)
+function getInt(string $name): int
 {
     $value = $_GET[$name] ?? 0;
     return (int)$value;
@@ -945,12 +908,10 @@ function getInt($name)
 
 /**
  * 获取GET请求参数
- *
- * @param string $name
- *            字段
- * @return string
+ * @param string $name 字段
+ * @return array
  */
-function getAarray($name)
+function getAarray(string $name): array
 {
     $value = $_GET[$name] ?? [];
     if (!is_array($value)) {
@@ -961,14 +922,11 @@ function getAarray($name)
 
 /**
  * 获取POST请求参数
- *
- * @param string $name
- *            字段
- * @param bool $trim
- *            是否去掉空格
+ * @param string $name 字段
+ * @param bool $trim 是否去掉空格
  * @return string
  */
-function getPostString($name, $trim = true)
+function getPostString(string $name, bool $trim = true): string
 {
     $value = $_POST[$name] ?? '';
     if ($value && $trim) {
@@ -979,12 +937,10 @@ function getPostString($name, $trim = true)
 
 /**
  * 获取POST请求参数
- *
- * @param string $name
- *            字段
- * @return string
+ * @param string $name 字段
+ * @return int
  */
-function getPostInt($name)
+function getPostInt(string $name): int
 {
     $value = $_POST[$name] ?? 0;
     return (int)$value;
@@ -992,12 +948,10 @@ function getPostInt($name)
 
 /**
  * 获取POST请求参数
- *
- * @param string $name
- *            字段
- * @return string
+ * @param string $name 字段
+ * @return array
  */
-function getPostAarray($name)
+function getPostAarray(string $name): array
 {
     $value = $_POST[$name] ?? [];
     if (!is_array($value)) {
@@ -1008,23 +962,20 @@ function getPostAarray($name)
 
 /**
  * 获取客户端ip
- *
  * @return string
  */
-function getIp()
+function getIp(): string
 {
     return getServerValue('REMOTE_ADDR');
 }
 
 /**
  * 检测是否是合法的IP地址
- *
  * @param string $ip IP地址
  * @param string $type IP地址类型 (ipv4, ipv6)
- *
  * @return boolean
  */
-function isValidIp(string $ip, string $type = '')
+function isValidIp(string $ip, string $type = ''): bool
 {
     switch (strtolower($type)) {
         case 'ipv4':
@@ -1044,11 +995,10 @@ function isValidIp(string $ip, string $type = '')
 /**
  * 生成url
  *
- * @param string $path
- *            url path部分
+ * @param string $path url path部分
  * @return string
  */
-function generateUrl($path = '')
+function generateUrl(string $path = ''): string
 {
     return getFixedUrl($path);
 }
@@ -1058,18 +1008,14 @@ function generateUrl($path = '')
  * 请先安装中文分词器，
  * git网址：https://github.com/medcl/elasticsearch-analysis-ik
  * 安装方法，ElasticSearch bin目录下执行，elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v6.3.2/elasticsearch-analysis-ik-6.3.2.zip
- *
- * @param string $text
- *            待分词文本
- * @param int 分词最小字符
- * @param string $type
- *            需要的分词类别，ENGLISH、CN_WORD
- * @param string $analyzer
- *            分词器，ik_smart、ik_max_word、icu_tokenizer
+ * @param string $text 待分词文本
+ * @param int $minLen
+ * @param string $type 需要的分词类别，ENGLISH、CN_WORD
+ * @param string $analyzer 分词器，ik_smart、ik_max_word、icu_tokenizer
  * @param int $num 获取多少个分词个数
- * @return array|mixed[]
+ * @return mixed
  */
-function getAnalyzingText($text, $minLen = 1, $type = '', $analyzer = 'ik_smart', $num = 30)
+function getAnalyzingText(string $text, int $minLen = 1, string $type = '', string $analyzer = 'ik_smart', int $num = 30)
 {
     $text = myTrim(strip_tags($text));
     $result = ElasticSearch::getInstance()->getAnalyze($text, $analyzer);
@@ -1096,36 +1042,30 @@ function getAnalyzingText($text, $minLen = 1, $type = '', $analyzer = 'ik_smart'
 
 /**
  * 格式化模块名称，转为小写
- *
- * @param string $module
- *            模块名称
+ * @param string $module 模块名称
  * @return string
  */
-function formatModule($module)
+function formatModule(string $module): string
 {
     return strtolower($module);
 }
 
 /**
  * 格式化控制器名称，转为每个单词首字母大写（将_分隔的小写控制器）
- *
- * @param string $controller
- *            控制器名称
- * @return mixed
+ * @param string $controller 控制器名称
+ * @return string
  */
-function formatController($controller)
+function formatController(string $controller): string
 {
     return str_ireplace('_', '', ucwords($controller, '_'));
 }
 
 /**
  * 格式化方法
- *
- * @param string $action
- *            转为每个单词首字母大写，第一个字母转为小写（将_分隔的小写方法）
+ * @param string $action 转为每个单词首字母大写，第一个字母转为小写（将_分隔的小写方法）
  * @return string
  */
-function formatAction($action)
+function formatAction(string $action): string
 {
     return lcfirst(str_ireplace('_', '', ucwords($action, '_')));
 }
@@ -1133,15 +1073,12 @@ function formatAction($action)
 /**
  * 检测指定的模块与当前是否一致
  *
- * @param string $module
- *            模块
- * @param string $controller
- *            控制器
- * @param string $action
- *            方法
+ * @param string $module 模块
+ * @param string $controller 控制器
+ * @param string $action 方法
  * @return boolean
  */
-function checkAccess($module, $controller, $action)
+function checkAccess(string $module, string $controller, string $action): bool
 {
     $module = formatModule($module);
     $controller = formatController($controller);
@@ -1151,29 +1088,26 @@ function checkAccess($module, $controller, $action)
 
 /**
  * 输出json数据
- *
  * @param int $status
  * @param array $data
  * @param string $msg
- * @param integer $type
- * @throws
+ * @param int $type
  */
-function echoJson($status = 1, $data = [], $msg = '', $type = JSON_UNESCAPED_UNICODE)
+function echoJson(int $status = 1, array $data = [], string $msg = '', int $type = JSON_UNESCAPED_UNICODE): void
 {
     json([
         'data' => $data,
         'status' => $status,
         'msg' => $msg
-    ]);
+    ], $type);
 }
 
 /**
  * 输出json数据
  * @param array|string $data
  * @param int $type
- * @throws
  */
-function json($data, $type = JSON_UNESCAPED_UNICODE)
+function json(string|array $data, int $type = JSON_UNESCAPED_UNICODE): void
 {
     header('content-type:text/json;charset=utf-8');
     if (is_array($data)) {
@@ -1190,9 +1124,8 @@ function json($data, $type = JSON_UNESCAPED_UNICODE)
  * @param array $data
  * @param string $msg
  * @param int $type
- * @throws
  */
-function echoCorsJson($status = 1, $data = [], $msg = '', $type = JSON_UNESCAPED_UNICODE)
+function echoCorsJson(int $status = 1, array $data = [], string $msg = '', int $type = JSON_UNESCAPED_UNICODE): void
 {
     $access_control_allow_origin = config('cors.access_control_allow_origin');
     if (!empty($access_control_allow_origin)) {
@@ -1227,10 +1160,9 @@ function echoCorsJson($status = 1, $data = [], $msg = '', $type = JSON_UNESCAPED
 
 /**
  * 异常处理
- *
- * @param \Exception $exception
+ * @param \http\Exception\RuntimeException $exception
  */
-function exceptionHandler($exception)
+function exceptionHandler(http\Exception\RuntimeException $exception): void
 {
     $sep = '<br>';
     if (isCliMode()) {
@@ -1246,12 +1178,12 @@ function exceptionHandler($exception)
 /**
  * 错误处理
  *
- * @param string $errno
+ * @param int $errno
  * @param string $errstr
  * @param string $errfile
- * @param string $errline
+ * @param int $errline
  */
-function errorHandler($errno, $errstr, $errfile, $errline)
+function errorHandler(int $errno, string $errstr, string $errfile, int $errline): void
 {
     $data = ['错误文件: ' . $errfile, '错误行号: ' . $errline, '错误信息: ' . $errstr, '错误级别: ' . $errno];
     if (isCliMode()) {
@@ -1268,7 +1200,7 @@ function errorHandler($errno, $errstr, $errfile, $errline)
  * @param string $name
  * @return string
  */
-function toDivideName($name)
+function toDivideName(string $name): string
 {
     $name = preg_replace('/([A-Z])/', '_$1', $name);
     $name = strtolower(trim($name, '_'));
@@ -1277,15 +1209,11 @@ function toDivideName($name)
 
 /**
  * 获取url请求结果数据
- *
- * @param string $url
- *            请求网址
- * @param bool $isMobile
- *            是否模拟手机请求
- * @return mixed
- * @throws
+ * @param string $url 请求网址
+ * @param bool $isMobile 是否模拟手机请求
+ * @return string|bool
  */
-function getUrlResult($url, $isMobile = FALSE)
+function getUrlResult(string $url, bool $isMobile = FALSE): string|bool
 {
     $caiji = new Caiji($url);
     if (!$isMobile) {
@@ -1295,7 +1223,7 @@ function getUrlResult($url, $isMobile = FALSE)
     }
     $caiji->setAgent($agent);
     $caiji->setCookieFile(RUNTIME_DIR . '/cookie.txt');
-    $caiji->setIp(random_int(1, 255) . '.' . random_int(1, 255) . '.' . random_int(1, 255) . '.' . random_int(1, 255));
+    $caiji->setIp(mt_rand(1, 255) . '.' . mt_rand(1, 255) . '.' . mt_rand(1, 255) . '.' . mt_rand(1, 255));
     $caiji->setRefer($url);
     $caiji->setTime(3);
     return $caiji->getRes();
@@ -1303,16 +1231,12 @@ function getUrlResult($url, $isMobile = FALSE)
 
 /**
  * 获取模板配置变量,区分大小写
- *
- * @param string $configFile
- *            模板配置文件名
- * @param string $name
- *            字段名
- * @param string $section
- *            字段所在节点（域）
+ * @param string $configFile 模板配置文件名
+ * @param string $name 字段名
+ * @param string $section 字段所在节点（域）
  * @return boolean|string
  */
-function getTempletConfig($configFile, $name, $section = '')
+function getTempletConfig(string $configFile, string $name, string $section = ''): string|bool
 {
     // 判断模板配置文件是否存在
     $file = APPLICATION_DIR . '/' . MODULE . '/config/' . $configFile;
@@ -1387,8 +1311,7 @@ function getTempletConfig($configFile, $name, $section = '')
                 $mData = $value;
                 break;
             }
-
-// 是多行，就拼接数据
+            // 是多行，就拼接数据
             $mData .= $value . PHP_EOL;
         }
     }
@@ -1398,12 +1321,10 @@ function getTempletConfig($configFile, $name, $section = '')
 
 /**
  * 效验邮箱是否正确
- *
- * @param string $email
- *            电子邮箱
+ * @param string $email 电子邮箱
  * @return boolean
  */
-function isEmail($email)
+function isEmail(string $email): bool
 {
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         return false;
@@ -1413,12 +1334,10 @@ function isEmail($email)
 
 /**
  * 验证手机号
- *
- * @param string $phone
- *            手机号
+ * @param string $phone 手机号
  * @return boolean
  */
-function isPhone($phone)
+function isPhone(string $phone): bool
 {
     if (!preg_match('/^1[\d]{10}$/U', $phone)) {
         return false;
@@ -1428,12 +1347,10 @@ function isPhone($phone)
 
 /**
  * 验证url
- *
- * @param string $url
- *            网址
+ * @param string $url 网址
  * @return boolean
  */
-function isUrl($url)
+function isUrl(string $url): bool
 {
     if (!filter_var($url, FILTER_VALIDATE_URL)) {
         return false;
@@ -1446,7 +1363,7 @@ function isUrl($url)
  * @param string $ip
  * @return bool
  */
-function isIp($ip)
+function isIp(string $ip): bool
 {
     if (!filter_var($ip, FILTER_VALIDATE_IP)) {
         return false;
@@ -1456,12 +1373,10 @@ function isIp($ip)
 
 /**
  * 判断是否是主域
- *
- * @param string $domain
- *            主域
+ * @param string $domain 主域
  * @return boolean
  */
-function isDomain($domain)
+function isDomain(string $domain): bool
 {
     if (preg_match('/com.cn/i', $domain)) {
         if (!preg_match('/^[\w]+\.com\.cn$/Ui', $domain)) {
@@ -1477,10 +1392,9 @@ function isDomain($domain)
 
 /**
  * 判断当前是不是手机端
- *
  * @return boolean
  */
-function isMobile()
+function isMobile(): bool
 {
     if (preg_match('/mobile|android|iphone/i', getServerValue('HTTP_USER_AGENT'))) {
         return true;
@@ -1490,11 +1404,10 @@ function isMobile()
 
 /**
  * 获取修正后的url
- *
  * @param string $url
  * @return string
  */
-function getFixedUrl($url)
+function getFixedUrl(string $url): string
 {
     if (empty($url)) {
         $url = getAbsoluteUrl();
@@ -1508,7 +1421,7 @@ function getFixedUrl($url)
  * 获取当前模块路由规则
  * @return array
  */
-function getCurrentRoute()
+function getCurrentRoute(): array
 {
     return getRequireOnceData(ROOT_DIR . '/application/' . MODULE . '/route.php');
 }
@@ -1516,9 +1429,9 @@ function getCurrentRoute()
 /**
  * 返回php文件定义的数组
  * @param string $phpFile
- * @return array|mixed
+ * @return mixed
  */
-function getRequireOnceData($phpFile)
+function getRequireOnceData(string $phpFile)
 {
     $data = [];
     $phpFileMd5 = strtoupper(md5($phpFile));
@@ -1537,9 +1450,9 @@ function getRequireOnceData($phpFile)
  * 获取session值
  *
  * @param string $name
- * @return string
+ * @return mixed
  */
-function getSession($name)
+function getSession(string $name)
 {
     return Session::getInstance()->get($name, false);
 }
@@ -1550,17 +1463,16 @@ function getSession($name)
  * @param string $name
  * @param string $value
  */
-function setSession($name, $value)
+function setSession(string $name, string $value): void
 {
     Session::getInstance()->set($name, $value);
 }
 
 /**
  * 删除session
- *
  * @param string $name
  */
-function deleteSession($name)
+function deleteSession(string $name): void
 {
     Session::getInstance()->delete($name);
 }
@@ -1568,7 +1480,7 @@ function deleteSession($name)
 /**
  * 开启session
  */
-function startSession()
+function startSession(): void
 {
     Session::getInstance()->startSession();
 }
@@ -1576,39 +1488,36 @@ function startSession()
 /**
  * 删除所有session
  */
-function clearAllSession()
+function clearAllSession(): void
 {
     Session::getInstance()->clear();
 }
 
 /**
  * 获取cookie值
- *
  * @param string $name
  * @return string
  */
-function getLocalCookie($name)
+function getLocalCookie(string $name): string
 {
     return Cookie::getInstance()->get($name, false);
 }
 
 /**
  * 设置cookie
- *
  * @param string $name
  * @param string $value
  */
-function setLocalCookie($name, $value)
+function setLocalCookie(string $name, string $value): void
 {
     Cookie::getInstance()->set($name, $value);
 }
 
 /**
  * 删除cookie
- *
  * @param string $name
  */
-function deleteCookie($name)
+function deleteCookie(string $name): void
 {
     Cookie::getInstance()->delete($name);
 }
@@ -1616,7 +1525,7 @@ function deleteCookie($name)
 /**
  * 清除所有cookie
  */
-function clearAllCookie()
+function clearAllCookie(): void
 {
     Cookie::getInstance()->clear();
 }
@@ -1626,7 +1535,7 @@ function clearAllCookie()
  * @param int $time 时间，单位秒
  * @return string
  */
-function formatTime($time)
+function formatTime(int $time): string
 {
     $cha = time() - $time;
     if ($cha === 0) {
@@ -1651,16 +1560,16 @@ function formatTime($time)
 /**
  * 查询手机号归属地
  * @param string $phone
- * @return array|bool|mixed
+ * @return mixed
  */
-function getPhoneAddress($phone)
+function getPhoneAddress(string $phone)
 {
     $phone = substr($phone, 0, 7);
     $res = Sqlite::getInstance()->setDatabaseDir(EXTEND_DIR . '/phonedb/')
         ->name('phone')
         ->table('phones')
         ->field('phones.type,regions.province,regions.city,regions.zip_code,regions.area_code')
-        ->eq('number', $phone)
+        ->eq('int', $phone)
         ->join('regions', 'phones.region_id=regions.id')
         ->find();
     if (empty($res)) {
@@ -1692,9 +1601,9 @@ function getPhoneAddress($phone)
 /**
  * 将xml结构转为数组
  * @param string $xml
- * @return array|mixed
+ * @return array
  */
-function xmlToArray($xml)
+function xmlToArray(string $xml): array
 {
     try {
         $xml = preg_replace('/<!\[CDATA\[(.*)\]\]>/isU', '$1', $xml);
@@ -1707,15 +1616,15 @@ function xmlToArray($xml)
 /**
  * 将数组转为标准的xml结构
  * @param array $data
- * @return bool|mixed
+ * @return mixed
  */
-function arrayToXml($data)
+function arrayToXml(array $data)
 {
     $xml = arrayToXmlStr($data);
     if (empty($xml)) {
         return false;
     }
-    $xmlObj = new \SimpleXMLElement($xml);
+    $xmlObj = new SimpleXMLElement($xml);
     return $xmlObj->asXML();
 }
 
@@ -1724,7 +1633,7 @@ function arrayToXml($data)
  * @param array $data
  * @return string
  */
-function arrayToXmlStr($data)
+function arrayToXmlStr(array $data): string
 {
     if (!is_array($data)) {
         return '';
@@ -1745,7 +1654,7 @@ function arrayToXmlStr($data)
  * @param string $str
  * @return bool
  */
-function isZh($str)
+function isZh(string $str): bool
 {
     if (!preg_match('/^[\x{4e00}-\x{9fa5}]+$/u', $str)) {
         return false;
@@ -1757,7 +1666,7 @@ function isZh($str)
  * 获取框架版本号
  * @return string
  */
-function getMySmartyVersion()
+function getMySmartyVersion(): string
 {
     return MYSMARTY_VERSION;
 }
@@ -1766,7 +1675,7 @@ function getMySmartyVersion()
  * 是否是代理ip
  * @return bool
  */
-function isProxyIp()
+function isProxyIp(): bool
 {
     if (!empty(getServerValue('HTTP_VIA'))) {
         return true;
@@ -1779,7 +1688,7 @@ function isProxyIp()
  * @param string $file 文件路径
  * @return bool
  */
-function createDirByFile($file)
+function createDirByFile(string $file): bool
 {
     if (file_exists($file)) {
         return true;

@@ -21,7 +21,7 @@ class Start
     public static function initCommon()
     {
         header('content-type:text/html;charset=utf-8');
-        define('MYSMARTY_VERSION', '0.1.0');
+        define('MYSMARTY_VERSION', '0.1.1');
         define('APPLICATION_DIR', ROOT_DIR . '/application');
         define('EXTEND_DIR', ROOT_DIR . '/extend');
         define('PUBLIC_DIR', ROOT_DIR . '/public');
