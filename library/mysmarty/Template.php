@@ -1,181 +1,309 @@
 <?php
 
 namespace library\mysmarty;
-use RuntimeException;
-
 /**
- * 模板引擎类
- * @package library\mysmarty
+ * 模板解析
  */
 class Template
 {
+    // 静态对象
     private static ?self $obj = null;
-    // 模板目录所在文件夹
-    protected string $templateDir;
-    // 编译文件夹
-    protected string $compileDir;
-    // 缓存文件夹
-    protected string $cacheDir;
+    // 模板目录
+    private string $templateDir;
+    // 编译目录
+    private string $compileDir;
+    // 存储分配变量的数组
+    private array $data;
     // 左分隔符
-    protected string $leftDelimiter;
+    private string $leftDelimiter = '{';
     // 右分隔符
-    protected string $rightDelimiter;
-    // 分配变量
-    protected bool $forceCompile;
-    // 当前模板文件
-    protected int $cache;
-    // mysmarty保留变量存储
-    protected string $cachingType;
-    // 是否强制生成缓存文件，即使有缓存
-    protected int $cacheLifeTime;
-    // 缓存配置，0 关闭，1 开启
-    protected bool $formatHtml;
-    // 自定义缓存存储方式
-    protected BaseCache $cacheObj;
-    // 缓存时间
-    private array $assignVars = [];
-    // 是否格式化输出的html内容
-    private string $templateFile;
-    // 缓存对象
-    private array $mysmarty = [];
+    private string $rightDelimiter = '}';
+    // 函数合法开始标签
+    private array $funStartRegTags = ['include', 'foreach', 'if', 'elseif', 'else', 'php'];
+    // 函数合法结束标签
+    private array $funEndRegTags = ['foreach', 'if', 'php'];
+    // 替换标签
+    private array $repRegTags = ['literal'];
+    // 是否开启编译检查
+    private bool $compileCheck = true;
+    // 是否开启强制编译
+    private bool $forceCompile = true;
+    // 是否开启缓存
+    private bool $caching = false;
+    // 缓存类型
+    private string $cachingType = 'file';
 
     /**
-     * 构造方法.
-     */
-    public function __construct()
-    {
-        $this->cachingType = config('view.caching_type');
-        $this->formatHtml = config('view.load_output_filter');
-        $this->cache = config('view.cache');
-        $this->rightDelimiter = config('view.taglib_end') ?: '}';
-        $this->leftDelimiter = config('view.taglib_begin') ?: '{';
-        $this->forceCompile = config('view.force_compile');
-        $this->cacheLifeTime = config('view.cache_life_time');
-    }
-
-    /**
-     * 获取实例
+     * 获取静态操作对象
      * @return Template
      */
-    public static function getInstance(): Template
+    public static function getInstance(): self
     {
-        if (!isset(self::$obj) || self::$obj === null) {
+        if (self::$obj === null) {
             self::$obj = new self();
         }
         return self::$obj;
     }
 
     /**
-     * @return bool
+     * 设置模板目录
+     * @param string $templateDir 模板目录
      */
-    public function getForceCompile(): bool
+    public function setTemplateDir(string $templateDir): void
     {
-        return $this->forceCompile;
-    }
-
-    /**
-     * @param bool $forceCompile
-     * @return Template
-     */
-    public function setForceCompile(bool $forceCompile): Template
-    {
-        $this->forceCompile = $forceCompile;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getCache(): int
-    {
-        return $this->cache;
-    }
-
-    /**
-     * @param int $cache
-     * @return Template
-     */
-    public function setCache(int $cache): Template
-    {
-        $this->cache = $cache;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCachingType(): string
-    {
-        return $this->cachingType;
-    }
-
-    /**
-     * @param string $cachingType
-     * @return Template
-     */
-    public function setCachingType(string $cachingType): Template
-    {
-        $this->cachingType = $cachingType;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCacheLifeTime(): string
-    {
-        return $this->cacheLifeTime;
-    }
-
-    /**
-     * @param int $cacheLifeTime
-     * @return Template
-     */
-    public function setCacheLifeTime(int $cacheLifeTime): Template
-    {
-        $this->cacheLifeTime = $cacheLifeTime;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getFormatHtml(): bool
-    {
-        return $this->formatHtml;
-    }
-
-    /**
-     * @param bool $formatHtml
-     * @return Template
-     */
-    public function setFormatHtml(bool $formatHtml): Template
-    {
-        $this->formatHtml = $formatHtml;
-        return $this;
-    }
-
-    /**
-     * 获取缓存目录
-     * @return string
-     */
-    public function getCacheDir(): string
-    {
-        return $this->cacheDir;
-    }
-
-    /**
-     * 设置缓存目录
-     * @param string $cacheDir
-     * @return Template
-     */
-    public function setCacheDir($cacheDir): Template
-    {
-        $this->cacheDir = $cacheDir;
-        if (!file_exists($cacheDir) && !mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
-            exitApp(sprintf('缓存目录 "%s" 创建失败', $cacheDir));
+        if (!$this->createDir($templateDir)) {
+            exit('模板目录不存在或无法创建');
         }
-        return $this;
+        $this->templateDir = realpath($templateDir);
+    }
+
+    /**
+     * 获取模板目录
+     * @return string
+     */
+    public function getTemplateDir(): string
+    {
+        return $this->templateDir;
+    }
+
+    /**
+     * 设置编译目录
+     * @param string $compileDir 编译目录
+     */
+    public function setCompileDir(string $compileDir): void
+    {
+        if (!$this->createDir($compileDir)) {
+            exit('编译目录不存在或无法创建');
+        }
+        $this->compileDir = realpath($compileDir);
+    }
+
+    /**
+     * 获取编译目录
+     * @return string
+     */
+    public function getCompileDir(): string
+    {
+        return $this->compileDir;
+    }
+
+    /**
+     * 分配变量值
+     * @param string $key 变量key
+     * @param mixed $value 变量值
+     */
+    public function assign(string $key, $value): void
+    {
+        $this->data[$key] = $value;
+    }
+
+    /**
+     * 显示模板
+     * @param string $template 模板文件
+     */
+    public function display(string $template): void
+    {
+        // 编译文件key
+        $compileKey = md5($template);
+        // 编译文件
+        $compileFile = $this->compileDir . '/' . $compileKey . '.php';
+        if (!file_exists($compileFile) || $this->forceCompile || ($this->compileCheck && (filemtime($compileFile) < filemtime($this->templateDir . '/' . $template)))) {
+            // 强制编译
+            $templateData = $this->compile($template);
+            file_put_contents($compileFile, $templateData);
+        }
+        extract($this->data);
+        $this->echoHeader();
+        require_once $compileFile;
+        exit();
+    }
+
+    /**
+     * 显示缓存
+     */
+    public function showCache(): void
+    {
+        if (!$this->caching) {
+            return;
+        }
+        // 如 FileCache 类中的 showCache方法，没有缓存 返回false
+        $cacheData = call_user_func(array(__NAMESPACE__ . '\\' . ucfirst($this->cachingType) . 'Cache', 'showCache'));
+        if (false !== $cacheData) {
+            $this->echoHeader();
+            exit($cacheData);
+        }
+    }
+
+    /**
+     * 模板文件编译
+     * @param string $template 模板文件
+     * @return string
+     */
+    private function compile(string $template): string
+    {
+        $templateData = file_get_contents($this->templateDir . '/' . ltrim($template, '/'));
+        if ($templateData === false) {
+            exit('模板文件不存在');
+        }
+        return $this->compileStr($templateData);
+    }
+
+    /**
+     * 编译模板字符串
+     * @param string $templateData
+     * @return string
+     */
+    private function compileStr(string $templateData): string
+    {
+        $blockReg = '/' . $this->leftDelimiter . 'block[\s]+name=([a-z0-9_]+)' . $this->rightDelimiter . '(.*)' . $this->leftDelimiter . '\/block' . $this->rightDelimiter . '/iUs';
+        if (preg_match('/' . $this->leftDelimiter . 'extends[\s]+file=[\'"]([^\'"]+)[\'"][\s]*' . $this->rightDelimiter . '/iU', $templateData, $mat)) {
+            // 解析模板继承表达式
+            $parentTemplateData = file_get_contents($this->templateDir . '/' . ltrim($mat[1], '/'));
+            if ($parentTemplateData === false) {
+                exit('父模板文件不存在');
+            }
+            $blockData = [];
+            if (preg_match_all($blockReg, $templateData, $mat2)) {
+                foreach ($mat2[1] as $k => $v) {
+                    $blockData[$v] = $mat2[2][$k];
+                }
+            }
+            $parentTemplateData = preg_replace_callback($blockReg, function ($matchs) use ($blockData) {
+                return $this->leftDelimiter . 'block name=' . $matchs[1] . $this->rightDelimiter . ($blockData[$matchs[1]] ?? '') . $this->leftDelimiter . '/block' . $this->rightDelimiter;
+            }, $parentTemplateData);
+            return $this->compileStr($parentTemplateData);
+        }
+        // 解析普通表达式
+        // 去掉block标签
+        $templateData = preg_replace($blockReg, '\2', $templateData);
+        // 替换标签
+        $repData = [];
+        $repRegStr = implode('|', $this->repRegTags);
+        $templateData = preg_replace_callback('/' . $this->leftDelimiter . '(' . $repRegStr . ')[\s]*([^' . $this->rightDelimiter . ']+)?[\s]*' . $this->rightDelimiter . '(.*)' . $this->leftDelimiter . '\/\1' . $this->rightDelimiter . '/iUs', function ($matchs) use (&$repData) {
+            $funCode = '';
+            switch ($matchs[1]) {
+                case 'literal':
+                    $key = 'literal_' . md5('literal' . time() . mt_rand(1000, 9999));
+                    $repData[$key] = $matchs[3];
+                    $funCode .= $key;
+                    break;
+            }
+            return $funCode;
+        }, $templateData);
+        // 处理foreach等函数的开始标签
+        $funStartRegStr = implode('|', $this->funStartRegTags);
+        $funStartReg = '/' . $this->leftDelimiter . '(' . $funStartRegStr . ')[\s]*([^' . $this->rightDelimiter . ']+)?[\s]*' . $this->rightDelimiter . '/is';
+        $templateData = preg_replace_callback($funStartReg, function ($matchs) {
+            $funCode = '';
+            switch ($matchs[1]) {
+                case 'foreach':
+                    // foreach 标签处理
+                    // 先判断是不是php语法
+                    if (preg_match('/[\s]+as[\s]+/iU', $matchs[2])) {
+                        // 使用的是php语法
+                        $funCode .= '<?php foreach(' . $matchs[2] . ') {?>';
+                    } else {
+                        // 使用的不是php语法
+                        $paramData = $this->paramToArr($matchs[2]);
+                        $from = $paramData['from'];
+                        $item = '$' . ltrim($paramData['item'], '$');
+                        $key = '$' . ltrim(($paramData['key'] ?? 'index'), '$');
+                        $funCode .= '<?php foreach(' . $from . ' as ' . $item . ' => ' . $key . ') {?>';
+                    }
+                    break;
+                case 'include':
+                    // 包含其它模板
+                    $paramData = $this->paramToArr($matchs[2], true);
+                    $funCode .= $this->compile($paramData['file']);
+                    break;
+                case 'if':
+                    $funCode .= '<?php if(' . $matchs[2] . '){?>';
+                    break;
+                case 'elseif':
+                    $funCode .= '<?php } else if(' . $matchs[2] . '){?>';
+                    break;
+                case 'else':
+                    $funCode .= '<?php } else {?>';
+                    break;
+                case 'php':
+                    $funCode .= '<?php' . PHP_EOL;
+                    break;
+            }
+            return $funCode;
+        }, $templateData);
+        // 处理foreach等函数的结束标签
+        $funEndRegStr = implode('|', $this->funEndRegTags);
+        $funEndReg = '/' . $this->leftDelimiter . '\/(' . $funEndRegStr . ')' . $this->rightDelimiter . '/iU';
+        $templateData = preg_replace_callback($funEndReg, function ($matchs) {
+            $funCode = '';
+            switch ($matchs[1]) {
+                case 'foreach':
+                case 'if':
+                    $funCode .= '<?php }?>';
+                    break;
+                case 'php':
+                    $funCode .= PHP_EOL . '?>';
+                    break;
+            }
+            return $funCode;
+        }, $templateData);
+        // 函数输出
+        $reg = '/' . $this->leftDelimiter . '([a-z0-9_]+\([^\)]+\))' . $this->rightDelimiter . '/i';
+        $templateData = preg_replace_callback($reg, function ($matchs) {
+            return '<?php echo ' . $matchs[1] . ';?>';
+        }, $templateData);
+        // 输出变量
+        $reg = '/' . $this->leftDelimiter . '(\$[^\s' . $this->rightDelimiter . '|]+)[\s]*(\|[^' . $this->rightDelimiter . ']+)*[\s]*' . $this->rightDelimiter . '/i';
+        $templateData = preg_replace_callback($reg, function ($matchs) {
+            $len = count($matchs);
+            if (2 === $len) {
+                return '<?php echo ' . $matchs[1] . ';?>';
+            } else if (3 === $len) {
+                $formatMethodCode = '';
+                $formatMethods = explode('|', $matchs[2]);
+                foreach ($formatMethods as $formatMethod) {
+                    $formatMethod = trim($formatMethod);
+                    if (empty($formatMethod)) {
+                        continue;
+                    }
+                    $formatMethodParams = explode(':', $formatMethod);
+                    $paramLen = count($formatMethodParams);
+                    $formatMethodParams[0] = trim($formatMethodParams[0]);
+                    if (1 == $paramLen) {
+                        $formatMethodCode .= '<?php ' . $matchs[1] . ' = call_user_func(\'' . $formatMethodParams[0] . '\', ' . $matchs[1] . ');?>';
+                    } else {
+                        $paramArr = '[' . $matchs[1];
+                        for ($i = 1; $i < $paramLen; $i++) {
+                            $paramArr .= ',' . $formatMethodParams[$i];
+                        }
+                        $paramArr .= ']';
+                        $formatMethodCode .= '<?php ' . $matchs[1] . ' = call_user_func_array(\'' . $formatMethodParams[0] . '\',' . $paramArr . ');?>';
+                    }
+                }
+                return $formatMethodCode . '<?php echo ' . $matchs[1] . ';?>';
+            }
+            return '';
+        }, $templateData);
+        // 将替换标签的内容替换回来
+        if (!empty($repData)) {
+            foreach ($repData as $key => $val) {
+                $templateData = str_ireplace($key, $val, $templateData);
+            }
+        }
+        return $templateData;
+    }
+
+    /**
+     * 创建文件夹
+     * @param string $dir 文件夹
+     * @return bool
+     */
+    private function createDir(string $dir): bool
+    {
+        if (!is_dir($dir)) {
+            return mkdir($dir, 0777, true);
+        }
+        return true;
     }
 
     /**
@@ -189,13 +317,11 @@ class Template
 
     /**
      * 设置左分隔符
-     * @param string $leftDelimiter
-     * @return Template
+     * @param string $leftDelimiter 左分隔符
      */
-    public function setLeftDelimiter(string $leftDelimiter): Template
+    public function setLeftDelimiter(string $leftDelimiter): void
     {
         $this->leftDelimiter = $leftDelimiter;
-        return $this;
     }
 
     /**
@@ -209,631 +335,62 @@ class Template
 
     /**
      * 设置右分隔符
-     * @param string $rightDelimiter
-     * @return Template
+     * @param string $rightDelimiter 右分隔符
      */
-    public function setRightDelimiter(string $rightDelimiter): Template
+    public function setRightDelimiter(string $rightDelimiter): void
     {
         $this->rightDelimiter = $rightDelimiter;
-        return $this;
     }
 
     /**
-     * 分配变量
-     * @param string|array $key 变量键
-     * @param mixed $value 变量值
+     * 将字符串的参数转为数组
+     * @param string $param 字符串参数
+     * @param bool $trimQm 是否去除字符串上的引号
+     * @return array
      */
-    public function assign($key, $value = ''): void
+    private function paramToArr(string $param, bool $trimQm = false): array
     {
-        if (is_array($key)) {
-            foreach ($key as $k => $v) {
-                $this->assignVars[$k] = $v;
-            }
-        } else {
-            $this->assignVars[$key] = $value;
-        }
-    }
-
-    /**
-     * 显示模板
-     * @param null|string $template 模板文件
-     * @param null|string $cacheId 缓存id
-     */
-    public function _display(string $template = null, string $cacheId = null): void
-    {
-        $cacheStatus = false;
-        if ($this->cache === 1 && !empty($cacheId)) {
-            $cacheStatus = true;
-        }
-        if ($cacheStatus) {
-            $content = $this->showCache($cacheId);
-            if ($content !== false) {
-                echo $content;
-                exit();
-            }
-        }
-        $this->templateFile = $template;
-        // 编译模板
-        $parseTemplate = $this->compileTemplate($template);
-        // 分配变量
-        if (!empty($this->assignVars)) {
-            extract($this->assignVars);
-        }
-        if (file_exists($parseTemplate)) {
-            ob_start();
-            require_once $parseTemplate;
-            $content = ob_get_clean();
-            // 格式化输出内容
-            if ($this->formatHtml) {
-                $content = formatHtml(removecomments($content));
-            }
-            if ($cacheStatus) {
-                $this->saveCache($cacheId, $content);
-            }
-            echo $content;
-            exit();
-        }
-    }
-
-    /**
-     * 显示缓存
-     * @param string $cacheId
-     * @return mixed
-     */
-    private function showCache(string $cacheId)
-    {
-        return $this->getCacheObj()->read($cacheId);
-    }
-
-    /**
-     * 获取缓存对象
-     * @return BaseCache
-     */
-    public function getCacheObj(): BaseCache
-    {
-        return $this->cacheObj;
-    }
-
-    /**
-     * 编译模板
-     * @param string $template 模板文件
-     * @return string 模板文件所在位置
-     */
-    private function compileTemplate(string $template): string
-    {
-        $compileDir = $this->getCompileDir();
-        $compileFile = rtrim($compileDir, '/') . '/' . md5($template) . '.php';
-        if (!$this->forceCompile && file_exists($compileFile)) {
-            return $compileFile;
-        }
-        $parseTemplate = myTrim($this->parseTemplate($template));
-        // 替换原样输出数据
-        if (isset($this->mysmarty['literal']) && !empty($this->mysmarty['literal'])) {
-            foreach ($this->mysmarty['literal'] as $k => $v) {
-                $parseTemplate = str_ireplace('###' . $k . '###', $v, $parseTemplate);
-            }
-        }
-        file_put_contents($compileFile, $parseTemplate);
-        return $compileFile;
-    }
-
-    /**
-     * 获取编译目录
-     * @return string
-     */
-    public function getCompileDir(): string
-    {
-        return $this->compileDir;
-    }
-
-    /**
-     * 设置编译目录
-     * @param string $compileDir
-     * @return Template
-     */
-    public function setCompileDir($compileDir): Template
-    {
-        $this->compileDir = $compileDir;
-        if (!file_exists($compileDir) && !mkdir($compileDir, 0777, true) && !is_dir($compileDir)) {
-            exitApp(sprintf('编译目录 "%s" 创建失败', $compileDir));
-        }
-        return $this;
-    }
-
-    /**
-     * 模板文件替换
-     * @param string $template 模板文件
-     * @return string
-     */
-    private function parseTemplate(string $template): string
-    {
-        $templateFile = rtrim($this->getTemplateDir(), '/') . '/' . $template;
-        if (!file_exists($templateFile)) {
-            exitApp('模板文件不存在');
-        }
-        return $this->parseTemplateData(file_get_contents($templateFile));
-    }
-
-    /**
-     * 获取模板目录
-     * @return string
-     */
-    public function getTemplateDir(): string
-    {
-        return $this->templateDir;
-    }
-
-    /**
-     * 设置模板目录
-     * @param string $templateDir
-     * @return Template
-     */
-    public function setTemplateDir($templateDir): Template
-    {
-        $this->templateDir = $templateDir;
-        return $this;
-    }
-
-    /**
-     * 解析模板内容
-     * @param string $templateData 模板数据
-     * @return string
-     */
-    private function parseTemplateData(string $templateData): string
-    {
-        if (empty($templateData)) {
-            return '';
-        }
-        $leftDelimiter = preg_quote($this->leftDelimiter);
-        $rightDelimiter = preg_quote($this->rightDelimiter);
-        /**
-         * 模板编译
-         */
-        $replaceCallbackArray = [
-            // 内建函数，闭合
-            '/' . $leftDelimiter . '([a-z0-9_]+)([\s]+[^' . $rightDelimiter . ']+)?' . $rightDelimiter . '(.*)' . $leftDelimiter . '\/\1' . $rightDelimiter . '/Uis' => static function ($match) {
-                $m = '_' . formatAction($match[1]);
-                if (method_exists(self::$obj, $m)) {
-                    if (empty($match[2])) {
-                        return call_user_func([self::$obj, $m], $match[3]);
-                    }
-                    return call_user_func([self::$obj, $m], $match[2], self::$obj->parseTemplateData(trim($match[3])));
+        $data = [];
+        $param = trim($param);
+        $paramArr = preg_split('/[\s]+/', $param);
+        foreach ($paramArr as $v) {
+            $v = trim($v);
+            $vArr = explode('=', $v);
+            if (2 === count($vArr)) {
+                $val = $vArr[1];
+                if ($trimQm) {
+                    $val = preg_replace('/[\'"]/', '', $val);
                 }
-                return '';
-            },
-            // 内建函数，非闭合
-            '/' . $leftDelimiter . '([a-z0-9_]+)([\s]+[^' . $rightDelimiter . ']+)?' . $rightDelimiter . '/U' => static function ($match) {
-                $m = formatAction($match[1]);
-                if (empty($match[2])) {
-                    if (method_exists(self::$obj, '_' . $m)) {
-                        return call_user_func([self::$obj, '_' . $m]);
-                    }
-                    if (function_exists($m)) {
-                        return '<?php echo ' . $m . '();?>';
-                    }
-                    if (function_exists('_' . $m)) {
-                        return '<?php echo _' . $m . '();?>';
-                    }
-                } else {
-                    if (method_exists(self::$obj, '_' . $m)) {
-                        return call_user_func([self::$obj, '_' . $m], $match[2]);
-                    }
-                    $argc = preg_split("/[\s,]+/", trim($match[2]));
-                    if (function_exists($m)) {
-                        return '<?php echo ' . $m . '(' . implode(',', $argc) . ');?>';
-                    }
-                    if (function_exists('_' . $m)) {
-                        return '<?php echo _' . $m . '(' . implode(',', $argc) . ');?>';
-                    }
-                }
-                return '';
-            },
-            // 模板配置
-            '/' . $leftDelimiter . '#([^$]+)#' . $rightDelimiter . '/U' => static function ($match) {
-                if (isset(self::$obj->mysmarty['config'])) {
-                    return '<?php echo getTempletConfig(\'' . self::$obj->mysmarty['config']['configFile'] . '\',\'' . $match[1] . '\',\'' . self::$obj->mysmarty['config']['section'] . '\');?>';
-                }
-                return '';
-            },
-            // 基本变量
-            '/' . $leftDelimiter . '(\$[\w]+)[\s]*(\|.+)?' . $rightDelimiter . '/U' => static function ($match) {
-                switch (count($match)) {
-                    case 2:
-                        // 不是变量调节器
-                        return '<?php echo ' . $match[1] . ';?>';
-                    case 3:
-                        // 变量调节器
-                        $matArr = explode('|', trim($match[2], '|'));
-                        $phpStr = '<?php';
-                        foreach ($matArr as $mat) {
-                            $tmp = explode(':', $mat);
-                            $parameter = $tmp;
-                            $parameter[0] = $match[1];
-                            $methodName = formatAction($tmp[0]);
-                            if (function_exists('_' . $methodName)) {
-                                $methodName = '_' . $methodName;
-                            }
-                            $phpStr .= ' ' . $match[1] . ' = call_user_func_array(\'' . $methodName . '\', [' . implode(',', $parameter) . ']);';
-                        }
-                        $phpStr .= ' echo ' . $match[1] . ';?>';
-                        return $phpStr;
-                }
-                return '';
-            },
-            // 内建变量
-            '/' . $leftDelimiter . '\$mysmarty\.([\w]+)\.([\w\.]+)' . $rightDelimiter . '/iU' => static function ($match) {
-                return self::$obj->mysmarty[$match[1]][$match[2]] ?? '';
-            },
-            // 注释
-            '/' . $leftDelimiter . '\*[\s]*(.*)[\s]*\*' . $rightDelimiter . '/Us' => static function ($match) {
-                return '<!-- ' . $match[1] . ' -->';
+                $data[$vArr[0]] = $val;
             }
-        ];
-        return preg_replace_callback_array($replaceCallbackArray, $templateData);
+        }
+        return $data;
     }
 
     /**
-     * 保存缓存
-     * @param string $cacheId 缓存key
-     * @param string $content 缓存内容
+     * 获取是否开启缓存
      * @return bool
      */
-    private function saveCache(string $cacheId, string $content): bool
+    public function getCaching(): bool
     {
-        return $this->getCacheObj()->write($cacheId, $content, $this->cacheLifeTime);
+        return $this->caching;
     }
 
     /**
-     * 判断是否存在缓存
-     * @param string $cacheId
-     * @return bool
+     * 设置缓存是否开启
+     * @param bool $caching
      */
-    public function isCached(string $cacheId): bool
+    public function setCaching(bool $caching): void
     {
-        return $this->getCacheObj()->isCached($cacheId);
+        $this->caching = $caching;
     }
 
     /**
-     * 删除缓存
-     * @param string $cacheId
-     * @return bool
+     * 输出html响应头
      */
-    public function clearCache(string $cacheId): bool
+    private function echoHeader(): void
     {
-        return $this->getCacheObj()->delete($cacheId);
-    }
-
-    /**
-     * 清空缓存
-     * @return bool
-     */
-    public function clearAllCache(): bool
-    {
-        return $this->getCacheObj()->purge();
-    }
-
-    private function __clone()
-    {
-    }
-
-    /**
-     * 捕获到的内容存储于变量里
-     * @param string $paramStr 参数
-     * @param string $content 内容
-     * @return string
-     */
-    private function _capture(string $paramStr, string $content = ''): string
-    {
-        if (empty($paramStr)) {
-            return '';
-        }
-        $val = $this->getValueByName($paramStr, 'name');
-        $this->mysmarty['capture'][$val] = $content;
-        return '';
-    }
-
-    /**
-     * 获取字符串中指定的值
-     * @param string $str 字符串
-     * @param string $name 名称
-     * @param bool $stripQuote 是否去掉双引号、单引号
-     * @return string
-     */
-    private function getValueByName(string $str, string $name, bool $stripQuote = true): string
-    {
-        if ($stripQuote) {
-            $str = preg_replace('/[\'"]/', '', $str);
-        }
-        if (preg_match('/' . $name . '[\s]*=[\s]*([^\s]+)/i', $str, $mat)) {
-            return $mat[1];
-        }
-        return '';
-    }
-
-    /**
-     * 加载配置
-     * @param string $paramStr 参数
-     * @return string
-     */
-    private function _configLoad(string $paramStr): string
-    {
-        if (empty($paramStr)) {
-            return '';
-        }
-        $configFile = $this->getValueByName($paramStr, 'file');
-        $section = $this->getValueByName($paramStr, 'section');
-        $this->mysmarty['config'] = [
-            'configFile' => $configFile,
-            'section' => $section
-        ];
-        return '';
-    }
-
-    /**
-     * foreach 循环
-     * @param string $paramStr 参数
-     * @param string $content 内容
-     * @return string
-     */
-    private function _foreach(string $paramStr, string $content = ''): string
-    {
-        if (empty($paramStr)) {
-            return '';
-        }
-        return '<?php foreach(' . trim($paramStr) . '){?>' . $content . '<?php }?>';
-    }
-
-    /**
-     * for 循环
-     * @param string $paramStr 参数
-     * @param string $content 内容
-     * @return string
-     */
-    private function _for(string $paramStr, string $content = ''): string
-    {
-        if (empty($paramStr)) {
-            return '';
-        }
-        return '<?php for(' . trim($paramStr) . '){?>' . $content . '<?php }?>';
-    }
-
-    /**
-     * 包含文件
-     * @param string $paramStr 参数
-     * @return string
-     */
-    private function _include(string $paramStr): string
-    {
-        if (empty($paramStr)) {
-            return '';
-        }
-        $file = $this->getValueByName($paramStr, 'file');
-        $templateFile = realpath(self::$obj->templateDir . '/' . $file);
-        if (file_exists($templateFile)) {
-            return $this->parseTemplateData(file_get_contents($templateFile));
-        }
-        return '';
-    }
-
-    /**
-     * 分配变量
-     * @param string $paramStr 参数
-     * @return string
-     */
-    private function _assign(string $paramStr): string
-    {
-        if (empty($paramStr)) {
-            return '';
-        }
-        $var = $this->getValueByName($paramStr, 'var');
-        $value = $this->getValueByName($paramStr, 'value', false);
-        return '<?php $' . $var . ' = ' . $value . ';?>';
-    }
-
-    /**
-     * if条件
-     * @param string $paramStr 参数
-     * @param string $content 内容
-     * @return string
-     */
-    private function _if(string $paramStr, string $content = ''): string
-    {
-        if (empty($paramStr)) {
-            return '';
-        }
-        $paramStr = $this->convertChar($paramStr);
-        return '<?php if(' . $paramStr . '){?>' . $content . '<?php }?>';
-    }
-
-    /**
-     * 转换模板的条件语句
-     * @param string $char
-     * @return string
-     */
-    private function convertChar(string $char): string
-    {
-        $char = trim($char);
-        $char = preg_replace('/[\s]+eq[\s]+/', ' == ', $char);
-        $char = preg_replace('/[\s]+neq[\s]+/', ' != ', $char);
-        $char = preg_replace('/[\s]+gt[\s]+/', ' > ', $char);
-        $char = preg_replace('/[\s]+egt[\s]+/', ' >= ', $char);
-        $char = preg_replace('/[\s]+lt[\s]+/', ' < ', $char);
-        $char = preg_replace('/[\s]+elt[\s]+/', ' <= ', $char);
-        return $char;
-    }
-
-    /**
-     * elseif条件
-     * @param string $paramStr 参数
-     * @return string
-     */
-    private function _elseif(string $paramStr): string
-    {
-        if (empty($paramStr)) {
-            return '';
-        }
-        $paramStr = $this->convertChar($paramStr);
-        return '<?php } else if(' . $paramStr . '){?>';
-    }
-
-    /**
-     * 原样输出
-     * @param string $content 内容
-     * @return string
-     */
-    private function _literal(string $content = ''): string
-    {
-        $val = 'literal_' . uniqid('mysmarty', true);
-        $this->mysmarty['literal'][$val] = $content;
-        return '###' . $val . '###';
-    }
-
-    /**
-     * 继承文件
-     * @param string $paramStr 参数
-     * @return string
-     */
-    private function _extends(string $paramStr): string
-    {
-        if (empty($paramStr)) {
-            return '';
-        }
-        $file = $this->getValueByName($paramStr, 'file');
-        $templateFile = realpath(self::$obj->templateDir . '/' . $file);
-        if (file_exists($templateFile)) {
-            $templateData = file_get_contents($templateFile);
-            if (preg_match_all('/\{block[\s]+name=[\'"]([a-z0-9_]+)[\'"]}(.*)\{\/block}/Uis', $templateData, $mat)) {
-                foreach ($mat[1] as $k => $v) {
-                    $value = $this->mysmarty['block'][$v] ?? $mat[2][$k];
-                    $templateData = str_ireplace($mat[0][$k], $value, $templateData);
-                }
-            }
-            return $this->parseTemplateData($templateData);
-        }
-        return '';
-    }
-
-    /**
-     * block
-     * @param string $paramStr 参数
-     * @param string $content 内容
-     * @return string
-     */
-    private function _block(string $paramStr, string $content = ''): string
-    {
-        if (empty($paramStr)) {
-            return '';
-        }
-        $name = $this->getValueByName($paramStr, 'name');
-        $this->mysmarty['block'][$name] = $content;
-        return '';
-    }
-
-    /**
-     * else条件
-     * @return string
-     */
-    private function _else(): string
-    {
-        return '<?php } else {?>';
-    }
-
-    /**
-     * css
-     * @param string $paramStr 参数
-     * @return string
-     */
-    private function _css(string $paramStr): string
-    {
-        if (empty($paramStr)) {
-            return '';
-        }
-        $css = '';
-        $format = $this->getValueByName($paramStr, 'format');
-        $href = $this->getValueByName($paramStr, 'href');
-        $hrefs = explode(',', $href);
-        if (!$format) {
-            foreach ($hrefs as $h) {
-                if (0 !== strpos($h, 'http')) {
-                    $h = '/' . trim($h, '/');
-                    $h = getAbsoluteUrl() . $h;
-                }
-                $css .= '<link rel="stylesheet" href="' . $h . '">';
-            }
-        } else {
-            $dir = PUBLIC_DIR . '/runtime';
-            $md5 = md5($href) . '.css';
-            $file = $dir . '/' . $md5;
-            if (config('app.debug', false) || !file_exists($file)) {
-                $cssData = '';
-                foreach ($hrefs as $v) {
-                    if (0 !== strpos($v, 'http')) {
-                        $v = '/' . trim($v, '/');
-                        if (!file_exists(PUBLIC_DIR . $v)) {
-                            continue;
-                        }
-                        $tmp = file_get_contents(PUBLIC_DIR . $v);
-                    } else {
-                        $tmp = file_get_contents($v);
-                    }
-                    $cssData .= formatCss($tmp);
-                }
-                if (!file_exists($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
-                    throw new RuntimeException(sprintf('目录 "%s" 创建失败', $dir));
-                }
-                file_put_contents($file, $cssData);
-            }
-            $url = getAbsoluteUrl() . '/runtime/' . $md5;
-            $css = '<link rel="stylesheet" href="' . $url . '">';
-        }
-        return $css;
-    }
-
-    /**
-     * js
-     * @param string $paramStr 参数
-     * @return string
-     */
-    private function _js(string $paramStr): string
-    {
-        $js = '';
-        $format = $this->getValueByName($paramStr, 'format');
-        $href = $this->getValueByName($paramStr, 'href');
-        $hrefs = explode(',', $href);
-        if (!$format) {
-            foreach ($hrefs as $h) {
-                if (0 !== strpos0($h, 'http')) {
-                    $h = '/' . trim($h, '/');
-                    $h = getAbsoluteUrl() . $h;
-                }
-                $js .= '<script src="' . $h . '"></script>';
-            }
-        } else {
-            $dir = PUBLIC_DIR . '/runtime';
-            $md5 = md5($href) . '.js';
-            $file = $dir . '/' . $md5;
-            if (config('app.debug', false) || !file_exists($file)) {
-                $jsData = '';
-                foreach ($hrefs as $v) {
-                    if (0 !== strpos($v, 'http')) {
-                        $v = '/' . trim($v, '/');
-                        if (!file_exists(PUBLIC_DIR . $v)) {
-                            continue;
-                        }
-                        $tmp = file_get_contents(PUBLIC_DIR . $v);
-                    } else {
-                        $tmp = file_get_contents($v);
-                    }
-                    $jsData .= formatJs($tmp);
-                }
-                if (!file_exists($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
-                    throw new RuntimeException(sprintf('目录 "%s" 创建失败', $dir));
-                }
-                file_put_contents($file, $jsData);
-            }
-            $url = getAbsoluteUrl() . '/runtime/' . $md5;
-            $js = '<script src="' . $url . '"></script>';
-        }
-        return $js;
+        header('content-type:text/html;charset=utf-8');
+//        header('X-Powered-By:' . config('app.x_powered_by'));
     }
 }
