@@ -51,7 +51,7 @@ class Template
      */
     public function setTemplateDir(string $templateDir): void
     {
-        if (!$this->createDir($templateDir)) {
+        if (!createDir($templateDir)) {
             exit('模板目录不存在或无法创建');
         }
         $this->templateDir = realpath($templateDir);
@@ -72,7 +72,7 @@ class Template
      */
     public function setCompileDir(string $compileDir): void
     {
-        if (!$this->createDir($compileDir)) {
+        if (!createDir($compileDir)) {
             exit('编译目录不存在或无法创建');
         }
         $this->compileDir = realpath($compileDir);
@@ -291,19 +291,6 @@ class Template
             }
         }
         return $templateData;
-    }
-
-    /**
-     * 创建文件夹
-     * @param string $dir 文件夹
-     * @return bool
-     */
-    private function createDir(string $dir): bool
-    {
-        if (!is_dir($dir)) {
-            return mkdir($dir, 0777, true);
-        }
-        return true;
     }
 
     /**

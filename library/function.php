@@ -1800,10 +1800,10 @@ function createDirByFile($file)
  * @param string $dir
  * @return bool
  */
-function createDir($dir)
+function createDir(string $dir): bool
 {
-    if (file_exists($dir)) {
-        return true;
+    if (!is_dir($dir)) {
+        return mkdir($dir, 0777, true);
     }
-    return mkdir($dir, 0777, true);
+    return true;
 }
