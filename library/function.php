@@ -19,7 +19,7 @@ use library\mysmarty\Start;
  * @param int $decimals 小数点保留几位
  * @return string
  */
-function formatFileSize($size, $decimals = 0)
+function formatFileSize(int $size, int $decimals = 0): string
 {
     $str = '';
     if ($size < 1024) {
@@ -52,7 +52,6 @@ function getCurrentLang($name = '')
 
 /**
  * 是否为GET请求
- * @access public
  * @return bool
  */
 function isGet()
@@ -62,7 +61,6 @@ function isGet()
 
 /**
  * 是否为POST请求
- * @access public
  * @return bool
  */
 function isPost()
@@ -72,7 +70,6 @@ function isPost()
 
 /**
  * 是否为PUT请求
- * @access public
  * @return bool
  */
 function isPut()
@@ -82,7 +79,6 @@ function isPut()
 
 /**
  * 是否为DELTE请求
- * @access public
  * @return bool
  */
 function isDelete()
@@ -92,7 +88,6 @@ function isDelete()
 
 /**
  * 是否为HEAD请求
- * @access public
  * @return bool
  */
 function isHead()
@@ -102,7 +97,6 @@ function isHead()
 
 /**
  * 是否为PATCH请求
- * @access public
  * @return bool
  */
 function isPatch()
@@ -112,7 +106,6 @@ function isPatch()
 
 /**
  * 是否为OPTIONS请求
- * @access public
  * @return bool
  */
 function isOptions()
