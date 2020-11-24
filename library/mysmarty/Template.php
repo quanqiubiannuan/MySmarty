@@ -113,7 +113,7 @@ class Template
             file_put_contents($compileFile, $templateData);
         }
         extract($this->data);
-        $this->echoHeader();
+        echoHtmlHeader();
         require_once $compileFile;
         exit();
     }
@@ -129,7 +129,7 @@ class Template
         // 如 FileCache 类中的 showCache方法，没有缓存 返回false
         $cacheData = call_user_func(array(__NAMESPACE__ . '\\' . ucfirst($this->cachingType) . 'Cache', 'showCache'));
         if (false !== $cacheData) {
-            $this->echoHeader();
+            echoHtmlHeader();
             exit($cacheData);
         }
     }
@@ -370,14 +370,5 @@ class Template
     public function setCaching(bool $caching): void
     {
         $this->caching = $caching;
-    }
-
-    /**
-     * 输出html响应头
-     */
-    private function echoHeader(): void
-    {
-        header('content-type:text/html;charset=utf-8');
-//        header('X-Powered-By:' . config('app.x_powered_by'));
     }
 }
