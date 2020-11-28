@@ -1765,8 +1765,11 @@ function getPath(): string
     return trim($pathinfo, '/');
 }
 
+/**
+ * 获取当前页面唯一的缓存key
+ * @return string
+ */
 function getCacheKey(): string
 {
-    var_dump($_SERVER);
-
+    return md5($_SERVER['QUERY_STRING'] ?? $_SERVER['REQUEST_URI']);
 }
