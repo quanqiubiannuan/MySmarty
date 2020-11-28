@@ -1,6 +1,10 @@
 <?php
 
 namespace library\mysmarty;
+/**
+ * 应用启动类
+ * @package library\mysmarty
+ */
 class Start
 {
     //当前模块
@@ -75,19 +79,7 @@ class Start
     {
         // 加载类文件
         spl_autoload_register(function ($class) {
-            if (preg_match('/[\\\]/', $class)) {
-                $controllerArr = explode('\\', $class);
-                $class = $controllerArr[count($controllerArr) - 1];
-                if ($controllerArr[0] === 'application') {
-                    requireFile(ROOT_DIR . '/application/' . $controllerArr[1] . '/' . $controllerArr[2] . '/' . $controllerArr[3] . '.php');
-                } else if ($controllerArr[0] === 'library') {
-                    if ($controllerArr[1] === 'mysmarty') {
-                        requireFile(ROOT_DIR . '/library/mysmarty/' . $class . '.php');
-                    } else {
-                        requireFile(ROOT_DIR . '/library/library/' . $class . '.php');
-                    }
-                }
-            }
+            requireFile(ROOT_DIR . '/' . str_ireplace('\\', '/', $class) . '.php');
         });
     }
 
@@ -185,7 +177,7 @@ class Start
                             $v = str_ireplace('$' . $i, $mat[$i], $v);
                         }
                         if (0 === stripos($v, 'http')) {
-                            redirect($v, 301);
+                            redirect($v);
                         }
                         $pathArr = explode('/', $v);
                         break;
