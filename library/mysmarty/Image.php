@@ -472,7 +472,7 @@ class Image
             header('Content-type: image/png');
             imagepng($src_image);
             imagedestroy($src_image);
-            exitApp();
+            exit();
         } else {
             return $this->saveImage($src_image, $filename);
         }

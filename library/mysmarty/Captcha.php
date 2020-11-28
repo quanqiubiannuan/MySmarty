@@ -294,7 +294,7 @@ class Captcha
         $im = $this->generateImage();
         imagepng($im);
         imagedestroy($im);
-        exitApp();
+        exit();
     }
 
     /**

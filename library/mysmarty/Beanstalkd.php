@@ -29,7 +29,7 @@ class Beanstalkd
     {
         self::$handle = @fsockopen(self::$host, self::$port, $errno, $errstr, self::$connectTimeOut);
         if ($errno !== 0) {
-            exitApp();
+            exit();
         }
         if (!isCliMode()) {
             stream_set_timeout(self::$handle, self::$readTimeOut);
@@ -146,7 +146,7 @@ class Beanstalkd
                 return $this;
             }
         }
-        exitApp('使用管道失败');
+        exit('使用管道失败');
     }
 
     /**

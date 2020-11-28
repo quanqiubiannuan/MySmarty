@@ -331,18 +331,6 @@ function getUrl(string $path, string $domain): string
 }
 
 /**
- * 退出
- * @param string $msg 显示消息内容
- */
-function exitApp(string $msg = ''): void
-{
-    if (!empty($msg)) {
-        echoMsg($msg);
-    }
-    exit();
-}
-
-/**
  * 输出带有换行符的消息
  * @param string $msg
  */
@@ -439,7 +427,7 @@ function refresh(string $url = '', int $refreshTime = 1): void
 {
     $url = getFixedUrl($url);
     echo '<meta http-equiv="refresh" content="' . $refreshTime . ';url=' . $url . '">';
-    exitApp();
+    exit();
 }
 
 /**
@@ -776,7 +764,7 @@ function notFound(): void
 </html>
 HTML;
     echo $html;
-    exitApp();
+    exit();
 }
 
 /**
@@ -789,7 +777,7 @@ function redirect(string $url, int $code = 301): void
 {
     $url = getFixedUrl($url);
     header('Location: ' . $url, true, $code);
-    exitApp();
+    exit();
 }
 
 /**
@@ -855,7 +843,7 @@ function tip(string $msg, string $url = '', int $code = 200): void
 </html>
 HTML;
     echo $html;
-    exitApp();
+    exit();
 }
 
 /**
@@ -1115,7 +1103,7 @@ function json(string|array $data, int $type = JSON_UNESCAPED_UNICODE): void
     } else {
         echo $data;
     }
-    exitApp();
+    exit();
 }
 
 /**
@@ -1191,7 +1179,7 @@ function errorHandler(int $errno, string $errstr, string $errfile, int $errline)
     } else {
         echo implode('<br>', $data);
     }
-    exitApp();
+    exit();
 }
 
 /**

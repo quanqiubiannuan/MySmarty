@@ -102,7 +102,7 @@ class Controller
         $this->mySmarty->assign('url', $url);
         $this->mySmarty->assign('second', $second);
         $this->mySmarty->display('_sysecho.html');
-        exitApp();
+        exit();
     }
 
     /**

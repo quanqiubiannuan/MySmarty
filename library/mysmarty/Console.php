@@ -63,7 +63,7 @@ class Console
                     $commandFile = ROOT_DIR . '/application/command.php';
                     if (!file_exists($commandFile)) {
                         echoCliMsg($commandFile . ' 文件不存在');
-                        exitApp();
+                        exit();
                     }
                     $command = requireReturnFile($commandFile);
                     $c = $argv[1];
@@ -72,7 +72,7 @@ class Console
                             $command = trim($c, '/');
                         } else {
                             echoCliMsg($c . ' 命令不存在');
-                            exitApp();
+                            exit();
                         }
                     } else {
                         $command = trim($command[$c], '/');
@@ -81,7 +81,7 @@ class Console
                     $len = count($commandArr);
                     if ($len < 3) {
                         echoCliMsg($c . ' 命令错误');
-                        exitApp();
+                        exit();
                     }
                     $do = $argv[2] ?? '';
                     $tmp = '';
@@ -99,7 +99,7 @@ class Console
                     } else {
                         if (isWin()) {
                             echoCliMsg('Win电脑不支持此操作！');
-                            exitApp();
+                            exit();
                         }
                         chdir(ROOT_DIR);
                         $process = new Process('php mysmarty ' . $command);

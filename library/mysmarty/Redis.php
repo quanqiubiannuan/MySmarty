@@ -31,7 +31,7 @@ class Redis
     {
         self::$handle = @fsockopen(self::$host, self::$port, $errno, $errstr, self::$connectTimeOut);
         if ($errno !== 0) {
-            exitApp();
+            exit();
         }
         if (!isCliMode()) {
             stream_set_timeout(self::$handle, self::$readTimeOut);

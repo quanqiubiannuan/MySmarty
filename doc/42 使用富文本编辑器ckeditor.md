@@ -151,10 +151,10 @@ class Index extends Controller
             ->move('upload');
         if (empty($pic)) {
             http_response_code(500);
-            exitApp();
+            exit();
         }
         echo json_encode(['default' => $pic, 'url' => $pic]);
-        exitApp();
+        exit();
     }
 
     public function post(){

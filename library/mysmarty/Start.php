@@ -61,7 +61,7 @@ class Start
         }
         if (isCliMode()) {
             Console::start();
-            exitApp();
+            exit();
         }
     }
 
@@ -180,7 +180,7 @@ class Start
                     echo $failResult;
                 }
             }
-            exitApp();
+            exit();
         }
     }
 
