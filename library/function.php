@@ -6,6 +6,7 @@ use library\mysmarty\Ckeditor;
 use library\mysmarty\Config;
 use library\mysmarty\Cookie;
 use library\mysmarty\ElasticSearch;
+use library\mysmarty\Emoji;
 use library\mysmarty\Env;
 use library\mysmarty\IpLocation;
 use library\mysmarty\Query;
@@ -247,8 +248,8 @@ function getDescriptionforArticle(string $content, int $len = 200): string
 function myTrim(string $str): string
 {
     $str = trim($str);
-    $str = preg_replace('/^[　\s]{1,}/u', '', $str);
-    $str = preg_replace('/[　\s]{1,}$/u', '', $str);
+    $str = preg_replace('/^[　\s]+/u', '', $str);
+    $str = preg_replace('/[　\s]+$/u', '', $str);
     return $str;
 }
 
@@ -655,6 +656,11 @@ function formatCss(string $css): string
 function formatHtml(string $html): string
 {
     $html = preg_replace('/<!--.*-->/Us', '', $html);
+    // 替换换行
+    $html = preg_replace('/([\n]|[\r\n])/', '', $html);
+    $html = preg_replace('/[\t]+/', ' ', $html);
+    // 替换两个空格及以上空格 为一个
+    $html = preg_replace('/[ ]{2,}/', ' ', $html);
     return $html;
 }
 
@@ -1705,4 +1711,43 @@ function echoHtmlHeader(): void
 {
     header('content-type:text/html;charset=utf-8');
     header('X-Powered-By:' . config('app.x_powered_by'));
+}
+
+/**
+ * 截取字符串
+ * @param string $str 原字符
+ * @param int $len 截取长度
+ * @return string
+ */
+function len(string $str, int $len = 30): string
+{
+    $str = strip_tags($str);
+    $str = preg_replace('/^[\s　]+/', '', $str);
+    if (mb_strlen($str, 'utf-8') < $len) {
+        return $str;
+    }
+    return mb_substr($str, 0, $len) . '...';
+}
+
+/**
+ * 格式化时间
+ * @param string|int $time 时间戳或时间格式
+ * @param string $format Y-m-d H:i:s
+ * @return string
+ */
+function formatToTime(string|int $time, string $format = 'Y-m-d H:i:s'): string
+{
+    if (!is_int($time)) {
+        $time = strtotime($time);
+    }
+    return date($format, $time);
+}
+
+/**
+ * 输出表情
+ * @param string $str 表情文字
+ */
+function emoji(string $str): void
+{
+    Emoji::echoByName($str);
 }

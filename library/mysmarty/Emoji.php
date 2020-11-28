@@ -81,9 +81,9 @@ class Emoji
     /**
      * 根据表情名输出表情
      * @param string $name
-     * @return mixed|string
+     * @return string
      */
-    public static function echoByName($name)
+    public static function echoByName(string $name): string
     {
         if (isset(self::$data[$name])) {
             echo self::$data[$name];

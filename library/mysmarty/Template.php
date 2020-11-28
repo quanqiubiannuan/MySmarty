@@ -312,6 +312,13 @@ class Template
                 $templateData = str_ireplace($key, $val, $templateData);
             }
         }
+        // 是否格式化为一行
+        if (config('mysmarty.load_output_filter')) {
+            $templateData = formatHtml($templateData);
+            $templateData = formatJs($templateData);
+            $templateData = formatCss($templateData);
+            $templateData = myTrim($templateData);
+        }
         return $templateData;
     }
 
