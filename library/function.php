@@ -25,13 +25,13 @@ function formatFileSize(int $size, int $decimals = 0): string
     if ($size < 1024) {
         $str = $size . 'bytes';
     } else if ($size < 1048576) {
-        $str = int_format($size / 1024, $decimals, '.', '') . 'KB';
+        $str = number_format($size / 1024, $decimals, '.', '') . 'KB';
     } else if ($size < 1073741824) {
-        $str = int_format($size / 1048576, $decimals, '.', '') . 'MB';
+        $str = number_format($size / 1048576, $decimals, '.', '') . 'MB';
     } else if ($size < 1099511627776) {
-        $str = int_format($size / 1073741824, $decimals, '.', '') . 'GB';
+        $str = number_format($size / 1073741824, $decimals, '.', '') . 'GB';
     } else {
-        $str = int_format($size / 1099511627776, $decimals, '.', '') . 'TB';
+        $str = number_format($size / 1099511627776, $decimals, '.', '') . 'TB';
     }
     return $str;
 }
