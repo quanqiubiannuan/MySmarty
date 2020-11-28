@@ -1,11 +1,11 @@
 <?php
-// Smarty模板配置
+// MySmarty模板配置
 return [
     // 检查模板文件是否修改过，线上环境最好设置为false
     'compile_check' => true,
     // 强制编译，线上环境最好设置为false。开启缓存时，必须设置为false
     'force_compile' => false,
-    // 缓存开启，0 关闭，1 开启，2 单独配置每个页面的缓存
+    // 缓存开启，0 关闭，1 开启
     'cache' => 1,
     /**
      * 自定义缓存存储方式

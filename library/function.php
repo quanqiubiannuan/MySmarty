@@ -729,10 +729,10 @@ function getPlatformName(): string
 /**
  * 获取后台配置项数据
  * @param string $name 数组键名，支持 . 连接的键名
- * @param string $defValue 默认值
+ * @param mixed $defValue 默认值
  * @return string|array
  */
-function config(string $name, string $defValue = ''): string|array
+function config(string $name, mixed $defValue = ''): string|array
 {
     return Config::getConfig($name, $defValue);
 }

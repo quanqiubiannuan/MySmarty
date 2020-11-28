@@ -1,103 +1,62 @@
 <?php
-/**
- * Date: 2019/3/2
- * Time: 15:34
- */
 
 namespace library\mysmarty;
 
-use Exception;
-use Smarty;
-
-require_once ROOT_DIR . '/library/smarty/Smarty.class.php';
-
-class Controller extends Smarty
+class Controller
 {
 
-    private $myTemplate;
+    private string $myTemplate;
 
-    private $myCacheId;
+    protected bool $myCache = true;
 
-    protected $myCache = true;
+    private Template $mySmarty;
 
     /**
      * 构造方法
-     * Controller constructor.
      */
     public function __construct()
     {
-        parent::__construct();
         // 初始化变量
+        $this->mySmarty = Template::getInstance();
         $this->myTemplate = $this->getMyTemplate();
-        $this->myCacheId = $this->getMyCacheId();
         $this->initSmarty();
     }
 
     /**
      * 初始化smarty
      */
-    final private function initSmarty()
+    private function initSmarty(): void
     {
-        // 插件目录
-        $pluginsDir = ROOT_DIR . '/extend/plugins';
-        $this->addPluginsDir($pluginsDir);
         // 模板文件目录
         $templateDir = ROOT_DIR . '/application/' . Start::$module . '/view/';
-        $this->setTemplateDir($templateDir);
+        $this->mySmarty->setTemplateDir($templateDir);
         // 编译文件目录
         $compileDir = ROOT_DIR . '/runtime/templates_c/' . Start::$module . '/' . strtolower(Start::$controller);
-        $this->setCompileDir($compileDir);
+        $this->mySmarty->setCompileDir($compileDir);
         // 配置目录
         $configDir = ROOT_DIR . '/application/' . Start::$module . '/config/';
         if (file_exists($configDir)) {
-            $this->setConfigDir($configDir);
-        }
-        // 编译检查
-        $this->setCompileCheck(config('smarty.compile_check', false));
-        // 强制编译
-        $this->setForceCompile(config('smarty.force_compile', false));
-        // 过滤器
-        $outputFilter = config('smarty.load_output_filter');
-        if ($outputFilter) {
-            try {
-                $this->loadFilter('pre', 'removecomments');
-                $this->loadFilter('output', 'formathtml');
-            } catch (Exception $e) {
-
-            }
+            $this->mySmarty->setConfigDir($configDir);
         }
         // 配置模板分隔标签符
         if (!empty(config('smarty.taglib_begin'))) {
-            $this->setLeftDelimiter(config('smarty.taglib_begin'));
+            $this->mySmarty->setLeftDelimiter(config('smarty.taglib_begin'));
         }
         if (!empty(config('smarty.taglib_end'))) {
-            $this->setRightDelimiter(config('smarty.taglib_end'));
+            $this->mySmarty->setRightDelimiter(config('smarty.taglib_end'));
         }
         // 缓存配置
         $cache = $this->myCache ? config('smarty.cache', 0) : 0;
         if ($cache > 0) {
-            $this->setCaching($cache);
-            $this->setCacheLifetime(config('smarty.cache_life_time', 3600));
-            if (!empty(config('smarty.caching_type', ''))) {
-                $this->setCachingType(config('smarty.caching_type', ''));
-            } else {
-                // 缓存文件目录
-                $cacheDir = ROOT_DIR . '/runtime/cache/' . Start::$module . '/' . strtolower(Start::$controller);
-                $this->setCacheDir($cacheDir);
-            }
+            $this->mySmarty->setCaching($cache);
         }
     }
 
     /**
      * 显示模板
-     *
-     * @param null $template
-     * @param null $cache_id
-     * @param null $compile_id
-     * @param null $parent
-     * @throws
+     * @param string $template
      */
-    final public function display($template = null, $cache_id = null, $compile_id = null, $parent = null)
+    final public function display(string $template = ''): void
     {
         if (empty($template)) {
             $template = $this->myTemplate;
@@ -109,93 +68,67 @@ class Controller extends Smarty
                 }
             }
         }
-        if (empty($cache_id)) {
-            $cache_id = $this->myCacheId;
-        }
-        parent::display($template, $cache_id, $compile_id, $parent);
+        $this->mySmarty->display($template);
     }
 
     /**
      * 返回自动生成的模板文件
-     *
      * @return string
      */
-    final public function getMyTemplate()
+    final public function getMyTemplate(): string
     {
         return toDivideName(Start::$controller) . '/' . toDivideName(Start::$action) . '.' . config('smarty.suffix');
     }
 
     /**
-     * 生成唯一的cache_id
-     *
-     * @return string
-     */
-    final public function getMyCacheId()
-    {
-        return md5(getServerValue('QUERY_STRING') ?: '/') . getCurrentBrowserLanguage();
-    }
-
-    /**
      * 提示信息
      *
-     * @param string $message
-     *            提示的文字
-     * @param string $url
-     *            跳转的url
-     * @param integer $status
-     *            状态
-     * @param int $second
-     *            多少秒自动跳转，-1 不自动跳转，0 立即跳转 ，大于0 则多少秒 自动跳转
+     * @param string $message 提示的文字
+     * @param string $url 跳转的url
+     * @param integer $status 状态
+     * @param int $second 多少秒自动跳转，-1 不自动跳转，0 立即跳转 ，大于0 则多少秒 自动跳转
      * @throws
      */
-    final public function sysecho($message, $url, $status = 200, $second = -1)
+    final public function sysecho(string $message, string $url, int $status = 200, int $second = -1): void
     {
         http_response_code($status);
-        if ($this->getLeftDelimiter() !== '{') {
-            $this->setLeftDelimiter('{');
-        }
-        if ($this->getRightDelimiter() !== '}') {
-            $this->setRightDelimiter('}');
-        }
-        $this->addTemplateDir(LIBRARY_DIR . '/tpl');
-        $this->assign('message', $message);
+        $this->mySmarty->setTemplateDir(LIBRARY_DIR . '/tpl');
+        $this->mySmarty->assign('message', $message);
         if (!empty($url)) {
             $url = getFixedUrl($url);
         } else {
             $url = 'javascript:history.go(-1);';
         }
-        $this->assign('url', $url);
-        $this->assign('second', $second);
-        $this->display('_sysecho.html');
+        $this->mySmarty->assign('url', $url);
+        $this->mySmarty->assign('second', $second);
+        $this->mySmarty->display('_sysecho.html');
         exitApp();
     }
 
     /**
      * 成功提示
-     *
      * @param string $message
      * @param string $url
      */
-    final public function success($message, $url = '')
+    final public function success(string $message, string $url = ''): void
     {
         $this->sysecho($message, $url, 200);
     }
 
     /**
      * 错误提示
-     *
      * @param string $message
      * @param string $url
      */
-    final public function error($message, $url = '')
+    final public function error(string $message, string $url = ''): void
     {
-        $this->sysecho($message, $url, 200);
+        $this->sysecho($message, $url);
     }
 
     /**
      * 页面未找到
      */
-    final public function notFound()
+    final public function notFound(): void
     {
         $this->sysecho('页面未找到', '', 404);
     }
@@ -203,31 +136,27 @@ class Controller extends Smarty
     /**
      * 服务器错误
      */
-    final public function systemError()
+    final public function systemError(): void
     {
         $this->sysecho('服务器错误', '', 503);
     }
 
     /**
      * 重定向
-     *
      * @param string $path
      * @param integer $code
      */
-    final public function redirect($path, $code = 302)
+    final public function redirect(string $path, int $code = 302): void
     {
         redirect($path, $code);
     }
 
     /**
      * 渲染模板
-     *
-     * @param string $template
-     *            模板文件
-     * @param array $data
-     *            分配数据
+     * @param string $template 模板文件
+     * @param array $data 分配数据
      */
-    final public function view($template = '', $data = [])
+    final public function view(string $template = '', array $data = []): void
     {
         if (!empty($template)) {
             $template = str_ireplace('.', '/', $template);
@@ -235,7 +164,7 @@ class Controller extends Smarty
         }
         if (!empty($data)) {
             foreach ($data as $k => $v) {
-                $this->assign($k, $v);
+                $this->mySmarty->assign($k, $v);
             }
         }
         $this->display($template);
@@ -246,7 +175,7 @@ class Controller extends Smarty
      * @param string $url url不可以有pathinfo模式的传参
      * @param array $params 传递的参数，键值对
      */
-    final public function dispatch($url, $params = [])
+    final public function dispatch(string $url, array $params = []): void
     {
         $paramsStr = '';
         if (!empty($params)) {
@@ -256,64 +185,11 @@ class Controller extends Smarty
         }
         if (0 !== stripos($url, 'http')) {
             $url = trim($url, '/');
-            switch (count(explode('/', $url))) {
-                case 1:
-                    $url = formatModule(Start::$module) . '/' . toDivideName(Start::$controller) . '/' . $url;
-                    break;
-                case 2:
-                    $url = formatModule(Start::$module) . '/' . $url;
-                    break;
-            }
+            $url = match (count(explode('/', $url))) {
+                1 => formatModule(Start::$module) . '/' . toDivideName(Start::$controller) . '/' . $url,
+                2 => formatModule(Start::$module) . '/' . $url,
+            };
         }
         redirect($url . $paramsStr);
-    }
-
-    /**
-     * 判断当前模板是否有缓存
-     * @param string $cacheId
-     * @return bool
-     * @throws
-     */
-    final public function hasCached($cacheId = '')
-    {
-        if (empty($cacheId)) {
-            $cacheId = $this->myCacheId;
-        }
-        return $this->isCached($this->myTemplate, $cacheId);
-    }
-
-    /**
-     * 显示缓存网页
-     * @param string $cacheId
-     */
-    final public function showCached($cacheId = '')
-    {
-        $this->display(null, $cacheId);
-    }
-
-    /**
-     * 删除模板缓存
-     * @param string $cacheId
-     */
-    final public function removeCached($cacheId = '')
-    {
-        if (empty($cacheId)) {
-            $cacheId = $this->myCacheId;
-        }
-        $this->clearCache($this->myTemplate, $cacheId);
-    }
-
-    /**
-     * 显示缓存模板
-     * @param array $data
-     */
-    final public function cacheDisplay($data = [])
-    {
-        if (!empty($data)) {
-            foreach ($data as $k => $v) {
-                $this->assign($k, $v);
-            }
-        }
-        $this->display();
     }
 }

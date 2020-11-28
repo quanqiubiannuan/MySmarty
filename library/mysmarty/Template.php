@@ -12,6 +12,8 @@ class Template
     private string $templateDir;
     // 编译目录
     private string $compileDir;
+    // 配置目录
+    private string $configDir;
     // 存储分配变量的数组
     private array $data;
     // 左分隔符
@@ -41,6 +43,9 @@ class Template
     {
         if (self::$obj === null) {
             self::$obj = new self();
+            self::$obj->compileCheck = config('smarty.compile_check', false);
+            self::$obj->forceCompile = config('smarty.force_compile', false);
+            self::$obj->cachingType = config('smarty.caching_type', 'file');
         }
         return self::$obj;
     }
@@ -370,5 +375,23 @@ class Template
     public function setCaching(bool $caching): void
     {
         $this->caching = $caching;
+    }
+
+    /**
+     * 获取配置目录
+     * @return string
+     */
+    public function getConfigDir(): string
+    {
+        return $this->configDir;
+    }
+
+    /**
+     * 设置配置目录
+     * @param string $configDir
+     */
+    public function setConfigDir(string $configDir): void
+    {
+        $this->configDir = $configDir;
     }
 }
