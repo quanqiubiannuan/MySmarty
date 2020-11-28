@@ -265,10 +265,15 @@ class Template
         }, $templateData);
         // 输出模板配置变量
         $reg = '/' . $this->leftDelimiter . '#([^\s' . $this->rightDelimiter . '|]+)#' . $this->rightDelimiter . '/i';
-        $templateData = preg_replace_callback($reg,function ($matchs){
-            print_r($matchs);
-            exit();
-        },$templateData);
+        $templateData = preg_replace_callback($reg, function ($matchs) {
+            $tmp = explode('.', $matchs[1]);
+            switch (count($tmp)) {
+                case 1:
+                    return '<?php echo getTempletConfig("' . $this->configFile . '","' . $tmp[0] . '");?>';
+                case 2:
+                    return '<?php echo getTempletConfig("' . $this->configFile . '","' . $tmp[1] . '","' . $tmp[0] . '");?>';
+            }
+        }, $templateData);
         // 输出变量
         $reg = '/' . $this->leftDelimiter . '(\$[^\s' . $this->rightDelimiter . '|]+)[\s]*(\|[^' . $this->rightDelimiter . ']+)*[\s]*' . $this->rightDelimiter . '/i';
         $templateData = preg_replace_callback($reg, function ($matchs) {
