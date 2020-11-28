@@ -72,11 +72,7 @@ class Start
     {
         self::initCommon();
         // 请求pathinfo
-        $queryStr = $_GET[config('query_str', 's')] ?? '';
-        var_dump($_SERVER['PHP_SELF']);
-        var_dump($_GET);
-        exit($queryStr);
-        self::goPath($queryStr);
+        self::goPath(getPath());
     }
 
     /**
@@ -177,6 +173,7 @@ class Start
      */
     public static function goPath($path)
     {
+        exit($path);
         $pathInfo = trim($path, '/');
         $pathArr = [];
         if (empty($pathInfo)) {

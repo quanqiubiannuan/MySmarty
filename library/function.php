@@ -1751,10 +1751,18 @@ function emoji(string $str): void
     Emoji::echoByName($str);
 }
 
+/**
+ * 获取url的panthinfo，不包含请求参数
+ * @return string
+ */
 function getPath(): string
 {
     $pathinfo = $_GET[config('query_str', 's')] ?? '';
     unset($_GET[config('app.query_str', 's')], $_REQUEST[config('app.query_str', 's')]);
+    if (preg_match('/\.php/i', $pathinfo)) {
+        $pathinfo = str_ireplace(ltrim($_SERVER['PHP_SELF'], '/'), '', $pathinfo);
+    }
+    return trim($pathinfo, '/');
 }
 
 function getCacheKey(): string
