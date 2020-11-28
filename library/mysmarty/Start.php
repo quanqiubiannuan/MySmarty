@@ -1,26 +1,20 @@
 <?php
 
 namespace library\mysmarty;
-
-/**
- * Date: 2019/3/2
- * Time: 13:51
- */
 class Start
 {
     //当前模块
-    public static $module;
+    public static string $module;
     //当前控制器
-    public static $controller;
+    public static string $controller;
     //当前执行方法
-    public static $action;
+    public static string $action;
 
     /**
      * 初始化引入
      */
-    public static function initCommon()
+    public static function initCommon(): void
     {
-        header('content-type:text/html;charset=utf-8');
         define('MYSMARTY_VERSION', '0.1.1');
         define('APPLICATION_DIR', ROOT_DIR . '/application');
         define('EXTEND_DIR', ROOT_DIR . '/extend');
@@ -68,17 +62,16 @@ class Start
     /**
      * 执行控制器方法
      */
-    public static function forward()
+    public static function forward(): void
     {
         self::initCommon();
-        // 请求pathinfo
         self::goPath(getPath());
     }
 
     /**
      * 自动加载
      */
-    public static function loadClass()
+    public static function loadClass(): void
     {
         // 加载类文件
         spl_autoload_register(function ($class) {
@@ -100,17 +93,12 @@ class Start
 
     /**
      * 调用模块方法
-     *
-     * @param string $module
-     *            模块
-     * @param string $controller
-     *            控制器
-     * @param string $action
-     *            方法
-     * @param array $params
-     *            请求参数
+     * @param string $module 模块
+     * @param string $controller 控制器
+     * @param string $action 方法
+     * @param array $params 请求参数
      */
-    public static function go($module, $controller, $action, $params)
+    public static function go(string $module, string $controller, string $action, array $params): void
     {
         self::$module = $module;
         self::$controller = $controller;
@@ -149,8 +137,11 @@ class Start
     }
 
 
-    //验证中间件
-    private static function checkMiddleware($middlewareObj)
+    /**
+     * 验证中间件
+     * @param $middlewareObj
+     */
+    private static function checkMiddleware($middlewareObj): void
     {
         if (empty(call_user_func_array(array($middlewareObj, 'handle'), []))) {
             $failResult = call_user_func_array(array($middlewareObj, 'fail'), []);
@@ -169,12 +160,10 @@ class Start
 
     /**
      * 路径跳转
-     * @param string $path
+     * @param string $pathInfo
      */
-    public static function goPath($path)
+    public static function goPath(string $pathInfo): void
     {
-        exit($path);
-        $pathInfo = trim($path, '/');
         $pathArr = [];
         if (empty($pathInfo)) {
             //请求默认的主页
