@@ -39,14 +39,14 @@ class Controller
             $this->mySmarty->setConfigDir($configDir);
         }
         // 配置模板分隔标签符
-        if (!empty(config('smarty.taglib_begin'))) {
-            $this->mySmarty->setLeftDelimiter(config('smarty.taglib_begin'));
+        if (!empty(config('mysmarty.taglib_begin'))) {
+            $this->mySmarty->setLeftDelimiter(config('mysmarty.taglib_begin'));
         }
-        if (!empty(config('smarty.taglib_end'))) {
-            $this->mySmarty->setRightDelimiter(config('smarty.taglib_end'));
+        if (!empty(config('mysmarty.taglib_end'))) {
+            $this->mySmarty->setRightDelimiter(config('mysmarty.taglib_end'));
         }
         // 缓存配置
-        $cache = $this->myCache ? config('smarty.cache', 0) : 0;
+        $cache = $this->myCache ? config('mysmarty.cache', 0) : 0;
         if ($cache > 0) {
             $this->mySmarty->setCaching($cache);
         }
@@ -77,7 +77,7 @@ class Controller
      */
     final public function getMyTemplate(): string
     {
-        return toDivideName(Start::$controller) . '/' . toDivideName(Start::$action) . '.' . config('smarty.suffix');
+        return toDivideName(Start::$controller) . '/' . toDivideName(Start::$action) . '.' . config('mysmarty.suffix');
     }
 
     /**
@@ -160,7 +160,7 @@ class Controller
     {
         if (!empty($template)) {
             $template = str_ireplace('.', '/', $template);
-            $template .= '.' . config('smarty.suffix');
+            $template .= '.' . config('mysmarty.suffix');
         }
         if (!empty($data)) {
             foreach ($data as $k => $v) {

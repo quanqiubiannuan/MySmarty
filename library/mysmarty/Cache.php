@@ -23,11 +23,11 @@ class Cache
      */
     public static function set($name, $value, $expire = 3600)
     {
-        $cachingType = config('smarty.caching_type');
+        $cachingType = config('mysmarty.caching_type');
         switch ($cachingType) {
             case 'mysql':
-                $database = config('smarty.caching_type_params.mysql.database');
-                $table = config('smarty.caching_type_params.mysql.table');
+                $database = config('mysmarty.caching_type_params.mysql.database');
+                $table = config('mysmarty.caching_type_params.mysql.table');
                 return Model::getInstance()->name($database)
                     ->table($table)
                     ->add([
@@ -37,11 +37,11 @@ class Cache
                         'modified' => date('Y-m-d H:i:s', time() + $expire)
                     ], true);
             case 'redis':
-                Redis::getInstance()->select(config('smarty.caching_type_params.redis.db', 0));
+                Redis::getInstance()->select(config('mysmarty.caching_type_params.redis.db', 0));
                 return Redis::getInstance()->set($name, $value, $expire);
             case 'elasticsearch':
-                return ElasticSearch::getInstance()->setDataBase(config('smarty.caching_type_params.elasticsearch.database'))
-                    ->setTable(config('smarty.caching_type_params.elasticsearch.table'))
+                return ElasticSearch::getInstance()->setDataBase(config('mysmarty.caching_type_params.elasticsearch.database'))
+                    ->setTable(config('mysmarty.caching_type_params.elasticsearch.table'))
                     ->insert([
                         'id' => md5($name),
                         'name' => $name,
@@ -52,8 +52,8 @@ class Cache
                 return Memcached::getInstance()->set($name, $value, $expire);
             case 'mongodb':
                 self::rm($name);
-                $database = config('smarty.caching_type_params.mongodb.database');
-                $table = config('smarty.caching_type_params.mongodb.table');
+                $database = config('mysmarty.caching_type_params.mongodb.database');
+                $table = config('mysmarty.caching_type_params.mongodb.table');
                 return Mongodb::getInstance()->name($database)
                     ->table($table)
                     ->add([
@@ -83,11 +83,11 @@ class Cache
      */
     public static function get($name, $defValue = '')
     {
-        $cachingType = config('smarty.caching_type');
+        $cachingType = config('mysmarty.caching_type');
         switch ($cachingType) {
             case 'mysql':
-                $database = config('smarty.caching_type_params.mysql.database');
-                $table = config('smarty.caching_type_params.mysql.table');
+                $database = config('mysmarty.caching_type_params.mysql.database');
+                $table = config('mysmarty.caching_type_params.mysql.table');
                 $data = Model::getInstance()->name($database)
                     ->table($table)
                     ->where('id', md5($name))
@@ -98,15 +98,15 @@ class Cache
                 }
                 return $defValue;
             case 'redis':
-                Redis::getInstance()->select(config('smarty.caching_type_params.redis.db', 0));
+                Redis::getInstance()->select(config('mysmarty.caching_type_params.redis.db', 0));
                 $value = Redis::getInstance()->get($name);
                 if (!empty($value)) {
                     return $value;
                 }
                 return $defValue;
             case 'elasticsearch':
-                $data = ElasticSearch::getInstance()->setDataBase(config('smarty.caching_type_params.elasticsearch.database'))
-                    ->setTable(config('smarty.caching_type_params.elasticsearch.table'))
+                $data = ElasticSearch::getInstance()->setDataBase(config('mysmarty.caching_type_params.elasticsearch.database'))
+                    ->setTable(config('mysmarty.caching_type_params.elasticsearch.table'))
                     ->where('id', md5($name))
                     ->find();
                 if (!empty($data)) {
@@ -118,8 +118,8 @@ class Cache
             case 'memcached':
                 return Memcached::getInstance()->get($name);
             case 'mongodb':
-                $database = config('smarty.caching_type_params.mongodb.database');
-                $table = config('smarty.caching_type_params.mongodb.table');
+                $database = config('mysmarty.caching_type_params.mongodb.database');
+                $table = config('mysmarty.caching_type_params.mongodb.table');
                 $data = Mongodb::getInstance()->name($database)
                     ->table($table)
                     ->where('name', $name)
@@ -151,28 +151,28 @@ class Cache
      */
     public static function rm($name)
     {
-        $cachingType = config('smarty.caching_type');
+        $cachingType = config('mysmarty.caching_type');
         switch ($cachingType) {
             case 'mysql':
-                $database = config('smarty.caching_type_params.mysql.database');
-                $table = config('smarty.caching_type_params.mysql.table');
+                $database = config('mysmarty.caching_type_params.mysql.database');
+                $table = config('mysmarty.caching_type_params.mysql.table');
                 return Model::getInstance()->name($database)
                     ->table($table)
                     ->where('id', md5($name))
                     ->delete();
             case 'redis':
-                Redis::getInstance()->select(config('smarty.caching_type_params.redis.db', 0));
+                Redis::getInstance()->select(config('mysmarty.caching_type_params.redis.db', 0));
                 return Redis::getInstance()->del($name);
             case 'elasticsearch':
-                return ElasticSearch::getInstance()->setDataBase(config('smarty.caching_type_params.elasticsearch.database'))
-                    ->setTable(config('smarty.caching_type_params.elasticsearch.table'))
+                return ElasticSearch::getInstance()->setDataBase(config('mysmarty.caching_type_params.elasticsearch.database'))
+                    ->setTable(config('mysmarty.caching_type_params.elasticsearch.table'))
                     ->where('id', md5($name))
                     ->del();
             case 'memcached':
                 return Memcached::getInstance()->delete($name);
             case 'mongodb':
-                $database = config('smarty.caching_type_params.mongodb.database');
-                $table = config('smarty.caching_type_params.mongodb.table');
+                $database = config('mysmarty.caching_type_params.mongodb.database');
+                $table = config('mysmarty.caching_type_params.mongodb.table');
                 return Mongodb::getInstance()->name($database)
                     ->table($table)
                     ->delete([

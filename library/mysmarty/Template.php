@@ -14,6 +14,8 @@ class Template
     private string $compileDir;
     // 配置目录
     private string $configDir;
+    // 配置文件
+    private string $configFile = '';
     // 存储分配变量的数组
     private array $data = [];
     // 左分隔符
@@ -21,7 +23,7 @@ class Template
     // 右分隔符
     private string $rightDelimiter = '}';
     // 函数合法开始标签
-    private array $funStartRegTags = ['include', 'foreach', 'if', 'elseif', 'else', 'php'];
+    private array $funStartRegTags = ['include', 'foreach', 'if', 'elseif', 'else', 'php', 'config_load'];
     // 函数合法结束标签
     private array $funEndRegTags = ['foreach', 'if', 'php'];
     // 替换标签
@@ -43,9 +45,9 @@ class Template
     {
         if (self::$obj === null) {
             self::$obj = new self();
-            self::$obj->compileCheck = config('smarty.compile_check', false);
-            self::$obj->forceCompile = config('smarty.force_compile', false);
-            self::$obj->cachingType = config('smarty.caching_type', 'file');
+            self::$obj->compileCheck = config('mysmarty.compile_check', false);
+            self::$obj->forceCompile = config('mysmarty.force_compile', false);
+            self::$obj->cachingType = config('mysmarty.caching_type', 'file');
         }
         return self::$obj;
     }
@@ -233,6 +235,10 @@ class Template
                 case 'php':
                     $funCode .= '<?php' . PHP_EOL;
                     break;
+                case 'config_load':
+                    $paramData = $this->paramToArr($matchs[2], true);
+                    $this->configFile = $paramData['file'];
+                    break;
             }
             return $funCode;
         }, $templateData);
@@ -257,6 +263,12 @@ class Template
         $templateData = preg_replace_callback($reg, function ($matchs) {
             return '<?php echo ' . $matchs[1] . ';?>';
         }, $templateData);
+        // 输出模板配置变量
+        $reg = '/' . $this->leftDelimiter . '#([^\s' . $this->rightDelimiter . '|]+)#' . $this->rightDelimiter . '/i';
+        $templateData = preg_replace_callback($reg,function ($matchs){
+            print_r($matchs);
+            exit();
+        },$templateData);
         // 输出变量
         $reg = '/' . $this->leftDelimiter . '(\$[^\s' . $this->rightDelimiter . '|]+)[\s]*(\|[^' . $this->rightDelimiter . ']+)*[\s]*' . $this->rightDelimiter . '/i';
         $templateData = preg_replace_callback($reg, function ($matchs) {

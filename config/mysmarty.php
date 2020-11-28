@@ -4,9 +4,9 @@ return [
     // 检查模板文件是否修改过，线上环境最好设置为false
     'compile_check' => true,
     // 强制编译，线上环境最好设置为false。开启缓存时，必须设置为false
-    'force_compile' => false,
+    'force_compile' => true,
     // 缓存开启，0 关闭，1 开启
-    'cache' => 1,
+    'cache' => 0,
     /**
      * 自定义缓存存储方式
      * 为空，使用文件缓存
