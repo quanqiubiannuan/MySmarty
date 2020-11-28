@@ -112,7 +112,7 @@ class Controller
      */
     final public function success(string $message, string $url = ''): void
     {
-        $this->sysecho($message, $url, 200);
+        $this->sysecho($message, $url);
     }
 
     /**

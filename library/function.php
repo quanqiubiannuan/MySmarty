@@ -1213,7 +1213,7 @@ function toDivideName(string $name): string
  * @param bool $isMobile 是否模拟手机请求
  * @return string|bool
  */
-function getUrlResult(string $url, bool $isMobile = FALSE): string|bool
+function getUrlResult(string $url, bool $isMobile = false): string|bool
 {
     $caiji = new Caiji($url);
     if (!$isMobile) {
