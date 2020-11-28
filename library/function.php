@@ -1710,7 +1710,6 @@ function createDir(string $dir): bool
 function echoHtmlHeader(): void
 {
     header('content-type:text/html;charset=utf-8');
-    header('X-Powered-By:' . config('app.x_powered_by'));
 }
 
 /**
