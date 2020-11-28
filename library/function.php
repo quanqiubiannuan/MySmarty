@@ -368,7 +368,7 @@ function requireFile(string $file): void
  * @param string $file
  * @return mixed
  */
-function requireReturnFile(string $file)
+function requireReturnFile(string $file): mixed
 {
     return getRequireOnceData($file);
 }
