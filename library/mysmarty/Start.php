@@ -71,24 +71,11 @@ class Start
     public static function forward()
     {
         self::initCommon();
-        // 请求参数
-        $queryString = $_SERVER['QUERY_STRING'] ?? '';
-        if (!empty($queryString)) {
-            $queryArr = explode('&', $queryString);
-            foreach ($queryArr as $q) {
-                $qArr = explode('=', $q);
-                if (count($qArr) !== 2) {
-                    continue;
-                }
-                $_GET[$qArr[0]] = $qArr[1];
-            }
-        }
         // 请求pathinfo
-        if (isset($_SERVER['QUERY_STRING'])) {
-            $queryStr = $_GET[config('query_str', 's')] ?? '';
-        } else {
-            $queryStr = $_SERVER['PATH_INFO'] ?? str_ireplace('index.php', '', $_SERVER['REQUEST_URI']);
-        }
+        $queryStr = $_GET[config('query_str', 's')] ?? '';
+        var_dump($_SERVER['PHP_SELF']);
+        var_dump($_GET);
+        exit($queryStr);
         self::goPath($queryStr);
     }
 
@@ -249,7 +236,6 @@ class Start
         } else {
             error('路径错误');
         }
-        unset($_GET[config('app.query_str', 's')], $_REQUEST[config('app.query_str', 's')]);
         self::go($module, $controller, $action, $params);
     }
 }

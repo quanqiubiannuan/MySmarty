@@ -4,7 +4,6 @@ namespace library\mysmarty;
 
 /**
  * 文件缓存
- * @package library\mysmarty
  */
 class FileCache extends BaseCache
 {
@@ -14,11 +13,10 @@ class FileCache extends BaseCache
 
     /**
      * 设置缓存文件夹
-     * @param string $cacheDir
      */
-    public function __construct(string $cacheDir)
+    public function __construct()
     {
-        $this->cacheDir = $cacheDir;
+        $this->cacheDir = ROOT_DIR . '/runtime/cache/' . Start::$module . '/' . strtolower(Start::$controller);
     }
 
     /**
@@ -67,9 +65,9 @@ class FileCache extends BaseCache
     /**
      * 读取缓存
      * @param string $cachekey key
-     * @return mixed
+     * @return string|bool
      */
-    public function read(string $cachekey)
+    public function read(string $cachekey): string|bool
     {
         $cacheFile = $this->cacheDir . '/' . $cachekey . '.cache';
         if (file_exists($cacheFile)) {

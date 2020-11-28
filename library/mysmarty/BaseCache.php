@@ -3,16 +3,15 @@
 namespace library\mysmarty;
 /**
  * MySmarty缓存类
- * @package library\mysmarty
  */
 abstract class BaseCache
 {
     /**
      * 读取缓存
      * @param string $cachekey 缓存key
-     * @return mixed
+     * @return string|bool
      */
-    abstract public function read(string $cachekey);
+    abstract public function read(string $cachekey): string|bool;
 
     /**
      * 写入缓存
@@ -42,4 +41,9 @@ abstract class BaseCache
      * @return bool
      */
     abstract public function isCached(string $cachekey): bool;
+
+    public function showCache(): string|false
+    {
+
+    }
 }

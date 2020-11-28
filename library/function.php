@@ -1750,3 +1750,15 @@ function emoji(string $str): void
 {
     Emoji::echoByName($str);
 }
+
+function getPath(): string
+{
+    $pathinfo = $_GET[config('query_str', 's')] ?? '';
+    unset($_GET[config('app.query_str', 's')], $_REQUEST[config('app.query_str', 's')]);
+}
+
+function getCacheKey(): string
+{
+    var_dump($_SERVER);
+
+}

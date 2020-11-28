@@ -9,6 +9,8 @@ class Index extends Controller
 {
     public function test()
     {
+        getCacheKey();
+        exit();
         $this->display();
     }
 }
