@@ -1160,9 +1160,9 @@ function echoCorsJson(int $status = 1, array $data = [], string $msg = '', int $
 
 /**
  * 异常处理
- * @param \http\Exception\RuntimeException $exception
+ * @param Error|ErrorException|\http\Exception\RuntimeException $exception
  */
-function exceptionHandler(http\Exception\RuntimeException $exception): void
+function exceptionHandler(Error|ErrorException|http\Exception\RuntimeException $exception): void
 {
     $sep = '<br>';
     if (isCliMode()) {

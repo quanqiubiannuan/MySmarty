@@ -15,7 +15,7 @@ class Template
     // 配置目录
     private string $configDir;
     // 存储分配变量的数组
-    private array $data;
+    private array $data = [];
     // 左分隔符
     private string $leftDelimiter = '{';
     // 右分隔符
