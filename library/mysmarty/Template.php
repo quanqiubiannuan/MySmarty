@@ -134,7 +134,7 @@ class Template
             return;
         }
         // 如 FileCache 类中的 showCache方法，没有缓存 返回false
-        $cacheData = call_user_func(array(__NAMESPACE__ . '\\' . ucfirst($this->cachingType) . 'Cache', 'showCache'));
+        $cacheData = call_user_func([__NAMESPACE__ . '\\' . ucfirst($this->cachingType) . 'Cache', 'showCache']);
         if (false !== $cacheData) {
             echoHtmlHeader();
             exit($cacheData);
