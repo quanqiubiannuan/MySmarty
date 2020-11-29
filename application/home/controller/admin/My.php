@@ -4,7 +4,7 @@ namespace application\home\controller\admin;
 
 class My
 {
-    public function home()
+    public function home(int $a,string $age = '')
     {
 
     }

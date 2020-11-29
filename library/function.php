@@ -1764,25 +1764,82 @@ function generateRoute(): void
         // 重新生成
         $controllerDir = APPLICATION_DIR . '/' . MODULE . '/controller';
         $classData = getNamespaceClass($controllerDir);
-        var_dump($classData);
+        $data = [];
         try {
             foreach ($classData as $class) {
-                $obj = new \ReflectionClass($class);
+                // 获取类上的路由设置
+                $obj = new ReflectionClass($class);
                 $attributes = $obj->getAttributes(Route::class);
+                $topRoute = '';
+                $topPattern = [];
+                $topMiddleware = [];
+                $topLevel = Route::MIDDLE;
                 if (1 === count($attributes)) {
                     // 定义了路由
-
-                } else {
-                    // 没定义
-
+                    $topRouteObj = $attributes[0]->newInstance();
+                    $topRoute = $topRouteObj->getUrl();
+                    $topPattern = $topRouteObj->getPattern();
+                    $topMiddleware = $topRouteObj->getMiddleware();
+                    $topLevel = $topRouteObj->getLevel();
                 }
-//            var_dump($attributes[0]->getName());
-//            var_dump($attributes[0]->getArguments());
-//            var_dump($attributes[0]->newInstance());
+                if (empty($topRoute)) {
+                    // 转为普通访问方式
+                    $tmp = str_ireplace('application\\' . MODULE . '\controller\\', '', $class);
+                    $tmp = str_ireplace('\\', '/', $tmp);
+                    // 控制器名字
+                    $shortName = $obj->getShortName();
+                    $tmp = str_ireplace($shortName, toDivideName($shortName), $tmp);
+                    $topRoute = MODULE . '/' . $tmp;
+                }
+                // 获取方法上的路由设置
+                $methods = $obj->getMethods(ReflectionMethod::IS_PUBLIC);
+                foreach ($methods as $method) {
+                    $methodRoute = '';
+                    $methodPattern = [];
+                    $methodMiddleware = [];
+                    $methodLevel = $topLevel;
+                    // 方法参数列表
+                    $methodParams = [];
+                    $methodName = $method->getName();
+                    $methodAttributes = $method->getAttributes(Route::class);
+                    if (1 === count($methodAttributes)) {
+                        // 方法使用了路由
+                        $methodRouteObj = $methodAttributes[0]->newInstance();
+                        $methodRoute = $methodRouteObj->getUrl();
+                        $methodPattern = $methodRouteObj->getPattern();
+                        $methodMiddleware = $methodRouteObj->getMiddleware();
+                        $methodLevel = $methodRouteObj->getLevel();
+                    }
+                    if (empty($methodRoute)) {
+                        // 转为普通访问方式
+                        $methodRoute = toDivideName($methodName);
+                    }
+                    $methodParameters = $method->getParameters();
+                    foreach ($methodParameters as $methodParameter) {
+                        $methodParams[] = $methodParameter->getName();
+                    }
+                    $uri = $topRoute . '/' . $methodRoute;
+                    $data[] = [
+                        'class' => $class,
+                        'methodName' => $methodName,
+                        'methodParams' => $methodParams,
+                        'methodLevel' => $methodLevel,
+                        'uri' => $uri,
+                        'methodMiddleware' => array_merge($topMiddleware, $methodMiddleware),
+                        'methodPattern' => array_merge($topPattern, $methodPattern),
+                    ];
+                }
             }
+            var_dump($data);
+            // 处理路由文件
+            // 替换正则表达式
+
         } catch (ReflectionException $e) {
             error('路由文件生成失败');
         }
+        exit();
+        file_put_contents(ROUTE_FILE, json_encode($data));
+        define('ROUTE', $data);
     } else {
         echo '不需要生成路由';
         // 不需要生成
