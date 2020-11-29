@@ -1154,9 +1154,9 @@ function echoCorsJson(int $status = 1, array $data = [], string $msg = '', int $
 
 /**
  * 异常处理
- * @param Error|ErrorException|\http\Exception\RuntimeException $exception
+ * @param Error|ErrorException|\http\Exception\RuntimeException|\http\Exception $exception
  */
-function exceptionHandler(Error|ErrorException|http\Exception\RuntimeException $exception): void
+function exceptionHandler(Error|ErrorException|http\Exception\RuntimeException|\http\Exception $exception): void
 {
     $sep = '<br>';
     if (isCliMode()) {
@@ -1190,7 +1190,6 @@ function errorHandler(int $errno, string $errstr, string $errfile, int $errline)
 
 /**
  * 将大写分割为_连接的小写字符串，如MyName -> my_name
- *
  * @param string $name
  * @return string
  */
@@ -1772,4 +1771,22 @@ function getPath(): string
 function getCacheKey(): string
 {
     return md5($_SERVER['QUERY_STRING'] ?? $_SERVER['REQUEST_URI']);
+}
+
+/**
+ * 判断当前请求是否为网页html请求
+ * @return bool
+ */
+function isRequestHtml(): bool
+{
+    return str_contains(getServerValue('HTTP_ACCEPT'), 'text/html');
+}
+
+/**
+ * 判断当前请求是否为json请求
+ * @return bool
+ */
+function isRequestJson(): bool
+{
+    return str_contains(getServerValue('HTTP_ACCEPT'), 'json');
 }
