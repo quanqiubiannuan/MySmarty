@@ -11,8 +11,8 @@ class MongodbCache extends BaseCache
 
     public function __construct()
     {
-        $this->database = config('view.caching_type_params.mongodb.database');
-        $this->table = config('view.caching_type_params.mongodb.table');
+        $this->database = config('mysmarty.caching_type_params.mongodb.database');
+        $this->table = config('mysmarty.caching_type_params.mongodb.table');
     }
 
     /**

@@ -16,4 +16,8 @@ class Test extends Controller
     {
         echo 'test';
     }
+
+    public function test2(){
+        $this->test();
+    }
 }

@@ -8,7 +8,7 @@ class RedisCache extends BaseCache
 
     public function __construct()
     {
-        $this->db = config('view.caching_type_params.redis.db', 0);
+        $this->db = config('mysmarty.caching_type_params.redis.db', 0);
     }
 
     /**

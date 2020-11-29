@@ -11,8 +11,8 @@ class ElasticsearchCache extends BaseCache
 
     public function __construct()
     {
-        $this->database = config('view.caching_type_params.elasticsearch.database');
-        $this->table = config('view.caching_type_params.elasticsearch.table');
+        $this->database = config('mysmarty.caching_type_params.elasticsearch.database');
+        $this->table = config('mysmarty.caching_type_params.elasticsearch.table');
     }
 
     /**
