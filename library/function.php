@@ -1773,7 +1773,6 @@ function hasFileUpdate(int $type): bool
 function generateRoute(): void
 {
     if (!file_exists(ROUTE_FILE) || hasFileUpdate(2)) {
-        echo '重新生成路由';
         // 重新生成
         $controllerDir = APPLICATION_DIR . '/' . MODULE . '/controller';
         $classData = getNamespaceClass($controllerDir);
@@ -1884,11 +1883,9 @@ function generateRoute(): void
         file_put_contents(ROUTE_FILE, json_encode($data));
         define('ROUTE', $data);
     } else {
-        echo '不需要生成路由';
         // 不需要生成
         define('ROUTE', json_decode(file_get_contents(ROUTE_FILE), true));
     }
-    exit();
 }
 
 /**
