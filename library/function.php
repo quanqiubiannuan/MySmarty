@@ -1132,13 +1132,26 @@ function errorHandler(int $errno, string $errstr, string $errfile, int $errline)
 
 /**
  * 将大写分割为_连接的小写字符串，如MyName -> my_name
- * @param string $name
+ * @param string $name 待转换的字符串
+ * @param string $splitStr 分割字符串
  * @return string
  */
-function toDivideName(string $name): string
+function toDivideName(string $name, string $splitStr = ''): string
 {
-    $name = preg_replace('/([A-Z])/', '_$1', $name);
-    $name = strtolower(trim($name, '_'));
+    if (empty($splitStr)) {
+        $name = preg_replace('/([A-Z])/', '_$1', $name);
+        $name = strtolower(trim($name, '_'));
+    } else {
+        $tmp = explode($name, $splitStr);
+        $name = '';
+        foreach ($tmp as $v) {
+            if (empty($name)) {
+                $name = toDivideName($v);
+            } else {
+                $name .= $splitStr . toDivideName($v);
+            }
+        }
+    }
     return $name;
 }
 
@@ -1765,6 +1778,8 @@ function generateRoute(): void
         $controllerDir = APPLICATION_DIR . '/' . MODULE . '/controller';
         $classData = getNamespaceClass($controllerDir);
         $data = [];
+        $sortLevelData = [];
+        $sortLenData = [];
         try {
             foreach ($classData as $class) {
                 // 获取类上的路由设置
@@ -1782,6 +1797,7 @@ function generateRoute(): void
                     $topMiddleware = $topRouteObj->getMiddleware();
                     $topLevel = $topRouteObj->getLevel();
                 }
+                $controllerPath = str_ireplace('application\\' . MODULE . '\controller\\', '', $class);
                 // 获取方法上的路由设置
                 $methods = $obj->getMethods(ReflectionMethod::IS_PUBLIC);
                 foreach ($methods as $method) {
@@ -1808,11 +1824,8 @@ function generateRoute(): void
                     if (!str_starts_with($methodRoute, '/')) {
                         if (empty($topRoute)) {
                             // 转为普通访问方式
-                            $tmp = str_ireplace('application\\' . MODULE . '\controller\\', '', $class);
-                            $tmp = str_ireplace('\\', '/', $tmp);
-                            // 控制器名字
-                            $shortName = $obj->getShortName();
-                            $tmp = str_ireplace($shortName, toDivideName($shortName), $tmp);
+                            $tmp = str_ireplace('\\', '/', $controllerPath);
+                            $tmp = toDivideName($tmp, '/');
                             $topRoute = MODULE . '/' . $tmp;
                         }
                         $methodRoute = trim($topRoute, '/') . '/' . $methodRoute;
@@ -1821,27 +1834,53 @@ function generateRoute(): void
                     foreach ($methodParameters as $methodParameter) {
                         $methodParams[] = $methodParameter->getName();
                     }
+                    // 处理路由文件
+                    $methodPattern = array_merge($topPattern, $methodPattern);
+                    $methodMiddleware = array_merge($topMiddleware, $methodMiddleware);
+                    $uri = trim($methodRoute, '/');
+                    // 替换正则表达式
+                    $reg = '/{([a-z0-9_]+)}/iU';
+                    $uri = preg_replace_callback($reg, function ($match) use ($methodPattern) {
+                        return '(?P<' . $match[1] . '>' . ($methodPattern[$match[1]] ?? '[a-z0-9_]+') . ')';
+                    }, $uri);
+                    // 处理中间件，方法名区分大小写
+                    $dealMethodMiddleware = [];
+                    foreach ($methodMiddleware as $midd => $middleware) {
+                        if (is_array($middleware)) {
+                            // 排除
+                            $middExcept = $middleware['except'] ?? [];
+                            if (!empty($middExcept) && !in_array($methodName, $middExcept)) {
+                                $dealMethodMiddleware[] = $midd;
+                            }
+                            // 仅包括
+                            $middOnly = $middleware['only'] ?? [];
+                            if (!empty($middOnly) && in_array($methodName, $middOnly)) {
+                                $dealMethodMiddleware[] = $midd;
+                            }
+                        } else if (is_string($middleware)) {
+                            $dealMethodMiddleware[] = $middleware;
+                        }
+                    }
+                    $dealMethodMiddleware = array_unique($dealMethodMiddleware);
+                    // 排序
+                    $sortLevelData[] = $methodLevel;
+                    $sortLenData[] = mb_strlen($uri, 'utf-8');
                     $data[] = [
                         'class' => $class,
                         'methodName' => $methodName,
                         'methodParams' => $methodParams,
                         'methodLevel' => $methodLevel,
-                        'uri' => trim($methodRoute, '/'),
-                        'methodMiddleware' => array_merge($topMiddleware, $methodMiddleware),
-                        'methodPattern' => array_merge($topPattern, $methodPattern),
+                        'uri' => str_ireplace('#', '\#', $uri),
+                        'methodMiddleware' => $dealMethodMiddleware,
+                        'methodPattern' => $methodPattern,
+                        'controller' => $controllerPath
                     ];
                 }
             }
-            var_dump($data);
-            // 处理路由文件
-            // 排序
-            // 替换正则表达式
-            // 处理中间件
-
+            array_multisort($sortLevelData, SORT_DESC, $sortLenData, SORT_DESC, $data);
         } catch (ReflectionException $e) {
             error('路由文件生成失败');
         }
-        exit();
         file_put_contents(ROUTE_FILE, json_encode($data));
         define('ROUTE', $data);
     } else {

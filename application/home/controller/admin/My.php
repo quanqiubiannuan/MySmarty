@@ -11,4 +11,9 @@ class My
     {
 
     }
+
+    public function homeTest(int $a, string $age = '')
+    {
+
+    }
 }

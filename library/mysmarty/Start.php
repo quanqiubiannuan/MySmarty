@@ -47,6 +47,16 @@ class Start
         if (!empty(config('app.app_init')) && function_exists(config('app.app_init'))) {
             call_user_func(config('app.app_init'));
         }
+        // 加载第三方库
+        if (file_exists(ROOT_DIR . '/vendor/autoload.php')) {
+            require_once ROOT_DIR . '/vendor/autoload.php';
+        }
+        // 控制台运行，不需要路由
+        if (isCliMode()) {
+            Console::start();
+            exit();
+        }
+        // 输出X-Powered-By信息
         if (!empty(config('app.x_powered_by'))) {
             header('X-Powered-By:' . config('app.x_powered_by'));
         }
@@ -54,16 +64,8 @@ class Start
         if (config('session.status') === 1) {
             startSession();
         }
-        //加载第三方库
-        if (file_exists(ROOT_DIR . '/vendor/autoload.php')) {
-            require_once ROOT_DIR . '/vendor/autoload.php';
-        }
         // 生成路由
         generateRoute();
-        if (isCliMode()) {
-            Console::start();
-            exit();
-        }
     }
 
     /**
@@ -167,10 +169,6 @@ class Start
             $routeArr = getCurrentRoute();
             if (!empty($routeArr)) {
                 foreach ($routeArr as $k => $v) {
-                    // 替换正则表达式分割符
-                    $k = str_ireplace('#', '\#', trim($k, '/'));
-                    // 去掉url中的/
-                    $v = trim($v, '/');
                     // 匹配当前规则，获取()内的内容
                     if (preg_match('#^' . $k . '$#iU', $pathInfo, $mat)) {
                         // 匹配到了多少个()

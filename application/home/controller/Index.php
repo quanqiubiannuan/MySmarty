@@ -7,6 +7,7 @@ use library\mysmarty\Route;
 
 class Index extends Controller
 {
+    #[Route('', level: Route::LOW)]
     public function test()
     {
         $obj = new \ReflectionClass('application\home\controller\Test');
