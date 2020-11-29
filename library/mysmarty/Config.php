@@ -1,30 +1,30 @@
 <?php
 
 namespace library\mysmarty;
-
 class Config
 {
     /**
      * 设置配置
      */
-    public static function initAllConfig()
+    public static function initAllConfig(): void
     {
-        if (!defined('CONFIG')) {
-            $c1 = self::getDirConfigData(CONFIG_DIR);
-            $c2 = self::getDirConfigData(APPLICATION_DIR . '/' . MODULE . '/config');
-            define('CONFIG', array_replace_recursive($c1, $c2));
-        }
+        $c1 = self::getDirConfigData(CONFIG_DIR);
+        $c2 = self::getDirConfigData(APPLICATION_DIR . '/' . MODULE . '/config');
+        $data = array_replace_recursive($c1, $c2);
+        createDirByFile(CONFIG_FILE);
+        file_put_contents(CONFIG_FILE, json_encode($data));
+        define('CONFIG', $data);
     }
 
     /**
      * @param string $name 配置名称
-     * @param string $defValue 默认值
-     * @return array|string
+     * @param mixed $defValue 默认值
+     * @return string|array|bool
      */
-    public static function getConfig($name, $defValue = '')
+    public static function getConfig(string $name, mixed $defValue = ''): string|array|bool
     {
         $config = CONFIG;
-        if (preg_match('/[\.]/', $name)) {
+        if (preg_match('/[.]/', $name)) {
             $arr = explode('.', $name);
             foreach ($arr as $v) {
                 if (isset($config[$v])) {
@@ -43,14 +43,14 @@ class Config
      * @param string $dir
      * @return array
      */
-    private static function getDirConfigData($dir)
+    private static function getDirConfigData(string $dir): array
     {
         $data = [];
         if (file_exists($dir)) {
             //读取$dir目录下的配置
             $files = scandir($dir);
             foreach ($files as $file) {
-                if ($file !== '.' && $file !== '..' && str_ends_with($file, '.php')) {
+                if (str_ends_with($file, '.php')) {
                     $data[str_ireplace('.php', '', $file)] = require_once $dir . '/' . $file;
                 }
             }

@@ -14,7 +14,7 @@ class Controller
     /**
      * 构造方法
      */
-    public function __construct()
+    protected function __construct()
     {
         // 初始化变量
         $this->mySmarty = Template::getInstance();
@@ -56,7 +56,7 @@ class Controller
      * 显示模板
      * @param string $template
      */
-    final public function display(string $template = ''): void
+    final protected function display(string $template = ''): void
     {
         if (empty($template)) {
             $template = $this->myTemplate;
@@ -75,7 +75,7 @@ class Controller
      * 返回自动生成的模板文件
      * @return string
      */
-    final public function getMyTemplate(): string
+    final protected function getMyTemplate(): string
     {
         return toDivideName(Start::$controller) . '/' . toDivideName(Start::$action) . '.' . config('mysmarty.suffix');
     }
@@ -89,7 +89,7 @@ class Controller
      * @param int $second 多少秒自动跳转，-1 不自动跳转，0 立即跳转 ，大于0 则多少秒 自动跳转
      * @throws
      */
-    final public function sysecho(string $message, string $url, int $status = 200, int $second = -1): void
+    final protected function sysecho(string $message, string $url, int $status = 200, int $second = -1): void
     {
         http_response_code($status);
         $this->mySmarty->setTemplateDir(LIBRARY_DIR . '/tpl');
@@ -110,7 +110,7 @@ class Controller
      * @param string $message
      * @param string $url
      */
-    final public function success(string $message, string $url = ''): void
+    final protected function success(string $message, string $url = ''): void
     {
         $this->sysecho($message, $url);
     }
@@ -120,7 +120,7 @@ class Controller
      * @param string $message
      * @param string $url
      */
-    final public function error(string $message, string $url = ''): void
+    final protected function error(string $message, string $url = ''): void
     {
         $this->sysecho($message, $url);
     }
@@ -128,7 +128,7 @@ class Controller
     /**
      * 页面未找到
      */
-    final public function notFound(): void
+    final protected function notFound(): void
     {
         $this->sysecho('页面未找到', '', 404);
     }
@@ -136,7 +136,7 @@ class Controller
     /**
      * 服务器错误
      */
-    final public function systemError(): void
+    final protected function systemError(): void
     {
         $this->sysecho('服务器错误', '', 503);
     }
@@ -146,7 +146,7 @@ class Controller
      * @param string $path
      * @param integer $code
      */
-    final public function redirect(string $path, int $code = 302): void
+    final protected function redirect(string $path, int $code = 302): void
     {
         redirect($path, $code);
     }
@@ -156,7 +156,7 @@ class Controller
      * @param string $template 模板文件
      * @param array $data 分配数据
      */
-    final public function view(string $template = '', array $data = []): void
+    final protected function view(string $template = '', array $data = []): void
     {
         if (!empty($template)) {
             $template = str_ireplace('.', '/', $template);
@@ -175,7 +175,7 @@ class Controller
      * @param string $url url不可以有pathinfo模式的传参
      * @param array $params 传递的参数，键值对
      */
-    final public function dispatch(string $url, array $params = []): void
+    final protected function dispatch(string $url, array $params = []): void
     {
         $paramsStr = '';
         if (!empty($params)) {

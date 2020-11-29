@@ -28,24 +28,22 @@ class Start
         define('RUNTIME_DIR', ROOT_DIR . '/runtime');
         define('LIBRARY_DIR', ROOT_DIR . '/library');
         define('CONFIG_DIR', ROOT_DIR . '/config');
+        define('CONFIG_FILE', RUNTIME_DIR . '/cache/config.php');
+        define('ROUTE_FILE', RUNTIME_DIR . '/cache/route.php');
         // 自动加载
         self::loadClass();
         // 引入核心函数库
         require_once LIBRARY_DIR . '/function.php';
         require_once APPLICATION_DIR . '/common.php';
-        if (file_exists(APPLICATION_DIR . '/' . MODULE . '/common.php')) {
-            require_once APPLICATION_DIR . '/' . MODULE . '/common.php';
-        }
-        //初始化配置
-        Config::initAllConfig();
-        date_default_timezone_set(config('app.default_timezone'));
-        if (!config('app.debug')) {
+        // 生成配置文件
+        generateConfig();
+        if (!config('app.debug', false)) {
             error_reporting(0);
         } else {
-            generateRoute(true);
             set_error_handler('errorHandler');
             set_exception_handler('exceptionHandler');
         }
+        date_default_timezone_set(config('app.default_timezone'));
         if (!empty(config('app.app_init')) && function_exists(config('app.app_init'))) {
             call_user_func(config('app.app_init'));
         }
@@ -60,6 +58,8 @@ class Start
         if (file_exists(ROOT_DIR . '/vendor/autoload.php')) {
             require_once ROOT_DIR . '/vendor/autoload.php';
         }
+        // 生成路由
+        generateRoute();
         if (isCliMode()) {
             Console::start();
             exit();

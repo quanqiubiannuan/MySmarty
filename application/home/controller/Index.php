@@ -9,6 +9,7 @@ class Index extends Controller
 {
     public function test()
     {
+        $this->display();
         $obj = new \ReflectionClass('application\home\controller\Test');
         $attributes = $obj->getAttributes(Route::class);
         var_dump(count($attributes));

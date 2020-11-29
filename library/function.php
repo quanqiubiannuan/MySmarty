@@ -10,6 +10,7 @@ use library\mysmarty\Emoji;
 use library\mysmarty\Env;
 use library\mysmarty\IpLocation;
 use library\mysmarty\Query;
+use library\mysmarty\Route;
 use library\mysmarty\Session;
 use library\mysmarty\Sqlite;
 use library\mysmarty\Start;
@@ -701,9 +702,9 @@ function getPlatformName(): string
  * 获取后台配置项数据
  * @param string $name 数组键名，支持 . 连接的键名
  * @param mixed $defValue 默认值
- * @return string|array
+ * @return string|array|bool
  */
-function config(string $name, mixed $defValue = ''): string|array
+function config(string $name, mixed $defValue = ''): string|array|bool
 {
     return Config::getConfig($name, $defValue);
 }
@@ -725,28 +726,8 @@ function error(string $msg, int $code = 503): void
 function notFound(): void
 {
     http_response_code(404);
-    $html = <<<HTML
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>文件未找到</title>
-    <style type="text/css">
-       *{
-            margin:0;
-            padding:0;
-        }
-    </style>
-</head>
-<body>
-    <h5 style="color:red;padding:30px 0 20px;text-align:center;font-size:22px;">文件未找到</h5>
-    <p style="text-align:center;">
-        <a href='/' title='返回主页'>返回主页</a>
-    </p>
-</body>
-</html>
-HTML;
-    echo $html;
+    echoHtmlHeader();
+    echo file_get_contents(LIBRARY_DIR . '/tpl/not_found.html');
     exit();
 }
 
@@ -804,27 +785,11 @@ function tip(string $msg, string $url = '', int $code = 200): void
         $color = 'red';
     }
     $url = getFixedUrl($url);
-    $html = <<<HTML
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>{$msg}</title>
-    <style type="text/css">
-       *{
-            margin:0;
-            padding:0;
-        }
-    </style>
-</head>
-<body>
-    <h5 style="color:{$color};padding:30px 0 20px;text-align:center;font-size:22px;">{$msg}</h5>
-    <p style="text-align:center;">
-        <a href='{$url}' title='点击跳转'>点击跳转</a>
-    </p>
-</body>
-</html>
-HTML;
+    $html = file_get_contents(LIBRARY_DIR . '/tpl/tip.html');
+    $html = str_ireplace('{$url}', $url, $html);
+    $html = str_ireplace('{$color}', $color, $html);
+    $html = str_ireplace('{$msg}', $msg, $html);
+    echoHtmlHeader();
     echo $html;
     exit();
 }
@@ -1740,18 +1705,139 @@ function isRequestJson(): bool
 }
 
 /**
- * 生成路由文件
- * @param bool $reGenerate 是否重新生成
+ * 生成配置文件
  */
-function generateRoute(bool $reGenerate): void
+function generateConfig(): void
 {
-    $routeFile = RUNTIME_DIR . '/cache/route.php';
-    if (!file_exists($routeFile) || $reGenerate) {
+    if (!file_exists(CONFIG_FILE) || hasFileUpdate(1)) {
         // 重新生成
-        $controllerFile = APPLICATION_DIR . '/' . MODULE . '/controller';
-
+        Config::initAllConfig();
     } else {
         // 不需要生成
-
+        define('CONFIG', json_decode(file_get_contents(CONFIG_FILE), true));
     }
+}
+
+/**
+ * 检查文件是否有修改
+ * @param int $type 类型：1 配置文件是否有修改，2 控制器文件是否有修改
+ * @return bool
+ */
+function hasFileUpdate(int $type): bool
+{
+    switch ($type) {
+        case 1:
+            $checkFileTime = filemtime(CONFIG_FILE);
+            $files = scandir(CONFIG_DIR);
+            foreach ($files as $file) {
+                if (str_ends_with($file, '.php')) {
+                    if (filemtime(CONFIG_DIR . '/' . $file) >= $checkFileTime) {
+                        return true;
+                    }
+                }
+            }
+            $dir = APPLICATION_DIR . '/' . MODULE . '/config';
+            if (file_exists($dir)) {
+                $files = scandir($dir);
+                foreach ($files as $file) {
+                    if (str_ends_with($file, '.php')) {
+                        if (filemtime($dir . '/' . $file) >= $checkFileTime) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            break;
+        case 2:
+            return checkeFileUpdate(APPLICATION_DIR . '/' . MODULE . '/controller');
+    }
+    return false;
+}
+
+/**
+ * 生成路由文件
+ */
+function generateRoute(): void
+{
+    if (!file_exists(ROUTE_FILE) || hasFileUpdate(2)) {
+        echo '重新生成路由';
+        // 重新生成
+        $controllerDir = APPLICATION_DIR . '/' . MODULE . '/controller';
+        $classData = getNamespaceClass($controllerDir);
+        var_dump($classData);
+        try {
+            foreach ($classData as $class) {
+                $obj = new \ReflectionClass($class);
+                $attributes = $obj->getAttributes(Route::class);
+                if (1 === count($attributes)) {
+                    // 定义了路由
+
+                } else {
+                    // 没定义
+
+                }
+//            var_dump($attributes[0]->getName());
+//            var_dump($attributes[0]->getArguments());
+//            var_dump($attributes[0]->newInstance());
+            }
+        } catch (ReflectionException $e) {
+            error('路由文件生成失败');
+        }
+    } else {
+        echo '不需要生成路由';
+        // 不需要生成
+        define('ROUTE', json_decode(file_get_contents(ROUTE_FILE), true));
+    }
+    exit();
+}
+
+/**
+ * 获取指定文件夹内class的命名空间地址
+ * @param string $dir
+ * @return array
+ */
+function getNamespaceClass(string $dir): array
+{
+    static $classData = [];
+    static $prefix = ROOT_DIR . '/';
+    if (file_exists($dir)) {
+        //读取$dir目录下的配置
+        $files = scandir($dir);
+        foreach ($files as $file) {
+            if ($file !== '.' && $file !== '..') {
+                if (str_ends_with($file, '.php')) {
+                    $classData[] = str_ireplace('/', '\\', str_ireplace($prefix, '', $dir . '/' . str_ireplace('.php', '', $file)));
+                } else {
+                    getNamespaceClass($dir . '/' . $file);
+                }
+            }
+        }
+    }
+    return $classData;
+}
+
+/**
+ * 获取指定文件夹内控制器文件是否有修改
+ * @param string $dir
+ * @return bool
+ */
+function checkeFileUpdate(string $dir): bool
+{
+    $checkFileTime = filemtime(ROUTE_FILE);
+    if (file_exists($dir)) {
+        //读取$dir目录下的配置
+        $files = scandir($dir);
+        foreach ($files as $file) {
+            if ($file !== '.' && $file !== '..') {
+                if (str_ends_with($file, '.php')) {
+                    if (filemtime($dir . '/' . $file) > $checkFileTime) {
+                        return true;
+                    }
+                } else {
+                    checkeFileUpdate($dir . '/' . $file);
+                }
+            }
+        }
+    }
+    return false;
 }
