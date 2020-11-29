@@ -33,8 +33,8 @@ class Start
         // 引入核心函数库
         require_once LIBRARY_DIR . '/function.php';
         require_once APPLICATION_DIR . '/common.php';
-        if (defined('MODULE')) {
-            requireFile(APPLICATION_DIR . '/' . MODULE . '/common.php');
+        if (file_exists(APPLICATION_DIR . '/' . MODULE . '/common.php')) {
+            require_once APPLICATION_DIR . '/' . MODULE . '/common.php';
         }
         //初始化配置
         Config::initAllConfig();
@@ -42,6 +42,7 @@ class Start
         if (!config('app.debug')) {
             error_reporting(0);
         } else {
+            generateRoute(true);
             set_error_handler('errorHandler');
             set_exception_handler('exceptionHandler');
         }
@@ -51,11 +52,13 @@ class Start
         if (!empty(config('app.x_powered_by'))) {
             header('X-Powered-By:' . config('app.x_powered_by'));
         }
-        //加载第三方库
-        requireFile(ROOT_DIR . '/vendor/autoload.php');
         // session开启
         if (config('session.status') === 1) {
             startSession();
+        }
+        //加载第三方库
+        if (file_exists(ROOT_DIR . '/vendor/autoload.php')) {
+            require_once ROOT_DIR . '/vendor/autoload.php';
         }
         if (isCliMode()) {
             Console::start();
@@ -79,7 +82,7 @@ class Start
     {
         // 加载类文件
         spl_autoload_register(function ($class) {
-            requireFile(ROOT_DIR . '/' . str_ireplace('\\', '/', $class) . '.php');
+            require_once ROOT_DIR . '/' . str_ireplace('\\', '/', $class) . '.php';
         });
     }
 

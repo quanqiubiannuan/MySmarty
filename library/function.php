@@ -22,7 +22,6 @@ use library\mysmarty\Start;
  */
 function formatFileSize(int $size, int $decimals = 0): string
 {
-    $str = '';
     if ($size < 1024) {
         $str = $size . 'bytes';
     } else if ($size < 1048576) {
@@ -44,7 +43,7 @@ function formatFileSize(int $size, int $decimals = 0): string
  */
 function getCurrentLang(string $name = ''): string|array
 {
-    $data = getRequireOnceData(ROOT_DIR . '/application/' . MODULE . '/lang/' . strtolower(getCurrentBrowserLanguage()) . '.php');
+    $data = require_once ROOT_DIR . '/application/' . MODULE . '/lang/' . strtolower(getCurrentBrowserLanguage()) . '.php';
     if (!empty($name)) {
         return $data[$name] ?? '';
     }
@@ -180,7 +179,6 @@ function downloadImg(string $imgSrc): string|bool
     if (0 !== stripos($imgSrc, 'http')) {
         return false;
     }
-    $hz = '';
     if (preg_match('/\.jpg/i', $imgSrc)) {
         $hz = 'jpg';
     } else if (preg_match('/\.jpeg/i', $imgSrc)) {
@@ -351,27 +349,6 @@ function echoMsg(string $msg): void
 function echoCliMsg(string $msg): void
 {
     echo $msg . PHP_EOL;
-}
-
-/**
- * 引入一个文件
- * @param string $file
- */
-function requireFile(string $file): void
-{
-    if (file_exists($file)) {
-        require_once $file;
-    }
-}
-
-/**
- * 引入一个带有返回结果的文件
- * @param string $file
- * @return mixed
- */
-function requireReturnFile(string $file): mixed
-{
-    return getRequireOnceData($file);
 }
 
 /**
@@ -602,10 +579,10 @@ function getServerValue(string $name, string $defValue = ''): string
  * 获取环境配置（动态配置）
  *
  * @param string $key
- * @param string $defValue
+ * @param mixed $defValue
  * @return mixed
  */
-function getLocalEnv(string $key, string $defValue = '')
+function getLocalEnv(string $key, mixed $defValue = null): mixed
 {
     return Env::get($key, $defValue);
 }
@@ -1149,14 +1126,14 @@ function echoCorsJson(int $status = 1, array $data = [], string $msg = '', int $
         'data' => $data,
         'status' => $status,
         'msg' => $msg
-    ]);
+    ], $type);
 }
 
 /**
  * 异常处理
- * @param Error|ErrorException|\http\Exception\RuntimeException|\http\Exception $exception
+ * @param Throwable $exception
  */
-function exceptionHandler(Error|ErrorException|http\Exception\RuntimeException|\http\Exception $exception): void
+function exceptionHandler(Throwable $exception): void
 {
     $sep = '<br>';
     if (isCliMode()) {
@@ -1411,41 +1388,12 @@ function getFixedUrl(string $url): string
 }
 
 /**
- * 获取当前模块路由规则
- * @return array
- */
-function getCurrentRoute(): array
-{
-    return getRequireOnceData(ROOT_DIR . '/application/' . MODULE . '/route.php');
-}
-
-/**
- * 返回php文件定义的数组
- * @param string $phpFile
- * @return mixed
- */
-function getRequireOnceData(string $phpFile)
-{
-    $data = [];
-    $phpFileMd5 = strtoupper(md5($phpFile));
-    if (!defined($phpFileMd5)) {
-        if (file_exists($phpFile)) {
-            $data = require $phpFile;
-            define($phpFileMd5, $data);
-        }
-    } else {
-        $data = constant($phpFileMd5);
-    }
-    return $data;
-}
-
-/**
  * 获取session值
  *
  * @param string $name
  * @return mixed
  */
-function getSession(string $name)
+function getSession(string $name): mixed
 {
     return Session::getInstance()->get($name, false);
 }
@@ -1555,7 +1503,7 @@ function formatTime(int $time): string
  * @param string $phone
  * @return mixed
  */
-function getPhoneAddress(string $phone)
+function getPhoneAddress(string $phone): mixed
 {
     $phone = substr($phone, 0, 7);
     $res = Sqlite::getInstance()->setDatabaseDir(EXTEND_DIR . '/phonedb/')
@@ -1609,9 +1557,9 @@ function xmlToArray(string $xml): array
 /**
  * 将数组转为标准的xml结构
  * @param array $data
- * @return mixed
+ * @return string|bool
  */
-function arrayToXml(array $data)
+function arrayToXml(array $data): string|bool
 {
     $xml = arrayToXmlStr($data);
     if (empty($xml)) {
@@ -1789,4 +1737,21 @@ function isRequestHtml(): bool
 function isRequestJson(): bool
 {
     return str_contains(getServerValue('HTTP_ACCEPT'), 'json');
+}
+
+/**
+ * 生成路由文件
+ * @param bool $reGenerate 是否重新生成
+ */
+function generateRoute(bool $reGenerate): void
+{
+    $routeFile = RUNTIME_DIR . '/cache/route.php';
+    if (!file_exists($routeFile) || $reGenerate) {
+        // 重新生成
+        $controllerFile = APPLICATION_DIR . '/' . MODULE . '/controller';
+
+    } else {
+        // 不需要生成
+
+    }
 }

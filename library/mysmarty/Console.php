@@ -65,7 +65,7 @@ class Console
                         echoCliMsg($commandFile . ' 文件不存在');
                         exit();
                     }
-                    $command = requireReturnFile($commandFile);
+                    $command = require_once $commandFile;
                     $c = $argv[1];
                     if (!isset($command[$c])) {
                         if (preg_match('/\//', $c)) {

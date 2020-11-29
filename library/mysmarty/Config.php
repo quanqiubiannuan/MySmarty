@@ -11,10 +11,7 @@ class Config
     {
         if (!defined('CONFIG')) {
             $c1 = self::getDirConfigData(CONFIG_DIR);
-            $c2 = [];
-            if (defined('MODULE')){
-                $c2 = self::getDirConfigData(APPLICATION_DIR . '/' . MODULE . '/config');
-            }
+            $c2 = self::getDirConfigData(APPLICATION_DIR . '/' . MODULE . '/config');
             define('CONFIG', array_replace_recursive($c1, $c2));
         }
     }
@@ -53,8 +50,8 @@ class Config
             //读取$dir目录下的配置
             $files = scandir($dir);
             foreach ($files as $file) {
-                if ($file !== '.' && $file !== '..' && preg_match('/\.php$/i', $file)) {
-                    $data[str_ireplace('.php', '', $file)] = getRequireOnceData($dir . '/' . $file);
+                if ($file !== '.' && $file !== '..' && str_ends_with($file, '.php')) {
+                    $data[str_ireplace('.php', '', $file)] = require_once $dir . '/' . $file;
                 }
             }
         }
