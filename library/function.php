@@ -1782,15 +1782,6 @@ function generateRoute(): void
                     $topMiddleware = $topRouteObj->getMiddleware();
                     $topLevel = $topRouteObj->getLevel();
                 }
-                if (empty($topRoute)) {
-                    // 转为普通访问方式
-                    $tmp = str_ireplace('application\\' . MODULE . '\controller\\', '', $class);
-                    $tmp = str_ireplace('\\', '/', $tmp);
-                    // 控制器名字
-                    $shortName = $obj->getShortName();
-                    $tmp = str_ireplace($shortName, toDivideName($shortName), $tmp);
-                    $topRoute = MODULE . '/' . $tmp;
-                }
                 // 获取方法上的路由设置
                 $methods = $obj->getMethods(ReflectionMethod::IS_PUBLIC);
                 foreach ($methods as $method) {
@@ -1814,17 +1805,28 @@ function generateRoute(): void
                         // 转为普通访问方式
                         $methodRoute = toDivideName($methodName);
                     }
+                    if (!str_starts_with($methodRoute, '/')) {
+                        if (empty($topRoute)) {
+                            // 转为普通访问方式
+                            $tmp = str_ireplace('application\\' . MODULE . '\controller\\', '', $class);
+                            $tmp = str_ireplace('\\', '/', $tmp);
+                            // 控制器名字
+                            $shortName = $obj->getShortName();
+                            $tmp = str_ireplace($shortName, toDivideName($shortName), $tmp);
+                            $topRoute = MODULE . '/' . $tmp;
+                        }
+                        $methodRoute = trim($topRoute, '/') . '/' . $methodRoute;
+                    }
                     $methodParameters = $method->getParameters();
                     foreach ($methodParameters as $methodParameter) {
                         $methodParams[] = $methodParameter->getName();
                     }
-                    $uri = $topRoute . '/' . $methodRoute;
                     $data[] = [
                         'class' => $class,
                         'methodName' => $methodName,
                         'methodParams' => $methodParams,
                         'methodLevel' => $methodLevel,
-                        'uri' => $uri,
+                        'uri' => trim($methodRoute, '/'),
                         'methodMiddleware' => array_merge($topMiddleware, $methodMiddleware),
                         'methodPattern' => array_merge($topPattern, $methodPattern),
                     ];
@@ -1832,7 +1834,9 @@ function generateRoute(): void
             }
             var_dump($data);
             // 处理路由文件
+            // 排序
             // 替换正则表达式
+            // 处理中间件
 
         } catch (ReflectionException $e) {
             error('路由文件生成失败');

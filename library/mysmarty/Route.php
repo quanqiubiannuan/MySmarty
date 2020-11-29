@@ -43,7 +43,7 @@ class Route
      */
     public function getUrl(): string
     {
-        return trim($this->url, '/');
+        return $this->url;
     }
 
     /**
