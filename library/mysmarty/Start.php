@@ -19,7 +19,7 @@ class Start
      */
     public static function initCommon(): void
     {
-        define('MYSMARTY_VERSION', '0.1.1');
+        define('MYSMARTY_VERSION', '1.0.0');
         define('APPLICATION_DIR', ROOT_DIR . '/application');
         define('EXTEND_DIR', ROOT_DIR . '/extend');
         define('PUBLIC_DIR', ROOT_DIR . '/public');
@@ -127,85 +127,53 @@ class Start
 
     /**
      * 验证中间件
-     * @param $middlewareObj
+     * @param string $middleware 中间件的地址
+     * @param array $params 路由参数
      */
-    private static function checkMiddleware($middlewareObj): void
+    private static function checkMiddleware(string $middleware, array $params = []): void
     {
-        if (empty(call_user_func_array(array($middlewareObj, 'handle'), []))) {
-            $failResult = call_user_func_array(array($middlewareObj, 'fail'), []);
-            if (empty($failResult)) {
-                error('未授权访问', 401);
-            } else {
-                if (is_array($failResult)) {
-                    json($failResult);
-                } else {
-                    echo $failResult;
-                }
-            }
+        // 调用中间件方法执行
+        $middlewareObj = new $middleware();
+        if (false === $middlewareObj->handle($params)) {
+            // 失败后执行
+            $middlewareObj->fail($params);
             exit();
         }
     }
 
     /**
      * 路径跳转
-     * @param string $pathInfo
+     * @param string $uri
      */
-    public static function goPath(string $pathInfo): void
+    public static function goPath(string $uri): void
     {
-        $pathArr = [];
-        if (empty($pathInfo)) {
-            //请求默认的主页
-            $pathArr = [MODULE, CONTROLLER, ACTION];
-        } else {
-            $routeArr = getCurrentRoute();
-            if (!empty($routeArr)) {
-                foreach ($routeArr as $k => $v) {
-                    // 匹配当前规则，获取()内的内容
-                    if (preg_match('#^' . $k . '$#iU', $pathInfo, $mat)) {
-                        // 匹配到了多少个()
-                        $len = count($mat);
-                        for ($i = 1; $i < $len; $i++) {
-                            // 将匹配到的内容替换到请求跳转url中
-                            $v = str_ireplace('$' . $i, $mat[$i], $v);
-                        }
-                        if (0 === stripos($v, 'http')) {
-                            redirect($v);
-                        }
-                        $pathArr = explode('/', $v);
-                        break;
-                    }
-                }
-            }
-            if (empty($pathArr)) {
-                $pathArr = explode('/', $pathInfo);
-            }
-        }
-        $len = count($pathArr);
-        $module = '';
-        $controller = '';
-        $action = '';
+        $controller = CONTROLLER;
+        $action = ACTION;
+        // 方法执行需要的参数
         $params = [];
-        if ($len >= 3) {
-            $module = formatModule($pathArr[0]);
-            if ($module !== MODULE) {
-                error('该域名禁止访问此模块');
-            }
-            $controller = formatController($pathArr[1]);
-            $action = formatAction($pathArr[2]);
-            $tmp = '';
-            for ($i = 3; $i < $len; $i++) {
-                if ($i % 2 !== 0) {
-                    // 键
-                    $tmp = $pathArr[$i];
-                } else {
-                    // 值
-                    $_GET[$tmp] = $pathArr[$i];
-                    $params[$tmp] = $pathArr[$i];
+        var_dump($uri);
+        var_dump(ROUTE);
+        if (!empty($uri)) {
+            foreach (ROUTE as $v) {
+                // 匹配当前规则，获取()内的内容
+                if (preg_match('#^' . $v['uri'] . '$#iU', $uri, $mat)) {
+                    foreach ($v['methodParams'] as $param) {
+                        if (isset($mat[$param])) {
+                            $params[$param] = $mat[$param];
+                        }
+                    }
+                    // 执行中间件
+                    foreach ($v['methodMiddleware'] as $midd) {
+                        self::checkMiddleware($midd, $params);
+                    }
+                    // 执行缓存
+                    break;
                 }
             }
-        } else {
-            error('路径错误');
         }
-        self::go($module, $controller, $action, $params);
+        echo PHP_EOL;
+        var_dump($controller, $action, $params);
+        exit();
+        self::go(MODULE, $controller, $action, $params);
     }
 }

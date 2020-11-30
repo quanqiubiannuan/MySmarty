@@ -21,6 +21,8 @@ class Route
     const LOW = 1;
     // 匹配级别，越大则越靠前
     private int $level;
+    // 是否缓存
+    private bool $caching;
 
     /**
      * 构造器.
@@ -28,13 +30,15 @@ class Route
      * @param array $pattern 路由变量规则
      * @param array $middleware 路由中间件
      * @param int $level 路由匹配级别
+     * @param bool $caching 是否缓存
      */
-    public function __construct(string $url, array $pattern = [], array $middleware = [], int $level = self::MIDDLE)
+    public function __construct(string $url, array $pattern = [], array $middleware = [], int $level = self::MIDDLE, bool $caching = true)
     {
         $this->url = $url;
         $this->pattern = $pattern;
         $this->middleware = $middleware;
         $this->level = $level;
+        $this->caching = $caching;
     }
 
     /**
@@ -71,5 +75,14 @@ class Route
     public function getLevel(): int
     {
         return $this->level;
+    }
+
+    /**
+     * 是否缓存
+     * @return bool
+     */
+    public function isCaching(): bool
+    {
+        return $this->caching;
     }
 }

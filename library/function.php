@@ -1161,14 +1161,19 @@ function toDivideName(string $name, string $splitStr = ''): string
         $name = preg_replace('/([A-Z])/', '_$1', $name);
         $name = strtolower(trim($name, '_'));
     } else {
-        $tmp = explode($name, $splitStr);
-        $name = '';
-        foreach ($tmp as $v) {
-            if (empty($name)) {
-                $name = toDivideName($v);
-            } else {
-                $name .= $splitStr . toDivideName($v);
+        $splitStr = str_ireplace('#', '\#', $splitStr);
+        if (preg_match('#[' . $splitStr . ']#', $name)) {
+            $tmp = preg_split('#[' . $splitStr . ']#', $name);
+            $name = '';
+            foreach ($tmp as $v) {
+                if (empty($name)) {
+                    $name = toDivideName($v);
+                } else {
+                    $name .= $splitStr . toDivideName($v);
+                }
             }
+        } else {
+            $name = toDivideName($name);
         }
     }
     return $name;
@@ -1807,6 +1812,7 @@ function generateRoute(): void
                 $topPattern = [];
                 $topMiddleware = [];
                 $topLevel = Route::MIDDLE;
+                $topCaching = true;
                 if (1 === count($attributes)) {
                     // 定义了路由
                     $topRouteObj = $attributes[0]->newInstance();
@@ -1814,6 +1820,13 @@ function generateRoute(): void
                     $topPattern = $topRouteObj->getPattern();
                     $topMiddleware = $topRouteObj->getMiddleware();
                     $topLevel = $topRouteObj->getLevel();
+                    $topCaching = $topRouteObj->isCaching();
+                }
+                if ($topCaching) {
+                    $defaultProperties = $obj->getDefaultProperties();
+                    if (!isset($defaultProperties['myCache']) || false === $defaultProperties['myCache']) {
+                        $topCaching = false;
+                    }
                 }
                 $controllerPath = str_ireplace('application\\' . MODULE . '\controller\\', '', $class);
                 // 获取方法上的路由设置
@@ -1827,6 +1840,7 @@ function generateRoute(): void
                     $methodParams = [];
                     $methodName = $method->getName();
                     $methodAttributes = $method->getAttributes(Route::class);
+                    $methodCaching = $topCaching;
                     if (1 === count($methodAttributes)) {
                         // 方法使用了路由
                         $methodRouteObj = $methodAttributes[0]->newInstance();
@@ -1834,6 +1848,7 @@ function generateRoute(): void
                         $methodPattern = $methodRouteObj->getPattern();
                         $methodMiddleware = $methodRouteObj->getMiddleware();
                         $methodLevel = $methodRouteObj->getLevel();
+                        $methodCaching = $methodRouteObj->isCaching();
                     }
                     if (empty($methodRoute)) {
                         // 转为普通访问方式
@@ -1883,6 +1898,10 @@ function generateRoute(): void
                     // 排序
                     $sortLevelData[] = $methodLevel;
                     $sortLenData[] = mb_strlen($uri, 'utf-8');
+                    // 处理缓存
+                    if (false === $topCaching && true === $methodCaching) {
+                        $methodCaching = false;
+                    }
                     $data[] = [
                         'class' => $class,
                         'methodName' => $methodName,
@@ -1891,7 +1910,8 @@ function generateRoute(): void
                         'uri' => str_ireplace('#', '\#', $uri),
                         'methodMiddleware' => $dealMethodMiddleware,
                         'methodPattern' => $methodPattern,
-                        'controller' => $controllerPath
+                        'controller' => $controllerPath,
+                        'caching' => $methodCaching
                     ];
                 }
             }
@@ -1924,7 +1944,7 @@ function getNamespaceClass(string $dir): array
                 if (str_ends_with($file, '.php')) {
                     $classData[] = str_ireplace('/', '\\', str_ireplace($prefix, '', $dir . '/' . str_ireplace('.php', '', $file)));
                 } else {
-                    getNamespaceClass($dir . '/' . $file);
+                    return getNamespaceClass($dir . '/' . $file);
                 }
             }
         }
@@ -1950,7 +1970,7 @@ function checkeFileUpdate(string $dir): bool
                         return true;
                     }
                 } else {
-                    checkeFileUpdate($dir . '/' . $file);
+                    return checkeFileUpdate($dir . '/' . $file);
                 }
             }
         }
