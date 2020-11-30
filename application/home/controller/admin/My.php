@@ -8,6 +8,6 @@ class My extends Controller
 {
     public function testMy()
     {
-        $this->display();
+
     }
 }
