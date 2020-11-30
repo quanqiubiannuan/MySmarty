@@ -10,6 +10,8 @@ class Index extends Controller
     #[Route('', level: Route::LOW)]
     public function test()
     {
-        echo 'test';
+        echo time();
+        echo '<br>' . date('Y-m-d H:i:s');
+        $this->display();
     }
 }

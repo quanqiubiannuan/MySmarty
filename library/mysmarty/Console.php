@@ -48,7 +48,10 @@ class Console
             for ($i = 2; $i < $len; $i++) {
                 $params[] = $argv[$i];
             }
-            Start::go(formatModule($module), formatController($controller), formatAction($action), $params);
+            Start::$module = formatModule($module);
+            Start::$controller = formatController($controller);
+            Start::$action = formatAction($action);
+            Start::go(params: $params);
         }
     }
 }

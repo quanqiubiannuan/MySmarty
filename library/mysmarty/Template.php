@@ -36,6 +36,8 @@ class Template
     private bool $caching = false;
     // 缓存类型
     private string $cachingType = 'file';
+    // 缓存key
+    private string $cachingKey = '';
 
     /**
      * 获取静态操作对象
@@ -48,6 +50,8 @@ class Template
             self::$obj->compileCheck = config('mysmarty.compile_check', false);
             self::$obj->forceCompile = config('mysmarty.force_compile', false);
             self::$obj->cachingType = config('mysmarty.caching_type', 'file');
+            self::$obj->caching = (1 === config('mysmarty.cache', 0));
+            self::$obj->cachingKey = getCacheKey();
         }
         return self::$obj;
     }
@@ -119,9 +123,23 @@ class Template
             $templateData = $this->compile($template);
             file_put_contents($compileFile, $templateData);
         }
+        ob_start();
         extract($this->data);
         echoHtmlHeader();
         require_once $compileFile;
+        if ($this->caching) {
+            $content = ob_get_contents();
+            // 是否格式化为一行
+            if (config('mysmarty.load_output_filter')) {
+                $content = formatHtml($content);
+                $content = formatJs($content);
+                $content = formatCss($content);
+                $content = myTrim($content);
+            }
+            $cacheClass = 'library\mysmarty\cache\\' . ucfirst($this->cachingType) . 'Cache';
+            (new $cacheClass())->write($this->cachingKey, $content, config('mysmarty.cache_life_time', 3600));
+        }
+        ob_end_flush();
         exit();
     }
 
@@ -134,7 +152,8 @@ class Template
             return;
         }
         // 如 FileCache 类中的 showCache方法，没有缓存 返回false
-        $cacheData = call_user_func([__NAMESPACE__ . '\\' . ucfirst($this->cachingType) . 'Cache', 'showCache']);
+        $cacheClass = 'library\mysmarty\cache\\' . ucfirst($this->cachingType) . 'Cache';
+        $cacheData = (new $cacheClass())->read($this->cachingKey);
         if (false !== $cacheData) {
             echoHtmlHeader();
             exit($cacheData);

@@ -1,6 +1,8 @@
 <?php
 
-namespace library\mysmarty;
+namespace library\mysmarty\cache;
+
+use library\mysmarty\Start;
 
 /**
  * 文件缓存
@@ -16,7 +18,7 @@ class FileCache extends BaseCache
      */
     public function __construct()
     {
-        $this->cacheDir = ROOT_DIR . '/runtime/cache/' . Start::$module . '/' . strtolower(Start::$controller);
+        $this->cacheDir = ROOT_DIR . '/runtime/cache/' . Start::$module . '/' . toDivideName(str_ireplace('\\', '/', Start::$controller), '/');
     }
 
     /**
@@ -28,6 +30,7 @@ class FileCache extends BaseCache
      */
     public function write(string $cachekey, string $content, int $expire = 3600): bool
     {
+        createDir($this->cacheDir);
         return file_put_contents($this->cacheDir . '/' . $cachekey . '.cache', (time() + $expire) . $this->delimiter . $content);
     }
 

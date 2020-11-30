@@ -442,9 +442,9 @@ function getPlatformName(): string
  * 获取后台配置项数据
  * @param string $name 数组键名，支持 . 连接的键名
  * @param mixed $defValue 默认值
- * @return string|array|bool
+ * @return mixed
  */
-function config(string $name, mixed $defValue = ''): string|array|bool
+function config(string $name, mixed $defValue = ''): mixed
 {
     return Config::getConfig($name, $defValue);
 }
@@ -1367,12 +1367,15 @@ function emoji(string $str): void
  */
 function getPath(): string
 {
-    $pathinfo = $_GET[config('query_str', 's')] ?? '';
-    unset($_GET[config('app.query_str', 's')], $_REQUEST[config('app.query_str', 's')]);
-    if (preg_match('/\.php/i', $pathinfo)) {
-        $pathinfo = str_ireplace(ltrim($_SERVER['PHP_SELF'], '/'), '', $pathinfo);
+    if (!defined('URI_PATH')) {
+        $pathinfo = $_GET[config('query_str', 's')] ?? '';
+        unset($_GET[config('app.query_str', 's')], $_REQUEST[config('app.query_str', 's')]);
+        if (preg_match('/\.php/i', $pathinfo)) {
+            $pathinfo = str_ireplace(ltrim($_SERVER['PHP_SELF'], '/'), '', $pathinfo);
+        }
+        define('URI_PATH', trim($pathinfo, '/'));
     }
-    return trim($pathinfo, '/');
+    return URI_PATH;
 }
 
 /**

@@ -150,32 +150,6 @@ class Session
     public function startSession()
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
-            switch (config('session.type')) {
-                case 'file':
-                    $handler = new FileSessionHandler();
-                    session_set_save_handler($handler, true);
-                    break;
-                case 'mysql':
-                    $handler = new MysqlSessionHandler();
-                    session_set_save_handler($handler, true);
-                    break;
-                case 'redis':
-                    $handler = new RedisSessionHandler();
-                    session_set_save_handler($handler, true);
-                    break;
-                case 'elasticsearch':
-                    $handler = new ElasticsearchSessionHandler();
-                    session_set_save_handler($handler, true);
-                    break;
-                case 'memcached':
-                    $handler = new MemcachedSessionHandler();
-                    session_set_save_handler($handler, true);
-                    break;
-                case 'mongodb':
-                    $handler = new MongodbSessionHandler();
-                    session_set_save_handler($handler, true);
-                    break;
-            }
             $lifetime = $this->lifetime ?: config('session.lifetime', 3600);
             $path = $this->path ?: config('session.path', '/');
             $domain = $this->domain ?: config('session.domain', '');

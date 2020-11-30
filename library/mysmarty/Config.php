@@ -19,9 +19,9 @@ class Config
     /**
      * @param string $name 配置名称
      * @param mixed $defValue 默认值
-     * @return string|array|bool
+     * @return mixed
      */
-    public static function getConfig(string $name, mixed $defValue = ''): string|array|bool
+    public static function getConfig(string $name, mixed $defValue = ''): mixed
     {
         $config = CONFIG;
         if (preg_match('/[.]/', $name)) {

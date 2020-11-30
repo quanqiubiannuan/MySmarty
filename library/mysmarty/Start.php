@@ -94,21 +94,15 @@ class Start
 
     /**
      * 调用模块方法
-     * @param string $module 模块
-     * @param string $controller 控制器
-     * @param string $action 方法
      * @param array $params 请求参数
      */
-    public static function go(string $module, string $controller, string $action, array $params): void
+    public static function go(array $params = []): void
     {
-        self::$module = $module;
-        self::$controller = $controller;
-        self::$action = $action;
-        $controllerNamespace = 'application\\' . $module . '\controller\\' . $controller;
+        $controllerNamespace = 'application\\' . Start::$module . '\controller\\' . Start::$controller;
         $obj = new $controllerNamespace();
         call_user_func_array(array(
             $obj,
-            $action
+            Start::$action
         ), array_values($params));
         // 程序到此结束运行
         exit();
@@ -149,12 +143,15 @@ class Start
         foreach ($route['methodMiddleware'] as $midd) {
             self::checkMiddleware($midd, $params);
         }
+        $controller = $route['controller'];
+        $action = $route['methodName'];
+        self::$module = MODULE;
+        self::$controller = $controller;
+        self::$action = $action;
         // 执行缓存
         if ($route['caching'] && 1 === config('mysmarty.cache', 0)) {
             Template::getInstance()->showCache();
         }
-        $controller = $route['controller'];
-        $action = $route['methodName'];
-        self::go(MODULE, $controller, $action, $params);
+        self::go(params: $params);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace library\mysmarty;
+namespace library\mysmarty\cache;
 /**
  * MySmarty缓存类
  */
@@ -41,9 +41,4 @@ abstract class BaseCache
      * @return bool
      */
     abstract public function isCached(string $cachekey): bool;
-
-    public function showCache(): string|false
-    {
-
-    }
 }

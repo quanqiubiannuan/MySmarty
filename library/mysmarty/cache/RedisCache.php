@@ -1,6 +1,8 @@
 <?php
 
-namespace library\mysmarty;
+namespace library\mysmarty\cache;
+
+use library\mysmarty\Redis;
 
 class RedisCache extends BaseCache
 {
@@ -14,9 +16,9 @@ class RedisCache extends BaseCache
     /**
      * 读取缓存
      * @param string $cachekey key
-     * @return mixed
+     * @return string|bool
      */
-    public function read(string $cachekey)
+    public function read(string $cachekey): string|bool
     {
         return Redis::getInstance()->setDb($this->db)->get($cachekey);
     }
