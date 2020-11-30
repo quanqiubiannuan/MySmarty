@@ -7,38 +7,14 @@ return [
      * session存储位置
      * 空：使用默认的php存放
      * file：存放在runtime目录下
-     * mysql：存放在mysql
      * redis：存放在redis
-     * elasticsearch：存放在elasticsearch
-     * memcached：存放在memcached
-     * mongodb:存放在mongodb
      */
     'type' => '',
     'session_type_params' => [
-        // mysql session配置
-        'mysql' => [
-            // 数据库
-            'database' => 'test',
-            // 缓存表
-            'table' => 'session'
-        ],
         // redis session配置
         'redis' => [
             // 使用第几个库（0 - 15）
             'db' => 0
-        ],
-        // elasticsearch session配置
-        'elasticsearch' => [
-            // 默认 数据库，索引
-            'database' => 'mysession',
-            // 默认 表，文档
-            'table' => 'session'
-        ],
-        'mongodb' => [
-            // 默认 数据库，索引
-            'database' => 'mysession',
-            // 默认 表，文档
-            'table' => 'session'
         ]
     ],
     // Cookie 的 生命周期，以秒为单位。

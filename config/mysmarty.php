@@ -10,39 +10,15 @@ return [
     /**
      * 自定义缓存存储方式
      * 为空，使用文件缓存
-     * mysql，使用mysql作为缓存存放位置
      * redis，使用redis作为缓存存放位置
-     * elasticsearch，使用elasticsearch作为缓存存放位置
-     * memcached，使用memcached作为缓存存放位置
-     * mongodb，使用mongodb作为缓存存放位置
      */
     'caching_type' => '',
     // 自定义缓存配置参数
     'caching_type_params' => [
-        // mysql缓存配置
-        'mysql' => [
-            // 数据库
-            'database' => 'test',
-            // 缓存表
-            'table' => 'cache'
-        ],
         // redis缓存配置
         'redis' => [
             // 使用第几个库（0 - 15）
             'db' => 0
-        ],
-        // elasticsearch 缓存配置
-        'elasticsearch' => [
-            // 默认 数据库，索引
-            'database' => 'mycache',
-            // 默认 表，文档
-            'table' => 'cache'
-        ],
-        'mongodb' => [
-            // 默认 数据库，索引
-            'database' => 'mycache',
-            // 默认 表，文档
-            'table' => 'cache'
         ]
     ],
     // 缓存时间,单位秒

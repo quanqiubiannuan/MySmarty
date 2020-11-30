@@ -1,12 +1,10 @@
 **MySmarty技术手册**
 
-​	MySmarty是在Smarty模板引擎上开发的mvc框架，需要您掌握Smarty技能
-
-​	Smarty文档手册：https://www.smarty.net/docs/zh_CN/
+​	MySmarty是基于PHP开发的mvc框架
 
 **一、环境要求**
 
-​	`php >= 7`
+​	`php >= 8`
 
 **二、代码上传**
 
@@ -121,10 +119,6 @@ application - 应用目录
 
 --------view - 视图
 
---------route.php - 路由配置，需要使用路由重写、伪静态时使用
-
---------common.php - 网站独立函数
-
 ----command.php - 命令配置文件
 
 ----common.php - 网站公共函数	
@@ -149,13 +143,11 @@ config - 网站全局配置文件目录
 
 ----session.php Session配置
 
-----smarty.php Smarty模板配置、缓存配置
+----mysmarty.php MySmarty模板配置、缓存配置
 
 extend - 扩展目录
 
 ----fonts - 字体文件目录，用户水印等
-
-----plugins - smarty 插件目录
 
 library - 框架核心目录
 
@@ -171,7 +163,7 @@ public - 网站根目录
 
 mysmarty - 命令行运行文件
 
-runtime - smarty编译文件、缓存文件等目录
+runtime - mysmarty编译文件、缓存文件等目录
 
 README.md - 本文件，可删除
 ```
@@ -199,7 +191,5 @@ README.md - 本文件，可删除
 ​	**详细使用文档请查看 doc 目录下的文档**
 
 ### 感谢
-
-​	https://www.smarty.net/
 
 ​	https://www.jetbrains.com/?from=MySmarty
