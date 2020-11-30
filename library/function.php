@@ -1839,6 +1839,10 @@ function generateRoute(): void
                     // 方法参数列表
                     $methodParams = [];
                     $methodName = $method->getName();
+                    // 去掉构造方法
+                    if ('__construct' === $methodName) {
+                        continue;
+                    }
                     $methodAttributes = $method->getAttributes(Route::class);
                     $methodCaching = $topCaching;
                     if (1 === count($methodAttributes)) {
@@ -1876,6 +1880,7 @@ function generateRoute(): void
                     $uri = preg_replace_callback($reg, function ($match) use ($methodPattern) {
                         return '(?P<' . $match[1] . '>' . ($methodPattern[$match[1]] ?? '[a-z0-9_]+') . ')';
                     }, $uri);
+                    $uri = str_ireplace('#', '\#', $uri);
                     // 处理中间件，方法名区分大小写
                     $dealMethodMiddleware = [];
                     foreach ($methodMiddleware as $midd => $middleware) {
@@ -1907,7 +1912,7 @@ function generateRoute(): void
                         'methodName' => $methodName,
                         'methodParams' => $methodParams,
                         'methodLevel' => $methodLevel,
-                        'uri' => str_ireplace('#', '\#', $uri),
+                        'uri' => $uri,
                         'methodMiddleware' => $dealMethodMiddleware,
                         'methodPattern' => $methodPattern,
                         'controller' => $controllerPath,
@@ -1916,6 +1921,20 @@ function generateRoute(): void
                 }
             }
             array_multisort($sortLevelData, SORT_DESC, $sortLenData, SORT_DESC, $data);
+            $home = [];
+            $homeClass = 'application\\' . MODULE . '\controller\\' . CONTROLLER;
+            foreach ($data as $k => $v) {
+                // 判断是否为首页
+                if ($homeClass === $v['class'] && ACTION === $v['methodName']) {
+                    $home = $data[$k];
+                    unset($data[$k]);
+                    break;
+                }
+            }
+            if (empty($home)) {
+                error('未定义主页路由');
+            }
+            $data['home'] = $home;
         } catch (ReflectionException $e) {
             error('路由文件生成失败');
         }

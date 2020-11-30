@@ -76,7 +76,19 @@ class Start
     public static function forward(): void
     {
         self::initCommon();
-        self::goPath(getPath());
+        $uri = getPath();
+        $mat = [];
+        if (!empty($uri)) {
+            foreach (ROUTE as $v) {
+                // 匹配当前规则，获取()内的内容
+                if ($uri === $v['uri'] || preg_match('#^' . $v['uri'] . '$#iU', $uri, $mat)) {
+                    self::runRoute($v, $mat);
+                    break;
+                }
+            }
+        } else {
+            self::runRoute(ROUTE['home'], $mat);
+        }
     }
 
     /**
@@ -91,33 +103,8 @@ class Start
         self::$module = $module;
         self::$controller = $controller;
         self::$action = $action;
-        $controllerNamespace = '\application\\' . $module . '\controller\\' . $controller;
+        $controllerNamespace = 'application\\' . $module . '\controller\\' . $controller;
         $obj = new $controllerNamespace();
-        if (isset($obj->middleware)) {
-            //存在中间件属性
-            $middleware = $obj->middleware;
-            foreach ($middleware as $k => $v) {
-                if (is_string($v)) {
-                    $middlewareNamespace = '\application\\' . $module . '\middleware\\' . formatController($v);
-                    $middlewareObj = new $middlewareNamespace();
-                    self::checkMiddleware($middlewareObj);
-                } else {
-                    $middlewareNamespace = '\application\\' . $module . '\middleware\\' . formatController($k);
-                    $middlewareObj = new $middlewareNamespace();
-                    if (isset($v['only'])) {
-                        if (in_array($action, $v['only'], true)) {
-                            self::checkMiddleware($middlewareObj);
-                        }
-                        continue;
-                    }
-                    if (isset($v['except'])) {
-                        if (!in_array($action, $v['except'], true)) {
-                            self::checkMiddleware($middlewareObj);
-                        }
-                    }
-                }
-            }
-        }
         call_user_func_array(array(
             $obj,
             $action
@@ -142,38 +129,29 @@ class Start
     }
 
     /**
-     * 路径跳转
-     * @param string $uri
+     * 执行路由规则
+     * @param array $route 匹配到的路由
+     * @param array $mat 匹配到的结果
      */
-    public static function goPath(string $uri): void
+    public static function runRoute(array $route, array $mat): void
     {
-        $controller = CONTROLLER;
-        $action = ACTION;
         // 方法执行需要的参数
         $params = [];
-        var_dump($uri);
-        var_dump(ROUTE);
-        if (!empty($uri)) {
-            foreach (ROUTE as $v) {
-                // 匹配当前规则，获取()内的内容
-                if (preg_match('#^' . $v['uri'] . '$#iU', $uri, $mat)) {
-                    foreach ($v['methodParams'] as $param) {
-                        if (isset($mat[$param])) {
-                            $params[$param] = $mat[$param];
-                        }
-                    }
-                    // 执行中间件
-                    foreach ($v['methodMiddleware'] as $midd) {
-                        self::checkMiddleware($midd, $params);
-                    }
-                    // 执行缓存
-                    break;
-                }
+        foreach ($route['methodParams'] as $param) {
+            if (isset($mat[$param])) {
+                $params[$param] = $mat[$param];
             }
         }
-        echo PHP_EOL;
-        var_dump($controller, $action, $params);
-        exit();
+        // 执行中间件
+        foreach ($route['methodMiddleware'] as $midd) {
+            self::checkMiddleware($midd, $params);
+        }
+        // 执行缓存
+        if ($route['caching'] && 1 === config('mysmarty.cache', 0)) {
+            Template::getInstance()->showCache();
+        }
+        $controller = $route['controller'];
+        $action = $route['methodName'];
         self::go(MODULE, $controller, $action, $params);
     }
 }

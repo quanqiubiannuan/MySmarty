@@ -1,30 +1,27 @@
 <?php
-/**
- * Date: 2019/5/21
- * Time: 16:04
- */
 
 namespace application\home\middleware;
 
-
 use library\mysmarty\Middleware;
 
-class Test extends Middleware {
+class Test extends Middleware
+{
 
     /**
      * 中间件执行方法
+     * @param array $params 路由中的参数数组
      * @return bool 返回 true 通过，false 不通过
      */
-    public function handle()
+    public function handle(array $params): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * 失败执行方法
-     * @return mixed
+     * @param array $params 路由中的参数数组
      */
-    public function fail()
+    public function fail(array $params): void
     {
         error('失败啦');
     }

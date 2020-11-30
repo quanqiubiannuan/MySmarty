@@ -14,7 +14,7 @@ class Controller
     /**
      * 构造方法
      */
-    protected function __construct()
+    public function __construct()
     {
         // 初始化变量
         $this->mySmarty = Template::getInstance();

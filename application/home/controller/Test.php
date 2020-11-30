@@ -9,31 +9,12 @@ use library\mysmarty\Route;
  * Class Test
  * @package application\home\controller
  */
-#[Route("/api/posts/{id}", pattern: [
-    'id' => '[\d]+'
-], middleware: [
-    \application\home\middleware\Test::class => [
-        'only' => ['test2', 'test'],
-    ]
-])]
+#[Route("/test", middleware: [\application\home\middleware\Test::class])]
 class Test extends Controller
 {
-    #[Route("{name}")]
-    public function test22()
+    #[Route("{name}/{id}")]
+    public function test22($id, $name)
     {
         echo 'test';
-    }
-
-    #[Route('test2', middleware: [
-        \application\home\middleware\Test2::class,
-    ])]
-    public function test2()
-    {
-        $this->test();
-    }
-
-    public function TestPhp()
-    {
-
     }
 }
