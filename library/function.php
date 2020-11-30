@@ -6,11 +6,9 @@ use library\mysmarty\Config;
 use library\mysmarty\Cookie;
 use library\mysmarty\ElasticSearch;
 use library\mysmarty\Emoji;
-use library\mysmarty\Env;
 use library\mysmarty\Query;
 use library\mysmarty\Route;
 use library\mysmarty\Session;
-use library\mysmarty\Start;
 
 /**
  * 格式化字节单位
@@ -236,97 +234,6 @@ function myTrim(string $str): string
 }
 
 /**
- * 去掉url中的请求参数
- * @param string $url
- * @return bool|string
- */
-function getNoParamUrl(string $url): string|bool
-{
-    if (false !== strpos($url, '?')) {
-        $url = substr($url, 0, strpos($url, '?'));
-    }
-    if (preg_match('/#/', $url)) {
-        $url = substr($url, 0, strpos($url, '#'));
-    }
-    return $url;
-}
-
-/**
- * 获取指定域名下的favicon.ico
- * @param string $domain
- * @return string
- */
-function getShortcutUrl(string $domain): string
-{
-    $url = trim($domain, '/');
-    $shortcut = $url . '/favicon.ico';
-    if (!isFavicon($shortcut)) {
-        $shortcut = '';
-        //网页匹配
-        $res = Query::getInstance()->setReferer($url)->setUrl($url)->setUserAgent('Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.108 Safari/537.36')
-            ->setRandIp()
-            ->getOne();
-        $reg = '/<link[^>]*href=["\']([^\'"]*)["\'][^>]*>/iU';
-        if (preg_match_all($reg, $res, $mat)) {
-            foreach ($mat[0] as $k => $v) {
-                if (false !== stripos($v, 'icon')) {
-                    $shortcut = getUrl($mat[1][$k], $url);
-                    break;
-                }
-            }
-        }
-    }
-    return $shortcut;
-}
-
-/**
- * 判断给定的url是否为favicon url
- * @param string $url
- * @return bool bool
- */
-function isFavicon(string $url): bool
-{
-    $res = get_headers($url, 1);
-    if (false === strpos($res[0], '200') || false === stripos($res['Content-Type'], 'image')) {
-        return false;
-    }
-    return true;
-}
-
-/**
- * 获取绝对url
- * @param string $path 完整网址或没有主域的url
- * @param string $domain 主域名，以http开头
- * @return string
- */
-function getUrl(string $path, string $domain): string
-{
-    if (false !== stripos($path, 'http')) {
-        return $path;
-    }
-    if (preg_match('/^\/\//i', $path)) {
-        $path = trim($path, '/');
-        $path = substr($path, strpos($path, '/') + 1);
-    }
-    $path = trim($path, '/');
-    $domain = trim($domain, '/');
-    return $domain . '/' . $path;
-}
-
-/**
- * 输出带有换行符的消息
- * @param string $msg
- */
-function echoMsg(string $msg): void
-{
-    if (isCliMode()) {
-        echoCliMsg($msg);
-    } else {
-        echo $msg . '<br>';
-    }
-}
-
-/**
  * 在控制台输出一条消息并换行
  * @param string $msg
  */
@@ -391,18 +298,6 @@ function getMemFreeRate(): int
         return 0;
     }
     return (int)(100 * $data['MemFree'] / $data['MemTotal']);
-}
-
-/**
- * 获取ip所在的位置信息
- *
- * @param string $ip
- * @return string
- */
-function getIpLocation(string $ip = ''): string
-{
-    $location = IpLocation::getInstance()->getlocation($ip);
-    return $location['country'] ?? '';
 }
 
 /**
@@ -539,18 +434,6 @@ function getServerValue(string $name, string $defValue = ''): string
 }
 
 /**
- * 获取环境配置（动态配置）
- *
- * @param string $key
- * @param mixed $defValue
- * @return mixed
- */
-function getLocalEnv(string $key, mixed $defValue = null): mixed
-{
-    return Env::get($key, $defValue);
-}
-
-/**
  * 格式化js
  *
  * @param string $js
@@ -602,33 +485,6 @@ function formatHtml(string $html): string
     // 替换两个空格及以上空格 为一个
     $html = preg_replace('/[ ]{2,}/', ' ', $html);
     return $html;
-}
-
-/**
- * 获取当前模块url
- * @return string
- */
-function getModuleUrl(): string
-{
-    return getAbsoluteUrl() . '/' . Start::$module;
-}
-
-/**
- * 获取当前控制器的url
- * @return string
- */
-function getControllerUrl(): string
-{
-    return getModuleUrl() . '/' . toDivideName(Start::$controller);
-}
-
-/**
- * 获取当前方法url
- * @return string
- */
-function getActionUrl(): string
-{
-    return getControllerUrl() . '/' . toDivideName(Start::$action);
 }
 
 /**
@@ -985,22 +841,6 @@ function formatController(string $controller): string
 function formatAction(string $action): string
 {
     return lcfirst(str_ireplace('_', '', ucwords($action, '_')));
-}
-
-/**
- * 检测指定的模块与当前是否一致
- *
- * @param string $module 模块
- * @param string $controller 控制器
- * @param string $action 方法
- * @return boolean
- */
-function checkAccess(string $module, string $controller, string $action): bool
-{
-    $module = formatModule($module);
-    $controller = formatController($controller);
-    $action = formatAction($action);
-    return MODULE === $module && CONTROLLER === $controller && ACTION === $action;
 }
 
 /**
@@ -1438,47 +1278,6 @@ function formatTime(int $time): string
     } else {
         return (int)($cha / 86400) . '天' . $unit;
     }
-}
-
-/**
- * 查询手机号归属地
- * @param string $phone
- * @return mixed
- */
-function getPhoneAddress(string $phone): mixed
-{
-    $phone = substr($phone, 0, 7);
-    $res = Sqlite::getInstance()->setDatabaseDir(EXTEND_DIR . '/phonedb/')
-        ->name('phone')
-        ->table('phones')
-        ->field('phones.type,regions.province,regions.city,regions.zip_code,regions.area_code')
-        ->eq('int', $phone)
-        ->join('regions', 'phones.region_id=regions.id')
-        ->find();
-    if (empty($res)) {
-        return false;
-    }
-    switch ($res['type']) {
-        case 1:
-            $res['type'] = '中国移动';
-            break;
-        case 2:
-            $res['type'] = '中国联通';
-            break;
-        case 3:
-            $res['type'] = '中国电信';
-            break;
-        case 4:
-            $res['type'] = '中国电信虚拟运营商';
-            break;
-        case 5:
-            $res['type'] = '中国联通虚拟运营商';
-            break;
-        case 6:
-            $res['type'] = '中国移动虚拟运营商';
-            break;
-    }
-    return $res;
 }
 
 /**
