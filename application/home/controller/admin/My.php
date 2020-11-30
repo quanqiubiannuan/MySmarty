@@ -2,10 +2,12 @@
 
 namespace application\home\controller\admin;
 
-class My
+use library\mysmarty\Controller;
+
+class My extends Controller
 {
     public function testMy()
     {
-
+        $this->display();
     }
 }

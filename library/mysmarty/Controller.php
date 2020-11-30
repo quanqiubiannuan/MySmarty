@@ -4,11 +4,9 @@ namespace library\mysmarty;
 
 class Controller
 {
-
-    private string $myTemplate;
-
+    // 是否开启缓存
     protected bool $myCache = true;
-
+    // 模板对象
     private Template $mySmarty;
 
     /**
@@ -18,7 +16,6 @@ class Controller
     {
         // 初始化变量
         $this->mySmarty = Template::getInstance();
-        $this->myTemplate = $this->getMyTemplate();
         $this->initSmarty();
     }
 
@@ -31,7 +28,7 @@ class Controller
         $templateDir = ROOT_DIR . '/application/' . Start::$module . '/view/';
         $this->mySmarty->setTemplateDir($templateDir);
         // 编译文件目录
-        $compileDir = ROOT_DIR . '/runtime/templates_c/' . Start::$module . '/' . strtolower(Start::$controller);
+        $compileDir = ROOT_DIR . '/runtime/templates_c/' . Start::$module . '/' . strtolower(str_ireplace('\\', '/', Start::$controller));
         $this->mySmarty->setCompileDir($compileDir);
         // 配置目录
         $configDir = ROOT_DIR . '/application/' . Start::$module . '/config/';
@@ -59,10 +56,10 @@ class Controller
     final protected function display(string $template = ''): void
     {
         if (empty($template)) {
-            $template = $this->myTemplate;
+            $template = $this->getMyTemplate();
         } else {
             if (!preg_match('#/#', $template)) {
-                $tmp = toDivideName(Start::$controller) . '/' . $template;
+                $tmp = toDivideName(str_ireplace('\\', '/', Start::$controller)) . '/' . $template;
                 if (file_exists(APPLICATION_DIR . '/' . formatModule(Start::$module) . '/view/' . $tmp)) {
                     $template = $tmp;
                 }
@@ -77,7 +74,7 @@ class Controller
      */
     final protected function getMyTemplate(): string
     {
-        return toDivideName(Start::$controller) . '/' . toDivideName(Start::$action) . '.' . config('mysmarty.suffix');
+        return toDivideName(str_ireplace('\\', '/', Start::$controller), '/') . '/' . toDivideName(Start::$action) . '.' . config('mysmarty.suffix');
     }
 
     /**
@@ -186,7 +183,7 @@ class Controller
         if (0 !== stripos($url, 'http')) {
             $url = trim($url, '/');
             $url = match (count(explode('/', $url))) {
-                1 => formatModule(Start::$module) . '/' . toDivideName(Start::$controller) . '/' . $url,
+                1 => formatModule(Start::$module) . '/' . toDivideName(str_ireplace('\\', '/', Start::$controller)) . '/' . $url,
                 2 => formatModule(Start::$module) . '/' . $url,
             };
         }

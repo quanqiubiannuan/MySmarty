@@ -1161,9 +1161,9 @@ function toDivideName(string $name, string $splitStr = ''): string
         $name = preg_replace('/([A-Z])/', '_$1', $name);
         $name = strtolower(trim($name, '_'));
     } else {
-        $splitStr = str_ireplace('#', '\#', $splitStr);
-        if (preg_match('#[' . $splitStr . ']#', $name)) {
-            $tmp = preg_split('#[' . $splitStr . ']#', $name);
+        $splitRegStr = preg_quote($splitStr);
+        if (preg_match('#[' . $splitRegStr . ']#', $name)) {
+            $tmp = preg_split('#[' . $splitRegStr . ']#', $name);
             $name = '';
             foreach ($tmp as $v) {
                 if (empty($name)) {
