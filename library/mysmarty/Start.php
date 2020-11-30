@@ -31,7 +31,9 @@ class Start
         define('CONFIG_FILE', RUNTIME_DIR . '/cache/config.php');
         define('ROUTE_FILE', RUNTIME_DIR . '/cache/route.php');
         // 自动加载
-        self::loadClass();
+        spl_autoload_register(function ($class) {
+            require_once ROOT_DIR . '/' . str_ireplace('\\', '/', $class) . '.php';
+        });
         // 引入核心函数库
         require_once LIBRARY_DIR . '/function.php';
         require_once APPLICATION_DIR . '/common.php';
@@ -75,17 +77,6 @@ class Start
     {
         self::initCommon();
         self::goPath(getPath());
-    }
-
-    /**
-     * 自动加载
-     */
-    public static function loadClass(): void
-    {
-        // 加载类文件
-        spl_autoload_register(function ($class) {
-            require_once ROOT_DIR . '/' . str_ireplace('\\', '/', $class) . '.php';
-        });
     }
 
     /**

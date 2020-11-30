@@ -898,10 +898,29 @@ function getPostAarray(string $name): array
 
 /**
  * 获取客户端ip
+ * @param bool $getProxyIp 是否获取代理ip
  * @return string
  */
-function getIp(): string
+function getIp(bool $getProxyIp = false): string
 {
+    if ($getProxyIp) {
+        $realIp = '';
+        if (!empty(getServerValue('HTTP_X_FORWARDED_FOR'))) {
+            $arr = explode(',', getServerValue('HTTP_X_FORWARDED_FOR'));
+            foreach ($arr as $ip) {
+                $ip = trim($ip);
+                if ($ip !== 'unknown') {
+                    $realIp = $ip;
+                    break;
+                }
+            }
+        } else if (!empty(getServerValue('HTTP_CLIENT_IP'))) {
+            $realIp = getServerValue('HTTP_CLIENT_IP');
+        }
+        if (isIp($realIp)) {
+            return $realIp;
+        }
+    }
     return getServerValue('REMOTE_ADDR');
 }
 
