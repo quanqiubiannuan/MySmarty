@@ -1,18 +1,15 @@
 <?php
 
 use library\mysmarty\Cache;
-use library\mysmarty\Caiji;
 use library\mysmarty\Ckeditor;
 use library\mysmarty\Config;
 use library\mysmarty\Cookie;
 use library\mysmarty\ElasticSearch;
 use library\mysmarty\Emoji;
 use library\mysmarty\Env;
-use library\mysmarty\IpLocation;
 use library\mysmarty\Query;
 use library\mysmarty\Route;
 use library\mysmarty\Session;
-use library\mysmarty\Sqlite;
 use library\mysmarty\Start;
 
 /**
@@ -35,20 +32,6 @@ function formatFileSize(int $size, int $decimals = 0): string
         $str = number_format($size / 1099511627776, $decimals, '.', '') . 'TB';
     }
     return $str;
-}
-
-/**
- * 获取当前的语言数组
- * @param string $name
- * @return array|string
- */
-function getCurrentLang(string $name = ''): string|array
-{
-    $data = require_once ROOT_DIR . '/application/' . MODULE . '/lang/' . strtolower(getCurrentBrowserLanguage()) . '.php';
-    if (!empty($name)) {
-        return $data[$name] ?? '';
-    }
-    return $data;
 }
 
 /**
@@ -365,27 +348,6 @@ function getZhChar(int $num = 1): string
         $char .= iconv('GB2312', 'UTF-8', $tmp);
     }
     return $char;
-}
-
-/**
- * 获取当前浏览器的语言
- * @return string
- */
-function getCurrentBrowserLanguage(): string
-{
-    $language = getServerValue('HTTP_ACCEPT_LANGUAGE');
-    if (!empty($language)) {
-        $languageArr = explode(';', $language);
-        if (!empty($languageArr)) {
-            $languageArr2 = explode(',', $languageArr[0]);
-            if (!empty($languageArr2[0])) {
-                return $languageArr2[0];
-            }
-            return $languageArr[0];
-        }
-        return $language;
-    }
-    return '';
 }
 
 /**
@@ -1177,28 +1139,6 @@ function toDivideName(string $name, string $splitStr = ''): string
         }
     }
     return $name;
-}
-
-/**
- * 获取url请求结果数据
- * @param string $url 请求网址
- * @param bool $isMobile 是否模拟手机请求
- * @return string|bool
- */
-function getUrlResult(string $url, bool $isMobile = false): string|bool
-{
-    $caiji = new Caiji($url);
-    if (!$isMobile) {
-        $agent = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36';
-    } else {
-        $agent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1';
-    }
-    $caiji->setAgent($agent);
-    $caiji->setCookieFile(RUNTIME_DIR . '/cookie.txt');
-    $caiji->setIp(mt_rand(1, 255) . '.' . mt_rand(1, 255) . '.' . mt_rand(1, 255) . '.' . mt_rand(1, 255));
-    $caiji->setRefer($url);
-    $caiji->setTime(3);
-    return $caiji->getRes();
 }
 
 /**
