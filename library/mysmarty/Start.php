@@ -89,6 +89,7 @@ class Start
         } else {
             self::runRoute(ROUTE['home'], $mat);
         }
+        error('路由匹配失败：' . $uri);
     }
 
     /**
@@ -109,6 +110,8 @@ class Start
             $obj,
             $action
         ), array_values($params));
+        // 程序到此结束运行
+        exit();
     }
 
 

@@ -10,11 +10,6 @@ class Index extends Controller
     #[Route('', level: Route::LOW)]
     public function test()
     {
-        $obj = new \ReflectionClass('application\home\controller\Test');
-        $attributes = $obj->getAttributes(Route::class);
-        var_dump(count($attributes));
-        var_dump($attributes[0]->getName());
-        var_dump($attributes[0]->getArguments());
-        var_dump($attributes[0]->newInstance());
+        echo 'test';
     }
 }
