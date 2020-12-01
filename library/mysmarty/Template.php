@@ -234,7 +234,7 @@ class Template
                         $from = $paramData['from'];
                         $item = '$' . ltrim($paramData['item'], '$');
                         $key = '$' . ltrim(($paramData['key'] ?? 'index'), '$');
-                        $funCode .= '<?php foreach(' . $from . ' as ' . $item . ' => ' . $key . ') {?>';
+                        $funCode .= '<?php foreach(' . $from . ' as ' . $key . ' => ' . $item . ') {?>';
                     }
                     break;
                 case 'include':
