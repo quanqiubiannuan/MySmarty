@@ -708,9 +708,9 @@ function generateUrl(string $path = ''): string
  * @param string $type 需要的分词类别，ENGLISH、CN_WORD
  * @param string $analyzer 分词器，ik_smart、ik_max_word、icu_tokenizer
  * @param int $num 获取多少个分词个数
- * @return mixed
+ * @return array
  */
-function getAnalyzingText(string $text, int $minLen = 1, string $type = '', string $analyzer = 'ik_smart', int $num = 30)
+function getAnalyzingText(string $text, int $minLen = 1, string $type = '', string $analyzer = 'ik_smart', int $num = 30): array
 {
     $text = myTrim(strip_tags($text));
     $result = ElasticSearch::getInstance()->getAnalyze($text, $analyzer);
