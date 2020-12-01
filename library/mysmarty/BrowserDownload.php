@@ -8,14 +8,14 @@ namespace library\mysmarty;
 class BrowserDownload
 {
     // 文件数据
-    private $data;
+    private string $data;
     // 文件类型
-    private $mimeType;
+    private string $mimeType;
     // 响应过期时间
-    private $expire = 360;
+    private int $expire = 360;
     // 下载文件名
-    private $downloadFileName;
-    private static $obj;
+    private string $downloadFileName;
+    private static self $obj;
 
     private function __construct()
     {
@@ -27,10 +27,9 @@ class BrowserDownload
 
     /**
      * 获取实例
-     * @return BrowserDownload
-     * @author 戴记
+     * @return static
      */
-    public static function getInstance()
+    public static function getInstance(): static
     {
         if (self::$obj === null) {
             self::$obj = new self();
@@ -39,27 +38,11 @@ class BrowserDownload
     }
 
     /**
-     * 设置文件链接
-     * @param string $url
-     * @return BrowserDownload
-     */
-    public function setUrl($url)
-    {
-        if (0 !== stripos($url, 'http')) {
-            exit('链接错误');
-        }
-        $this->data = file_get_contents($url);
-        $urlPath = parse_url($url, PHP_URL_PATH);
-        $this->downloadFileName = pathinfo($urlPath, PATHINFO_BASENAME);
-        return $this;
-    }
-
-    /**
      * 设置文件数据
      * @param string $data
-     * @return BrowserDownload
+     * @return static
      */
-    public function setData($data)
+    public function setData(string $data): static
     {
         $this->data = $data;
         return $this;
@@ -68,9 +51,9 @@ class BrowserDownload
     /**
      * 设置文件所在位置
      * @param string $file
-     * @return BrowserDownload
+     * @return static
      */
-    public function setFile($file)
+    public function setFile(string $file): static
     {
         if (!file_exists($file)) {
             exit('文件不存在');
@@ -84,10 +67,9 @@ class BrowserDownload
     /**
      * 设置文件类型
      * @param string $mimeType
-     * @return $this
-     * @author 戴记
+     * @return static
      */
-    public function setMimeType($mimeType)
+    public function setMimeType(string $mimeType): static
     {
         $this->mimeType = $mimeType;
         return $this;
@@ -96,10 +78,9 @@ class BrowserDownload
     /**
      * 设置响应过期时间
      * @param int $expire 单位：秒
-     * @return $this
-     * @author 戴记
+     * @return static
      */
-    public function setExpire($expire)
+    public function setExpire(int $expire): static
     {
         $this->expire = $expire;
         return $this;
@@ -108,16 +89,14 @@ class BrowserDownload
     /**
      * 输出文件
      * @param string $downloadFileName 文件下载名
-     * @throws \Exception
-     * @author 戴记
      */
-    public function output($downloadFileName = '')
+    public function output(string $downloadFileName = ''): void
     {
         if (empty($downloadFileName)) {
             if (!empty($this->downloadFileName)) {
                 $downloadFileName = $this->downloadFileName;
             } else {
-                $downloadFileName = md5(time() . random_int(1000, 9999));
+                $downloadFileName = md5(time() . mt_rand(1000, 9999));
             }
         }
         if (empty($this->data)) {

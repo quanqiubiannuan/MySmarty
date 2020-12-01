@@ -1539,12 +1539,12 @@ function generateRoute(): void
                     $methodPattern = array_merge($topPattern, $methodPattern);
                     $methodMiddleware = array_merge($topMiddleware, $methodMiddleware);
                     $uri = trim($methodRoute, '/');
+                    $uri = preg_quote($uri);
                     // 替换正则表达式
-                    $reg = '/{([a-z0-9_]+)}/iU';
+                    $reg = '/\\\{([a-z0-9_]+)\\\}/iU';
                     $uri = preg_replace_callback($reg, function ($match) use ($methodPattern) {
                         return '(?P<' . $match[1] . '>' . ($methodPattern[$match[1]] ?? '[a-z0-9_]+') . ')';
                     }, $uri);
-                    $uri = str_ireplace('#', '\#', $uri);
                     // 处理中间件，方法名区分大小写
                     $dealMethodMiddleware = [];
                     foreach ($methodMiddleware as $midd => $middleware) {
