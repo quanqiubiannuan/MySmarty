@@ -1,3 +1,6 @@
+控制器
+
+```php
 <?php
 
 namespace application\home\controller;
@@ -18,3 +21,4 @@ class Index extends Controller
         var_dump(Cookie::getInstance()->get('name', '李四'));
     }
 }
+```

@@ -1150,21 +1150,23 @@ function getLocalCookie(string $name): string
 
 /**
  * 设置cookie
- * @param string $name
- * @param string $value
+ * @param string $name key
+ * @param string $value 值
+ * @return bool
  */
-function setLocalCookie(string $name, string $value): void
+function setLocalCookie(string $name, string $value): bool
 {
-    Cookie::getInstance()->set($name, $value);
+    return Cookie::getInstance()->set($name, $value);
 }
 
 /**
  * 删除cookie
- * @param string $name
+ * @param string $name key
+ * @return bool
  */
-function deleteCookie(string $name): void
+function deleteCookie(string $name): bool
 {
-    Cookie::getInstance()->delete($name);
+    return Cookie::getInstance()->delete($name);
 }
 
 /**

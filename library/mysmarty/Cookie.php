@@ -5,17 +5,17 @@ namespace library\mysmarty;
 class Cookie
 {
 
-    private $expire;
+    private int $expire;
 
-    private $path;
+    private string $path;
 
-    private $domain;
+    private string $domain;
 
-    private $secure;
+    private bool $secure;
 
-    private $httponly;
+    private bool $httponly;
 
-    private static $obj;
+    private static ?self $obj = null;
 
     private function __construct()
     {
@@ -25,185 +25,151 @@ class Cookie
     {
     }
 
-    public static function getInstance()
+    /**
+     * @return static
+     */
+    public static function getInstance(): static
     {
         if (self::$obj === null) {
             self::$obj = new self();
+            self::$obj->expire = config('session.lifetime', 3600);
+            self::$obj->path = config('session.path', '/');
+            self::$obj->domain = config('session.domain', '');
+            self::$obj->secure = config('session.secure', false);
+            self::$obj->httponly = config('session.httponly', true);
+            if (empty(self::$obj->domain)) {
+                self::$obj->domain = $_SERVER['SERVER_NAME'];
+            }
         }
         return self::$obj;
     }
 
     /**
-     *
-     * @return mixed
+     * @return int
      */
-    public function getExpire()
+    public function getExpire(): int
     {
         return $this->expire;
     }
 
     /**
-     *
-     * @return mixed
+     * @param int $expire
      */
-    public function getPath()
+    public function setExpire(int $expire): void
+    {
+        $this->expire = $expire;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath(): string
     {
         return $this->path;
     }
 
     /**
-     *
-     * @return mixed
+     * @param string $path
      */
-    public function getDomain()
+    public function setPath(string $path): void
+    {
+        $this->path = $path;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDomain(): string
     {
         return $this->domain;
     }
 
     /**
-     *
-     * @return mixed
+     * @param string $domain
      */
-    public function getSecure()
+    public function setDomain(string $domain): void
+    {
+        $this->domain = $domain;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSecure(): bool
     {
         return $this->secure;
     }
 
     /**
-     *
-     * @return mixed
+     * @param bool $secure
      */
-    public function getHttponly()
+    public function setSecure(bool $secure): void
+    {
+        $this->secure = $secure;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHttponly(): bool
     {
         return $this->httponly;
     }
 
     /**
-     *
-     * @param integer $expire
-     * @return $this
-     */
-    public function setExpire($expire)
-    {
-        $this->expire = $expire;
-        return $this;
-    }
-
-    /**
-     *
-     * @param string $path
-     * @return $this
-     */
-    public function setPath($path)
-    {
-        $this->path = $path;
-        return $this;
-    }
-
-    /**
-     *
-     * @param string $domain
-     * @return $this
-     */
-    public function setDomain($domain)
-    {
-        $this->domain = $domain;
-        return $this;
-    }
-
-    /**
-     *
-     * @param bool $secure
-     * @return $this
-     */
-    public function setSecure($secure)
-    {
-        $this->secure = $secure;
-        return $this;
-    }
-
-    /**
-     *
      * @param bool $httponly
-     * @return $this
      */
-    public function setHttponly($httponly)
+    public function setHttponly(bool $httponly): void
     {
         $this->httponly = $httponly;
-        return $this;
     }
 
     /**
      * 设置
-     *
      * @param string $name
      * @param string $value
+     * @return bool
      */
-    public function set($name, $value)
+    public function set(string $name, string $value): bool
     {
-        $lifetime = $this->expire ?: config('session.lifetime', 3600);
-        $path = $this->path ?: config('session.path', '/');
-        $domain = $this->domain ?: config('session.domain', '');
-        $secure = $this->secure ?: config('session.secure', false);
-        $httponly = $this->httponly ?: config('session.httponly', true);
-        if (empty($domain)) {
-            $domain = $_SERVER['SERVER_NAME'];
-        }
-        setcookie($name, $value, time() + intval($lifetime), $path, $domain, $secure, $httponly);
+        return setcookie($name, $value, time() + intval(self::$obj->expire), self::$obj->path, self::$obj->domain, self::$obj->secure, self::$obj->httponly);
     }
 
     /**
      * 获取
-     *
      * @param string $name
      * @param string $defValue
      * @return string
      */
-    public function get($name, $defValue = '')
+    public function get(string $name, string $defValue = ''): string
     {
-        if (isset($_COOKIE[$name])) {
-            return $_COOKIE[$name];
-        }
-        return $defValue;
+        return $_COOKIE[$name] ?? $defValue;
     }
 
     /**
      * 删除
-     *
      * @param string $name
+     * @return bool
      */
-    public function delete($name)
+    public function delete(string $name): bool
     {
         if (isset($_COOKIE[$name])) {
-            $path = $this->path ?: config('session.path', '/');
-            $domain = $this->domain ?: config('session.domain', '');
-            $secure = $this->secure ?: config('session.secure', false);
-            $httponly = $this->httponly ?: config('session.httponly', true);
-            if (empty($domain)) {
-                $domain = $_SERVER['SERVER_NAME'];
-            }
-            setcookie($name, '', time() - 3600, $path, $domain, $secure, $httponly);
+            return setcookie($name, '', time() - 3600, self::$obj->path, self::$obj->domain, self::$obj->secure, self::$obj->httponly);
         }
+        return false;
     }
 
     /**
      * 清空
      */
-    public function clear()
+    public function clear(): void
     {
         if (count($_COOKIE) > 1) {
-            $path = $this->path ?: config('session.path', '/');
-            $domain = $this->domain ?: config('session.domain', '');
-            $secure = $this->secure ?: config('session.secure', false);
-            $httponly = $this->httponly ?: config('session.httponly', true);
-            if (empty($domain)) {
-                $domain = $_SERVER['SERVER_NAME'];
-            }
             foreach ($_COOKIE as $k => $v) {
                 if ($k === 'PHPSESSID') {
                     continue;
                 }
-                setcookie($k, '', time() - 3600, $path, $domain, $secure, $httponly);
+                setcookie($k, '', time() - 3600, self::$obj->path, self::$obj->domain, self::$obj->secure, self::$obj->httponly);
             }
         }
     }
