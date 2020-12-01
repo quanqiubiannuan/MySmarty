@@ -4,98 +4,75 @@ namespace library\mysmarty;
 
 /**
  * 验证码类
- *
- * @author 戴记
- *
  */
 class Captcha
 {
 
     /**
      * 图像宽度
-     *
      * @var int
      */
-    private $width = 0;
+    private int $width = 0;
 
     /**
      * 图像高度
-     *
      * @var int
      */
-    private $height = 50;
+    private int $height = 50;
 
     /**
      * 图像上显示的字符
-     *
-     * @var int
+     * @var string
      */
-    private $code;
+    private string $code;
 
     /**
      * 验证码类型
      * @var int 0 数字与字母，1 数字，2 字母，3 中文
      */
-    private $codeStyle = 0;
+    private int $codeStyle = 0;
 
     //验证码长度
-    private $codeSize = 4;
+    private int $codeSize = 4;
 
     /**
      * 字体大小
-     *
      * @var int
      */
-    private $font = 25;
+    private int $font = 25;
 
-    /**
-     * 验证码有效期，单位秒
-     * @var int
-     */
-    private $lifttime = 300;
     /**
      * 字体文件
      * @var string
      */
-    private $fontFile = 'times.ttf';
+    private string $fontFile = 'times.ttf';
 
     /**
      * 验证码session名称
      * @var string
      */
-    private static $sessionName = 'code';
+    private static string $sessionName = 'code';
 
     /**
      * 构造方法
-     *
-     * @param string $code
-     *            图像字符串
-     * @param integer $width
-     *            图像宽度
-     * @param integer $height
-     *            图像高度
+     * @param string $code 图像字符串
+     * @param int $height 图像高度
      */
-    private function __construct($code = null, $width = null, $height = null)
+    private function __construct(string $code = '', int $height = 0)
     {
-        if ($code !== null) {
-            if (empty($code)) {
-                $code = $this->getCode();
-            }
-            $this->code = (string)$code;
+        if (empty($code)) {
+            $this->code = $this->getCode();
         }
-        if ($width !== null) {
-            $this->width = $width;
-        }
-        if ($height !== null) {
+        if (0 !== $height) {
             $this->height = $height;
         }
     }
 
     /**
      * 获取单一实例
-     * @return $this
+     * @return static
      */
-    public static function getInstance()
+    public static function getInstance(): static
     {
         return new self();
     }
@@ -103,8 +80,9 @@ class Captcha
     /**
      * 设置字体我呢见
      * @param string $fontFile 字体文件名称
+     * @return static
      */
-    public function setFontFile($fontFile)
+    public function setFontFile(string $fontFile): static
     {
         $this->fontFile = $fontFile;
         return $this;
@@ -112,10 +90,10 @@ class Captcha
 
     /**
      * 设置字体大小
-     * @param integer $font
-     * @return $this
+     * @param int $font
+     * @return static
      */
-    public function setFont($font)
+    public function setFont(int $font): static
     {
         $this->font = $font;
         return $this;
@@ -124,40 +102,31 @@ class Captcha
     /**
      * 设置验证码session名称
      * @param string $sesssionName
-     * @return $this
+     * @return static
      */
-    public function setSessionName($sesssionName)
+    public function setSessionName(string $sesssionName): static
     {
         self::$sessionName = $sesssionName;
         return $this;
     }
 
     /**
-     * 设置验证码宽度
-     * @param integer $width
-     * @return $this
-     */
-    public function setWidth($width)
-    {
-        return $this;
-    }
-
-    /**
      * 设置验证码高度
-     * @param integer $height
-     * @return $this
+     * @param int $height
+     * @return static
      */
-    public function setHeight($height)
+    public function setHeight(int $height): static
     {
+        $this->height = $height;
         return $this;
     }
 
     /**
      * 设置验证码字符
      * @param string $code
-     * @return $this
+     * @return static
      */
-    public function setCode($code)
+    public function setCode(string $code): static
     {
         $this->code = $code;
         return $this;
@@ -165,10 +134,10 @@ class Captcha
 
     /**
      * 设置验证码类型
-     * @param integer $codeStyle 0 数字与字母，1 数字，2 字母，3 中文
-     * @return $this
+     * @param int $codeStyle 0 数字与字母，1 数字，2 字母，3 中文
+     * @return  static
      */
-    public function setCodeStyle($codeStyle)
+    public function setCodeStyle(int $codeStyle): static
     {
         $this->codeStyle = $codeStyle;
         return $this;
@@ -176,23 +145,12 @@ class Captcha
 
     /**
      * 设置验证码长度
-     * @param integer $codeSize
-     * @return $this
+     * @param int $codeSize
+     * @return static
      */
-    public function setCodeSize($codeSize)
+    public function setCodeSize(int $codeSize): static
     {
         $this->codeSize = $codeSize;
-        return $this;
-    }
-
-    /**
-     * 设置验证码有效时间
-     * @param integer $lifetime
-     * @return $this
-     */
-    public function setLifetime($lifetime)
-    {
-        $this->lifttime = $lifetime;
         return $this;
     }
 
@@ -202,24 +160,19 @@ class Captcha
 
     /**
      * 静态调用方法
-     *
-     * @param integer $width
-     *            图像宽度
-     * @param integer $height
-     *            图像高度
+     * @param int $height 图像高度
      * @return $this
      */
-    public static function code($width = 100, $height = 50)
+    public static function code(int $height = 50): static
     {
-        return new self('', $width, $height);
+        return new self('', $height);
     }
 
     /**
      * 获取随机字符串
-     *
      * @return string
      */
-    private function getCode()
+    private function getCode(): string
     {
         $str = '0123456789qwertyuioplkjhgfdsazxcvbnm' . strtoupper('qwertyuioplkjhgfdsazxcvbnm');
         return $this->getCodeByStr($str);
@@ -227,10 +180,9 @@ class Captcha
 
     /**
      * 获取随机一个字符串
-     *
      * @return string
      */
-    private function getOneCode()
+    private function getOneCode(): string
     {
         $str = '0123456789qwertyuioplkjhgfdsazxcvbnm' . strtoupper('qwertyuioplkjhgfdsazxcvbnm');
         return substr(str_shuffle($str), 0, 1);
@@ -238,10 +190,10 @@ class Captcha
 
     /**
      * 获取指定的字符串数据
-     * @param integer $str
+     * @param string $str
      * @return string
      */
-    private function getCodeByStr($str)
+    private function getCodeByStr(string $str): string
     {
         return substr(str_shuffle($str), 0, $this->codeSize);
     }
@@ -250,7 +202,7 @@ class Captcha
      * 获取数字验证码
      * @return string
      */
-    private function getNumCode()
+    private function getNumCode(): string
     {
         $str = '0123456789';
         return $this->getCodeByStr($str);
@@ -260,7 +212,7 @@ class Captcha
      * 获取字母验证码
      * @return string
      */
-    private function getLetterCode()
+    private function getLetterCode(): string
     {
         $str = 'qwertyuioplkjhgfdsazxcvbnm' . strtoupper('qwertyuioplkjhgfdsazxcvbnm');
         return $this->getCodeByStr($str);
@@ -270,17 +222,17 @@ class Captcha
      * 获取中文验证码
      * @return string
      */
-    private function getZhCode()
+    private function getZhCode(): string
     {
         return getZhChar($this->codeSize);
     }
 
     /**
      * 设置字体
-     * @param integer $font
-     * @return $this
+     * @param int $font
+     * @return static
      */
-    public function font($font)
+    public function font(int $font): static
     {
         return $this->setFont($font);
     }
@@ -288,7 +240,7 @@ class Captcha
     /**
      * 输出验证码
      */
-    public function output()
+    public function output(): void
     {
         header('Content-Type: image/png');
         $im = $this->generateImage();
@@ -299,8 +251,9 @@ class Captcha
 
     /**
      * 生成验证码
+     * @return \GdImage
      */
-    private function generateImage()
+    private function generateImage(): \GdImage
     {
         $kWidth = 20;
         if (empty($this->code)) {
@@ -337,15 +290,15 @@ class Captcha
         $y = ($this->height - $imgInfo[3] - $imgInfo[5]) / 2;
         // 写字符串
         for ($i = 0; $i < $codeLen; $i++) {
-            $angle = random_int(-20, 20);
-            $text_color = imagecolorallocate($im, random_int(0, 100), random_int(0, 100), random_int(0, 100));
+            $angle = mt_rand(-20, 20);
+            $text_color = imagecolorallocate($im, mt_rand(0, 100), mt_rand(0, 100), mt_rand(0, 100));
             // 画验证码
             $x = $i * $kWidth;
             imagefttext($im, $this->font, $angle, $x, $y, $text_color, ROOT_DIR . '/extend/fonts/' . $this->fontFile, $codeArr[$i]);
-            $text_color = imagecolorallocate($im, random_int(150, 255), random_int(150, 255), random_int(150, 255));
-            imagestring($im, 5, $x, $y + random_int(-1 * $y, 5), $this->getOneCode(), $text_color);
+            $text_color = imagecolorallocate($im, mt_rand(150, 255), mt_rand(150, 255), mt_rand(150, 255));
+            imagestring($im, 5, $x, $y + mt_rand(-1 * $y, 5), $this->getOneCode(), $text_color);
             // 画干扰线
-            imageline($im, random_int(0, $this->width), random_int(0, $this->height), random_int(0, $this->width), random_int(0, $this->height), $text_color);
+            imageline($im, mt_rand(0, $this->width), mt_rand(0, $this->height), mt_rand(0, $this->width), mt_rand(0, $this->height), $text_color);
         }
         return $im;
     }
@@ -354,7 +307,7 @@ class Captcha
      * 生成验证码的base64编码
      * @return string
      */
-    public function getBase64Image()
+    public function getBase64Image(): string
     {
         $im = $this->generateImage();
         $fileName = RUNTIME_DIR . '/captcha/captcha.png';
@@ -369,17 +322,19 @@ class Captcha
 
     /**
      * 验证验证码
-     *
-     * @param string $code
-     *            输入的字符
+     * @param string $code 输入的字符
      * @param string $sessionName 验证码session名称
-     * @return boolean
+     * @param bool $delete 是否删除验证码
+     * @return bool
      */
-    public static function check($code, $sessionName = 'code')
+    public static function check(string $code, string $sessionName = 'code', bool $delete = false): bool
     {
         if (getSession($sessionName) === strtolower($code)) {
             deleteSession($sessionName);
             return true;
+        }
+        if ($delete) {
+            deleteSession($sessionName);
         }
         return false;
     }
