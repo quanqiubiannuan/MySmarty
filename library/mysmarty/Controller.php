@@ -189,4 +189,14 @@ class Controller
         }
         redirect($url . $paramsStr);
     }
+
+    /**
+     * 分配变量
+     * @param string $key 变量名称
+     * @param mixed $value 变量值
+     */
+    final protected function assign(string $key, mixed $value): void
+    {
+        $this->mySmarty->assign($key, $value);
+    }
 }

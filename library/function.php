@@ -1660,3 +1660,16 @@ function checkeFileUpdate(string $dir): bool
     }
     return false;
 }
+
+/**
+ * 获取当前访问路径，不包含GET请求参数
+ * @return string
+ */
+function getHref(): string
+{
+    $uri = getPath();
+    if (!empty($uri)) {
+        return getAbsoluteUrl() . '/' . $uri;
+    }
+    return getAbsoluteUrl();
+}

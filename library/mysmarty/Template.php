@@ -23,7 +23,7 @@ class Template
     // 右分隔符
     private string $rightDelimiter = '}';
     // 函数合法开始标签
-    private array $funStartRegTags = ['include', 'foreach', 'if', 'elseif', 'else', 'php', 'config_load'];
+    private array $funStartRegTags = ['include', 'foreach', 'if', 'elseif', 'else', 'php', 'config_load', 'url', 'href'];
     // 函数合法结束标签
     private array $funEndRegTags = ['foreach', 'if', 'php'];
     // 替换标签
@@ -264,6 +264,12 @@ class Template
                 case 'config_load':
                     $paramData = $this->paramToArr($matchs[2], true);
                     $this->configFile = $paramData['file'];
+                    break;
+                case 'url':
+                    $funCode .= getAbsoluteUrl();
+                    break;
+                case 'href':
+                    $funCode .= getHref();
                     break;
             }
             return $funCode;
