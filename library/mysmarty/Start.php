@@ -89,7 +89,7 @@ class Start
         } else {
             self::runRoute(ROUTE['home'], $mat);
         }
-        error('路由匹配失败：' . $uri);
+        error('页面找不到');
     }
 
     /**

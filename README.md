@@ -139,8 +139,6 @@ config - 网站全局配置文件目录
 
 ----mail.php 邮件发送配置
 
-----queue.php 队列配置
-
 ----session.php Session配置
 
 ----mysmarty.php MySmarty模板配置、缓存配置
