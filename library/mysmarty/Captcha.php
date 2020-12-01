@@ -2,17 +2,13 @@
 
 namespace library\mysmarty;
 
+use GdImage;
+
 /**
  * 验证码类
  */
 class Captcha
 {
-
-    /**
-     * 图像宽度
-     * @var int
-     */
-    private int $width = 0;
 
     /**
      * 图像高度
@@ -251,9 +247,9 @@ class Captcha
 
     /**
      * 生成验证码
-     * @return \GdImage
+     * @return GdImage
      */
-    private function generateImage(): \GdImage
+    private function generateImage(): GdImage
     {
         $kWidth = 20;
         if (empty($this->code)) {
@@ -279,11 +275,11 @@ class Captcha
         // 创建画布
         $codeArr = preg_split('//u', $this->code);
         $codeLen = count($codeArr);
-        $this->width = $codeLen * $kWidth;
-        $im = @imagecreatetruecolor($this->width, $this->height);
+        $width = $codeLen * $kWidth;
+        $im = @imagecreatetruecolor($width, $this->height);
         // 背景颜色
         $backgroundColor = imagecolorallocatealpha($im, 243, 251, 254, 0);
-        imagefilledrectangle($im, 0, 0, $this->width - 1, $this->height - 1, $backgroundColor);
+        imagefilledrectangle($im, 0, 0, $width - 1, $this->height - 1, $backgroundColor);
         // 计算坐标
         $imgInfo = imagettfbbox($this->font, 0, ROOT_DIR . '/extend/fonts/' . $this->fontFile, $this->code);
         //开始y位置
@@ -298,7 +294,7 @@ class Captcha
             $text_color = imagecolorallocate($im, mt_rand(150, 255), mt_rand(150, 255), mt_rand(150, 255));
             imagestring($im, 5, $x, $y + mt_rand(-1 * $y, 5), $this->getOneCode(), $text_color);
             // 画干扰线
-            imageline($im, mt_rand(0, $this->width), mt_rand(0, $this->height), mt_rand(0, $this->width), mt_rand(0, $this->height), $text_color);
+            imageline($im, mt_rand(0, $width), mt_rand(0, $this->height), mt_rand(0, $width), mt_rand(0, $this->height), $text_color);
         }
         return $im;
     }
