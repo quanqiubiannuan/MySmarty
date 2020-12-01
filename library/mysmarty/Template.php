@@ -23,7 +23,7 @@ class Template
     // 右分隔符
     private string $rightDelimiter = '}';
     // 函数合法开始标签
-    private array $funStartRegTags = ['include', 'foreach', 'if', 'elseif', 'else', 'php', 'config_load', 'url', 'href'];
+    private array $funStartRegTags = ['include', 'foreach', 'if', 'elseif', 'else', 'php', 'config_load', 'url', 'href', 'captcha'];
     // 函数合法结束标签
     private array $funEndRegTags = ['foreach', 'if', 'php'];
     // 替换标签
@@ -270,6 +270,11 @@ class Template
                     break;
                 case 'href':
                     $funCode .= getHref();
+                    break;
+                case 'captcha':
+                    $paramData = $this->paramToArr($matchs[2], true);
+                    $src = getAbsoluteUrl() . '/' . trim($paramData['src'], '/');
+                    $funCode .= '<img src="' . $src . '" alt="验证码" style="cursor: pointer;" title="点击图片切换验证码" onclick="this.src=\'' . $src . '?i=\'+Math.random()+\'\'" />';
                     break;
             }
             return $funCode;
