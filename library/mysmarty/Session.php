@@ -5,7 +5,7 @@ namespace library\mysmarty;
 /**
  * session操作类
  *
- * @author 戴记
+
  *
  */
 class Session

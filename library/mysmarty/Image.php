@@ -5,7 +5,7 @@ namespace library\mysmarty;
 /**
  * 图像处理类
  *
- * @author 戴记
+
  *
  */
 class Image

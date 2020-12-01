@@ -5,7 +5,7 @@ namespace library\mysmarty;
 /**
  * 文件上传类
  *
- * @author 戴记
+
  *
  */
 class Upload

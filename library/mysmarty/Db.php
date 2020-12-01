@@ -5,7 +5,7 @@ namespace library\mysmarty;
 /**
  * 数据库便捷查询类
  *
- * @author 戴记
+
  *
  */
 class Db

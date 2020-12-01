@@ -7,7 +7,7 @@ use Exception;
 /**
  * 发送电子邮件类
  *
- * @author 戴记
+
  *
  */
 class Smtp

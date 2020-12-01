@@ -5,7 +5,7 @@ namespace library\mysmarty;
 /**
  * pdo连接池
  *
- * @author 戴记
+
  *
  */
 class MyPdo

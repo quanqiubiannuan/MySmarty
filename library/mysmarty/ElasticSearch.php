@@ -5,7 +5,7 @@ namespace library\mysmarty;
 /**
  * 全文搜索
  *
- * @author 戴记
+
  *
  */
 class ElasticSearch

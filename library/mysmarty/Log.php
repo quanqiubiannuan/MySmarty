@@ -5,7 +5,7 @@ namespace library\mysmarty;
 /**
  * 日志类
  *
- * @author 戴记
+
  *
  */
 class Log

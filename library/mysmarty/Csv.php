@@ -7,15 +7,14 @@ namespace library\mysmarty;
  */
 class  Csv
 {
-    private $fp;
+    private mixed $fp = null;
 
     /**
      * 开始导出数据
      * @param string $filename 导出的excel文件名称
      * @param array $header excel表格第一行设置，一维数组
-     * @author 戴记
      */
-    public function startCsv($filename, $header): void
+    public function startCsv(string $filename, array $header): void
     {
         header_remove();
         header('Content-Description: File Transfer');
@@ -34,9 +33,8 @@ class  Csv
     /**
      * 输出错误信息
      * @param string $msg 错误信息
-     * @author 戴记
      */
-    private function echoError($msg): void
+    private function echoError(string $msg): void
     {
         header_remove();
         header('content-type:text/html;charset=utf-8');
@@ -46,9 +44,8 @@ class  Csv
     /**
      * 添加数据置表格
      * @param array $data 一维或二维数组格式数据
-     * @author 戴记
      */
-    public function putCsv($data): void
+    public function putCsv(array $data): void
     {
         if (!empty($data)) {
             if (!is_array($data)) {
@@ -73,7 +70,6 @@ class  Csv
 
     /**
      * 结束导出
-     * @author 戴记
      */
     public function endCsv(): void
     {

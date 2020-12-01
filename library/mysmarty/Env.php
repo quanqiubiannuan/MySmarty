@@ -5,7 +5,7 @@ namespace library\mysmarty;
 /**
  * 环境变量（动态配置）配置
  *
- * @author 戴记
+
  *
  */
 class Env
