@@ -189,6 +189,13 @@ class Template
                 exit('父模板文件不存在');
             }
             $blockData = [];
+            // 父模板
+            if (preg_match_all($blockReg, $parentTemplateData, $mat2)) {
+                foreach ($mat2[1] as $k => $v) {
+                    $blockData[$v] = $mat2[2][$k];
+                }
+            }
+            // 子模板
             if (preg_match_all($blockReg, $templateData, $mat2)) {
                 foreach ($mat2[1] as $k => $v) {
                     $blockData[$v] = $mat2[2][$k];
