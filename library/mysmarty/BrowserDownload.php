@@ -15,7 +15,7 @@ class BrowserDownload
     private int $expire = 360;
     // 下载文件名
     private string $downloadFileName;
-    private static self $obj;
+    private static ?self $obj = null;
 
     private function __construct()
     {
