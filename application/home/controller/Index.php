@@ -2,15 +2,18 @@
 
 namespace application\home\controller;
 
-use library\mysmarty\BrowserDownload;
+use library\mysmarty\Cache;
 
 class Index
 {
     public function test()
     {
-        BrowserDownload::getInstance()
-            ->setData(file_get_contents('https://www.wyzda.com/static/v20200328/images/logo.png'))
-            ->setMimeType('image/jpg')
-            ->output('a.jpg');
+        //设置
+        var_dump(Cache::set('name', '李先生',3000));
+//        //获取
+        var_dump(Cache::get('name'));
+//        //删除
+        var_dump(Cache::rm('name'));
+        var_dump(Cache::get('name2', '默认值'));
     }
 }

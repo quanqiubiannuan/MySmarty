@@ -306,9 +306,9 @@ function getMemFreeRate(): int
  * @param string $name 键
  * @param string $value 值
  * @param int $expire 过期时间
- * @return int
+ * @return bool
  */
-function setCache(string $name, string $value, int $expire = 3600): int
+function setCache(string $name, string $value, int $expire = 3600): bool
 {
     return Cache::set($name, $value, $expire);
 }
@@ -327,9 +327,9 @@ function getCache(string $name, string $defValue = ''): string
 /**
  * 删除缓存
  * @param string $name 键
- * @return int
+ * @return bool
  */
-function deleteCache(string $name): int
+function deleteCache(string $name): bool
 {
     return Cache::rm($name);
 }
