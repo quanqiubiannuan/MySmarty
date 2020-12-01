@@ -344,6 +344,32 @@ pass=foobar
 
 支持多级继承
 
+**原样输出**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+内容
+{literal}
+    不会解析的地方
+{$name}
+
+{url}
+
+<script>
+    alert('xxx');
+</script>
+
+{/literal}
+</body>
+</html>
+```
+
 **其它模板语法**
 
 ```html

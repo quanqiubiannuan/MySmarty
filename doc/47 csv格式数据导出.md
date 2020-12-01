@@ -24,7 +24,7 @@ class Index extends Controller
         for ($i=0;$i<30;$i++){
             $csv->putCsv([
                 '张三'.$i,
-                random_int(10,50)
+                mt_rand(10,50)
             ]);
         }
         // 结束添加数据

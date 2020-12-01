@@ -1,8 +1,4 @@
 <?php
-/**
- * Date: 2019/5/29
- * Time: 13:55
- */
 
 namespace library\mysmarty;
 
@@ -12,8 +8,8 @@ namespace library\mysmarty;
  */
 class Ckeditor
 {
-    private static $obj;
-    private $allowTags = '<p><img><h1><h2><h3><h4><h5><h6><strong><i><a><ul><li><ol><blockquote><table><thead><tbody><tr><th><td><pre><code><br>';
+    private static ?self $obj = null;
+    private string $allowTags = '<p><img><h1><h2><h3><h4><h5><h6><strong><i><a><ul><li><ol><blockquote><table><thead><tbody><tr><th><td><pre><code><br>';
 
     private function __construct()
     {
@@ -25,9 +21,9 @@ class Ckeditor
 
     /**
      * 获取Ckeditor对象
-     * @return Ckeditor
+     * @return static
      */
-    public static function getInstance()
+    public static function getInstance(): static
     {
         if (self::$obj === null) {
             self::$obj = new self();
@@ -41,7 +37,7 @@ class Ckeditor
      * @param bool $downloadImg 是否自动下载远程图片
      * @return string
      */
-    public function getContent($content, $downloadImg = true)
+    public function getContent(string $content, bool $downloadImg = true): string
     {
         $content = $this->stripTags($content);
         $content = $this->paiban($content, $downloadImg);
@@ -53,7 +49,7 @@ class Ckeditor
      * @param string $content
      * @return string
      */
-    private function stripTags($content)
+    private function stripTags(string $content): string
     {
         $content = str_ireplace('<p></p>', '', $content);
         $content = preg_replace('/<p>([ 　]|&nbsp;)+<\/p>/iUu', '', $content);
@@ -87,9 +83,9 @@ class Ckeditor
     /**
      * 替换内容中的图片
      * @param string $content 内容
-     * @return mixed
+     * @return string
      */
-    private function replaceImg($content)
+    private function replaceImg(string $content): string
     {
         $reg = '/<img[^>]*>/iU';
         if (preg_match_all($reg, $content, $mat)) {
@@ -118,9 +114,9 @@ class Ckeditor
     /**
      * 替换内容中的代码部分
      * @param string $content 内容
-     * @return mixed
+     * @return string
      */
-    private function replaceCode($content)
+    private function replaceCode(string $content): string
     {
         $reg = '/<code[^>]*>/iU';
         if (preg_match_all($reg, $content, $mat)) {
@@ -143,7 +139,7 @@ class Ckeditor
      * @param string $attr img属性值
      * @return string
      */
-    private function getImgAttr($img, $attr)
+    private function getImgAttr(string $img, string $attr): string
     {
         $reg = '/<img [^>]*' . $attr . '=[\'"]([^\'"]+)[\'"][^>]*>/iU';
         if (preg_match($reg, $img, $mat)) {
@@ -158,7 +154,7 @@ class Ckeditor
      * @param string $attr img属性值
      * @return string
      */
-    private function getCodeAttr($code, $attr)
+    private function getCodeAttr(string $code, string $attr): string
     {
         $reg = '/<code [^>]*' . $attr . '=[\'"]([^\'"]+)[\'"][^>]*>/iU';
         if (preg_match($reg, $code, $mat)) {
@@ -173,9 +169,8 @@ class Ckeditor
      * @param bool $downloadImg 是否下载远程图片
      * @return string
      */
-    private function paiban($str, $downloadImg = true)
+    private function paiban(string $str, bool $downloadImg = true): string
     {
-        $isHtmlspecialchars = true;
         if (!preg_match('/<p>/i', $str)) {
             //没有匹配到p标签
             $strArr = explode(PHP_EOL, $str);
@@ -185,18 +180,13 @@ class Ckeditor
                 if (empty($v)) {
                     continue;
                 }
-                $str .= $this->repPvalue($v, $downloadImg, false);
+                $str .= $this->repPvalue($v, $downloadImg);
             }
         } else {
-            $startPnum = substr_count($str, '<p>');
-            $endPnum = substr_count($str, '</p>');
-            if ($startPnum === $endPnum) {
-                $isHtmlspecialchars = false;
-            }
             $reg = '/<p>(.*)<\/p>/iUs';
             if (preg_match_all($reg, $str, $mat)) {
                 foreach ($mat[0] as $v) {
-                    $str = str_ireplace($v, $this->repPvalue($v, $downloadImg, $isHtmlspecialchars), $str);
+                    $str = str_ireplace($v, $this->repPvalue($v, $downloadImg), $str);
                 }
             }
         }
@@ -208,7 +198,7 @@ class Ckeditor
      * @param string $str
      * @return string
      */
-    private function afterPaiban($str)
+    private function afterPaiban(string $str): string
     {
         $splitStr = '_@#@_';
         $finalStr = '';
@@ -245,7 +235,7 @@ class Ckeditor
      * @param string $pv
      * @return string
      */
-    private function getPBrValue($pv)
+    private function getPBrValue(string $pv): string
     {
         $str = '';
         $pv = myTrim($pv);
@@ -267,27 +257,22 @@ class Ckeditor
     /**
      * 获取p标签字段的格式化内容
      * @param string $pv
-     * @param bool $isHtmlspecialchars 是否转义内容
      * @return string
      */
-    private function getPValue($pv, $isHtmlspecialchars = false)
+    private function getPValue(string $pv): string
     {
-        $pv = myTrim($pv);
-        if ($isHtmlspecialchars) {
-            $pv = htmlspecialchars($pv);
-        }
-        return $pv;
+        return myTrim($pv);
     }
 
     /**
      * 正则替换p标签内容
      * @param string $pv
      * @param bool $downloadImg
-     * @param bool $isHtmlspecialchars
      * @return string
      */
-    private function repPvalue($pv, $downloadImg = true, $isHtmlspecialchars = false)
+    private function repPvalue(string $pv, bool $downloadImg = true): string
     {
+        $pv = htmlspecialchars_decode($pv);
         $pv = str_ireplace('<p>', '', $pv);
         $pv = str_ireplace('</p>', '', $pv);
         $pv = preg_replace('/&[\w]+;/iU', '', $pv);
@@ -309,7 +294,7 @@ class Ckeditor
                 }
                 return '<p>' . $pv . '</p>';
             } else {
-                return '<p>' . $this->getPValue($pv, $isHtmlspecialchars) . '</p>';
+                return '<p>' . $this->getPValue($pv) . '</p>';
             }
         }
         return '';
