@@ -8,6 +8,5 @@ class Index extends Controller
 {
     public function test()
     {
-
     }
 }

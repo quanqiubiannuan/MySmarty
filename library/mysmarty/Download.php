@@ -8,17 +8,17 @@ namespace library\mysmarty;
 
 class Download
 {
-    private static $obj;
+    private static ?self $obj = null;
 
-    private $downloadUrl;
+    private string $downloadUrl;
 
-    private $fileExtension;
+    private string $fileExtension;
 
-    private $saveDir;
+    private string $saveDir;
 
-    private $saveFilename;
+    private string $saveFilename;
 
-    private $timeOut = 60;
+    private int $timeOut = 60;
 
     private function init()
     {
@@ -37,7 +37,10 @@ class Download
     {
     }
 
-    public static function getInstance()
+    /**
+     * @return static
+     */
+    public static function getInstance(): static
     {
         if (self::$obj === null) {
             self::$obj = new self();
@@ -49,9 +52,9 @@ class Download
     /**
      * 设置下载链接
      * @param string $downloadUrl
-     * @return $this
+     * @return static
      */
-    public function setDownloadUrl($downloadUrl)
+    public function setDownloadUrl(string $downloadUrl): static
     {
         $this->downloadUrl = $downloadUrl;
         return $this;
@@ -60,9 +63,9 @@ class Download
     /**
      * 设置下载文件的后缀，不包括 .
      * @param string $fileExtension
-     * @return $this
+     * @return static
      */
-    public function setFileExtension($fileExtension)
+    public function setFileExtension(string $fileExtension): static
     {
         $this->fileExtension = $fileExtension;
         return $this;
@@ -71,9 +74,9 @@ class Download
     /**
      * 设置下载文件的保存目录
      * @param string $saveDir
-     * @return $this
+     * @return static
      */
-    public function setSaveDir($saveDir)
+    public function setSaveDir(string $saveDir): static
     {
         $this->saveDir = $saveDir;
         return $this;
@@ -82,9 +85,9 @@ class Download
     /**
      * 设置保存的文件名，包含文件名后缀
      * @param string $saveFilename
-     * @return $this
+     * @return static
      */
-    public function setSaveFilename($saveFilename)
+    public function setSaveFilename(string $saveFilename): static
     {
         $this->saveFilename = $saveFilename;
         return $this;
@@ -93,9 +96,9 @@ class Download
     /**
      * 设置下载超时时间
      * @param int $timeOut 单位，秒
-     * @return $this
+     * @return static
      */
-    public function setTimeOut($timeOut)
+    public function setTimeOut(int $timeOut): static
     {
         $this->timeOut = $timeOut;
         return $this;
@@ -105,12 +108,11 @@ class Download
      * 开始下载文件
      * @return bool|string 下载成功返回保存的文件名
      */
-    public function download()
+    public function download(): bool|string
     {
         if (0 !== stripos($this->downloadUrl, "http")) {
             return false;
         }
-
         $fileData = Query::getInstance()->setPcUserAgent()
             ->setUrl($this->downloadUrl)
             ->setTimeOut($this->timeOut)
@@ -119,11 +121,9 @@ class Download
         if (empty($fileData)) {
             return false;
         }
-
         if (empty($this->saveDir)) {
             $this->saveDir = PUBLIC_DIR . '/upload/' . date('Ymd');
         }
-
         //创建文件夹
         if (!file_exists($this->saveDir)) {
             if (!mkdir($this->saveDir, 0777, true)) {
