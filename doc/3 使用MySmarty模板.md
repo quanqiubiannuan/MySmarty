@@ -45,7 +45,7 @@ class Index extends Controller
 ```php
 <?php
 namespace application\home\controller;
-use my\library\SmartyController;
+use library\mysmarty\Controller;
 
 class Index extends Controller{
     public function test(){
