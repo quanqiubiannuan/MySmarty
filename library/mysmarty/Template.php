@@ -131,9 +131,6 @@ class Template
         // 是否格式化为一行
         if (config('mysmarty.load_output_filter')) {
             $content = formatHtml($content);
-            $content = formatJs($content);
-            $content = formatCss($content);
-            $content = myTrim($content);
         }
         if ($this->caching) {
             $cacheClass = 'library\mysmarty\cache\\' . ucfirst($this->cachingType) . 'Cache';
@@ -432,9 +429,6 @@ class Template
         // 是否格式化为一行
         if (config('mysmarty.load_output_filter')) {
             $templateData = formatHtml($templateData);
-            $templateData = formatJs($templateData);
-            $templateData = formatCss($templateData);
-            $templateData = myTrim($templateData);
         }
         return $templateData;
     }

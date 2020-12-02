@@ -394,19 +394,32 @@ function formatCss(string $css): string
 
 /**
  * 格式化html
- *
- * @param string $html
+ * @param string $html html代码的字符串
  * @return string
  */
 function formatHtml(string $html): string
 {
+    // 不替换pre内的内容
+    $preData = [];
+    if (preg_match_all('/<pre>(.*)<\/pre>/Us', $html, $mat)) {
+        foreach ($mat[1] as $k => $v) {
+            $key = '##@##' . $k . '##@##';
+            $preData[$key] = $v;
+            $html = str_ireplace($v, $key, $html);
+        }
+    }
     $html = preg_replace('/<!--.*-->/Us', '', $html);
     // 替换换行
     $html = preg_replace('/([\n]|[\r\n])/', '', $html);
     $html = preg_replace('/[\t]+/', ' ', $html);
     // 替换两个空格及以上空格 为一个
     $html = preg_replace('/[ ]{2,}/', ' ', $html);
-    return $html;
+    if (!empty($preData)) {
+        foreach ($preData as $k => $v) {
+            $html = str_ireplace($k, $v, $html);
+        }
+    }
+    return myTrim($html);
 }
 
 /**
