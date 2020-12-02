@@ -4,87 +4,88 @@ namespace library\mysmarty;
 
 use Exception;
 use PDO;
+use PDOStatement;
 use RuntimeException;
 
 class Model
 {
 
     // 数据库主机ip
-    private $host = '';
+    private string $host = '';
 
     // 数据库登录用户名
-    private $user = '';
+    private string $user = '';
 
     // 数据库登录密码
-    private $password = '';
+    private string $password = '';
 
     // 数据库端口
-    private $port = '';
+    private int $port = 3306;
 
     // 默认数据库连接库名
-    protected $database = '';
+    protected string $database = '';
 
     // 默认连接数据库编码
-    protected $charset = '';
+    protected string $charset = '';
 
     // 表名
-    protected $table;
+    protected string $table = '';
 
     // 默认连接配置
-    protected $config;
+    protected string $config = '';
 
     // 验证规则
-    protected $rule;
+    protected array $rule = [];
 
     // 类型转换
-    protected $type;
+    protected array $type = [];
 
     // 连接对象
-    private $dbh;
+    private ?PDO $dbh = null;
 
     // 当前类对象数组
-    private static $obj = [];
+    private static array $obj = [];
 
     // 查询字段
-    private $mField = '*';
+    private string $mField = '*';
 
-    private $mWhere = [];
+    private array $mWhere = [];
 
-    private $mWhereArgs = [];
+    private array $mWhereArgs = [];
 
-    private $mSql = '';
+    private string $mSql = '';
 
-    private $mOrder = '';
+    private string $mOrder = '';
 
-    private $mLimit = '';
+    private string $mLimit = '';
 
-    private $mGroup = '';
+    private string $mGroup = '';
 
-    private $mHaving = '';
+    private string $mHaving = '';
 
-    private $mJoin = [];
+    private array $mJoin = [];
 
-    private $mAllowField = [];
+    private array $mAllowField = [];
 
-    private $mData = [];
+    private array $mData = [];
 
-    private $mSetAttr = [];
+    private array $mSetAttr = [];
 
-    private $mGetAttr = [];
+    private array $mGetAttr = [];
 
-    private $mAddAttr = [];
+    private array $mAddAttr = [];
 
-    private $mValidate = false;
+    private bool $mValidate = false;
 
-    private $mHidden = [];
+    private array $mHidden = [];
 
-    private $mPdoAttribute = [];
+    private array $mPdoAttribute = [];
 
-    private $mErrorCode = 0;
+    private int $mErrorCode = 0;
 
-    private $mErrorInfo = '';
+    private array $mErrorInfo = [];
 
-    private static $mIsStaticCall = FALSE;
+    private static bool $mIsStaticCall = false;
 
     /**
      * 初始化查询变量
@@ -112,10 +113,9 @@ class Model
 
     /**
      * 保存where条件数据
-     *
-     * @return array[]|string[]
+     * @return array
      */
-    public function saveWhereData()
+    public function saveWhereData(): array
     {
         return [
             'mField' => $this->mField,
@@ -139,10 +139,9 @@ class Model
 
     /**
      * 恢复where条件数据
-     *
      * @param array $data
      */
-    public function recoverWhereData($data)
+    public function recoverWhereData(array $data)
     {
         if (!empty($data)) {
             foreach ($data as $k => $v) {
@@ -153,12 +152,9 @@ class Model
 
     /**
      * 构造方法
-     *
-     * @param string $config
-     *            配置名
-     * @throws
+     * @param string $config 配置名
      */
-    public function __construct($config = 'mysql')
+    public function __construct(string $config = 'mysql')
     {
         $config = $this->config ?: $config;
         if (!isset(CONFIG['database'][$config])) {
@@ -186,17 +182,15 @@ class Model
 
     /**
      * 获取数据库连接dsn
-     *
      * @return string
      */
-    private function getDsn()
+    private function getDsn(): string
     {
         return 'mysql:dbname=' . $this->database . ';host=' . $this->host . ';port=' . $this->port . ';charset=' . $this->charset;
     }
 
     /**
      * 连接数据库
-     * @throws
      */
     private function connect()
     {
@@ -224,7 +218,7 @@ class Model
      * @param string $database
      * @return string
      */
-    private function formatDatabae($database)
+    private function formatDatabae(string $database): string
     {
         $database = trim(str_ireplace('`', '', $database));
         return '`' . $database . '`';
@@ -232,13 +226,10 @@ class Model
 
     /**
      * 获取对象实例
-     *
-     * @param string $config
-     *            配置数据库名
-     * @return $this
-     * @throws
+     * @param string $config 配置数据库名
+     * @return static
      */
-    public static function getInstance($config = 'mysql')
+    public static function getInstance(string $config = 'mysql'): static
     {
         $obj = self::getCurrentObj($config);
         if ($obj === null) {
@@ -251,12 +242,10 @@ class Model
 
     /**
      * 获取当前mysql对象
-     *
-     * @param string $config
-     *            配置数据库名
-     * @return mixed|NULL
+     * @param string $config 配置数据库名
+     * @return PDO|null
      */
-    private static function getCurrentObj($config)
+    private static function getCurrentObj(string $config): PDO|null
     {
         if (!empty(self::$obj[$config])) {
             return self::$obj[$config];
@@ -266,10 +255,9 @@ class Model
 
     /**
      * 开启验证
-     *
-     * @return $this
+     * @return static
      */
-    public function validate()
+    public function validate(): static
     {
         $this->mValidate = true;
         return $this;
@@ -277,12 +265,10 @@ class Model
 
     /**
      * 指定数据库名
-     *
-     * @param string $database
-     *            数据库名
-     * @return Model
+     * @param string $database 数据库名
+     * @return static
      */
-    public function name($database)
+    public function name(string $database): static
     {
         $this->database = $database;
         return $this;
@@ -290,12 +276,10 @@ class Model
 
     /**
      * 指定表名
-     *
-     * @param string $table
-     *            表名
-     * @return Model
+     * @param string $table 表名
+     * @return static
      */
-    public function table($table)
+    public function table(string $table): static
     {
         $this->table = $table;
         return $this;
@@ -304,11 +288,10 @@ class Model
     /**
      * 字段选择
      *
-     * @param string $field
-     *            要查询的字段，多个逗号分隔
-     * @return Model
+     * @param string $field 要查询的字段，多个逗号分隔
+     * @return static
      */
-    public function field($field)
+    public function field(string $field): static
     {
         $this->mField = $field;
         return $this;
@@ -316,46 +299,37 @@ class Model
 
     /**
      * where and条件
-     *
-     * @param string|array $field
-     *            字段
-     * @param string $value
-     *            值
-     * @param string $op
-     *            操作符
-     * @return Model
+     * @param string|array $field 字段
+     * @param mixed $value 值
+     * @param string $op 操作符
+     * @return static
      */
-    public function where($field, $value = null, $op = '=')
+    public function where(array|string $field, mixed $value = null, string $op = '='): static
     {
         return $this->whereMap($field, $value, $op, true);
     }
 
     /**
      * where or 条件
-     *
-     * @param string $field
-     *            字段
-     * @param string $value
-     *            值
-     * @param string $op
-     *            操作符
-     * @return Model
+     * @param string|array $field 字段
+     * @param mixed $value 值
+     * @param string $op 操作符
+     * @return static
      */
-    public function whereOr($field, $value = null, $op = '=')
+    public function whereOr(string|array $field, mixed $value = null, string $op = '='): static
     {
         return $this->whereMap($field, $value, $op, false);
     }
 
     /**
      * where条件
-     *
      * @param string|array $field
-     * @param string $value
+     * @param mixed $value
      * @param string $op
      * @param boolean $and
-     * @return $this
+     * @return static
      */
-    public function whereMap($field, $value = null, $op = '=', $and = TRUE)
+    public function whereMap(array|string $field, mixed $value = null, string $op = '=', bool $and = true): static
     {
         $andStr = 'and';
         if (!$and) {
@@ -404,14 +378,11 @@ class Model
 
     /**
      * 排序
-     *
-     * @param string $field
-     *            排序字段
-     * @param string $order
-     *            排序规则，desc 降序，asc 升序
-     * @return Model
+     * @param string $field 排序字段
+     * @param string $order 排序规则，desc 降序，asc 升序
+     * @return static
      */
-    public function order($field, $order = '')
+    public function order(string $field, string $order = ''): static
     {
         if (empty($order)) {
             $this->mOrder = 'order by ' . $this->formatOrder($field);
@@ -426,7 +397,7 @@ class Model
      * @param string $field
      * @return string
      */
-    private function formatOrder($field)
+    private function formatOrder(string $field): string
     {
         $fieldArr = explode(',', $field);
         foreach ($fieldArr as $k => $v) {
@@ -439,14 +410,11 @@ class Model
 
     /**
      * 限制
-     *
-     * @param integer $offset
-     *            偏移量，从0开始
-     * @param integer $size
-     *            大小
-     * @return Model
+     * @param int $offset 偏移量，从0开始
+     * @param int $size 大小
+     * @return static
      */
-    public function limit($offset, $size = 0)
+    public function limit(int $offset, int $size = 0): static
     {
         if ($offset < 0) {
             $offset = 0;
@@ -461,14 +429,11 @@ class Model
 
     /**
      * 分页查询
-     *
-     * @param integer $page
-     *            第几页，从1开始
-     * @param integer $size
-     *            分页大小
-     * @return Model
+     * @param int $page 第几页，从1开始
+     * @param int $size 分页大小
+     * @return static
      */
-    public function page($page, $size = 10)
+    public function page(int $page, int $size = 10): static
     {
         $offset = ($page - 1) * $size;
         return $this->limit($offset, $size);
@@ -476,12 +441,10 @@ class Model
 
     /**
      * 分组
-     *
-     * @param string $field
-     *            字段
-     * @return Model
+     * @param string $field 字段
+     * @return static
      */
-    public function group($field)
+    public function group(string $field): static
     {
         $this->mGroup = 'group by ' . $this->formatGroup($field);
         return $this;
@@ -492,7 +455,7 @@ class Model
      * @param string $field
      * @return string
      */
-    private function formatGroup($field)
+    private function formatGroup(string $field): string
     {
         $fieldArr = explode(',', $field);
         foreach ($fieldArr as $k => $v) {
@@ -503,12 +466,10 @@ class Model
 
     /**
      * 分组
-     *
-     * @param string $condition
-     *            条件
-     * @return Model
+     * @param string $condition 条件
+     * @return static
      */
-    public function having($condition)
+    public function having(string $condition): static
     {
         $this->mHaving = 'having ' . $condition;
         return $this;
@@ -516,16 +477,12 @@ class Model
 
     /**
      * join查询
-     *
-     * @param string $table
-     *            连接的表名
-     * @param string $condition
-     *            连接条件
-     * @param string $type
-     *            连接类型（left join，right join,inner join）
-     * @return $this
+     * @param string $table 连接的表名
+     * @param string $condition 连接条件
+     * @param string $type 连接类型（left join，right join,inner join）
+     * @return static
      */
-    public function join($table, $condition, $type = 'left join')
+    public function join(string $table, string $condition, string $type = 'left join'): static
     {
         $this->mJoin[] = [
             $table,
@@ -538,53 +495,43 @@ class Model
     /**
      * 左连接
      *
-     * @param string $table
-     *            连接的表名
-     * @param string $condition
-     *            连接条件
-     * @return $this
+     * @param string $table 连接的表名
+     * @param string $condition 连接条件
+     * @return static
      */
-    public function leftJoin($table, $condition)
+    public function leftJoin(string $table, string $condition): static
     {
         return $this->join($table, $condition);
     }
 
     /**
      * 右连接
-     *
-     * @param string $table
-     *            连接的表名
-     * @param string $condition
-     *            连接条件
-     * @return mixed
+     * @param string $table 连接的表名
+     * @param string $condition 连接条件
+     * @return static
      */
-    public function rightJoin($table, $condition)
+    public function rightJoin(string $table, string $condition): static
     {
         return $this->join($table, $condition, 'right join');
     }
 
     /**
      * 内连接
-     *
-     * @param string $table
-     *            连接的表名
-     * @param string $condition
-     *            连接条件
-     * @return mixed
+     * @param string $table 连接的表名
+     * @param string $condition 连接条件
+     * @return static
      */
-    public function innerJoin($table, $condition)
+    public function innerJoin(string $table, string $condition): static
     {
         return $this->join($table, $condition, 'inner join');
     }
 
     /**
      * 去重查询
-     *
-     * @param string $field
-     *            字段
-     * @return Model
+     * @param string $field 字段
+     * @return static
      */
-    public function distinct($field)
+    public function distinct(string $field): static
     {
         $this->mField = 'distinct ' . $this->formatOrder($field);
         return $this;
@@ -592,11 +539,9 @@ class Model
 
     /**
      * 查询
-     *
-     * @return mixed[]
-     * @throws
+     * @return array
      */
-    public function select()
+    public function select(): array
     {
         $data = $this->query($this->dealSelectSql(), $this->mWhereArgs);
         $this->initializeVariable();
@@ -606,7 +551,7 @@ class Model
     /**
      * 处理sql语句
      */
-    private function dealSelectSql()
+    private function dealSelectSql(): string
     {
         $where = $this->dealWhere();
         $join = $this->dealJoin();
@@ -618,10 +563,9 @@ class Model
 
     /**
      * 处理join条件
-     *
      * @return string
      */
-    private function dealJoin()
+    private function dealJoin(): string
     {
         $join = '';
         if (!empty($this->mJoin)) {
@@ -638,10 +582,9 @@ class Model
 
     /**
      * 获取sql语句
-     *
      * @return string
      */
-    public function getLastSql()
+    public function getLastSql(): string
     {
         return $this->mSql;
     }
@@ -649,7 +592,7 @@ class Model
     /**
      * 处理where条件
      */
-    private function dealWhere()
+    private function dealWhere(): string
     {
         $where = '';
         if (!empty($this->mWhere)) {
@@ -679,7 +622,7 @@ class Model
      * @param string $field
      * @return string
      */
-    private function formatField($field)
+    private function formatField(string $field): string
     {
         if ($field === '*') {
             return '*';
@@ -699,13 +642,10 @@ class Model
 
     /**
      * 统计数据记录总数
-     *
-     * @param string $field
-     *            字段
-     * @return integer
-     * @throws
+     * @param string $field 字段
+     * @return int
      */
-    public function count($field = '*')
+    public function count(string $field = '*'): int
     {
         $num = 0;
         $this->mOrder = '';
@@ -720,13 +660,10 @@ class Model
 
     /**
      * 查找最大值
-     *
-     * @param string $field
-     *            字段
-     * @return number
-     * @throws
+     * @param string $field 字段
+     * @return int|float
      */
-    public function max($field)
+    public function max(string $field): int|float
     {
         $max = 0;
         $this->mOrder = '';
@@ -741,13 +678,10 @@ class Model
 
     /**
      * 查找最小值
-     *
-     * @param string $field
-     *            字段
-     * @return number
-     * @throws
+     * @param string $field 字段
+     * @return int|float
      */
-    public function min($field)
+    public function min(string $field): float|int
     {
         $min = 0;
         $this->mOrder = '';
@@ -762,13 +696,10 @@ class Model
 
     /**
      * 查找平均值
-     *
-     * @param string $field
-     *            字段
-     * @return number
-     * @throws
+     * @param string $field 字段
+     * @return int|float
      */
-    public function avg($field)
+    public function avg(string $field): float|int
     {
         $avg = 0;
         $this->mOrder = '';
@@ -783,13 +714,10 @@ class Model
 
     /**
      * 查找总和
-     *
-     * @param string $field
-     *            字段
-     * @return number
-     * @throws
+     * @param string $field 字段
+     * @return int|float
      */
-    public function sum($field)
+    public function sum(string $field): float|int
     {
         $sum = 0;
         $this->mOrder = '';
@@ -804,11 +732,9 @@ class Model
 
     /**
      * 查找一条数据
-     *
-     * @return array|mixed
-     * @throws
+     * @return array
      */
-    public function find()
+    public function find(): array
     {
         $this->limit('1');
         $data = [];
@@ -821,12 +747,10 @@ class Model
 
     /**
      * 空查询
-     *
-     * @param string $field
-     *            字段
-     * @return Model
+     * @param string $field 字段
+     * @return static
      */
-    public function null($field)
+    public function null(string $field): static
     {
         $this->where($this->formatField($field) . ' is null');
         return $this;
@@ -834,12 +758,10 @@ class Model
 
     /**
      * 非空查询
-     *
-     * @param string $field
-     *            字段
-     * @return Model
+     * @param string $field 字段
+     * @return static
      */
-    public function notNull($field)
+    public function notNull(string $field): static
     {
         $this->where($this->formatField($field) . ' is not null');
         return $this;
@@ -847,15 +769,11 @@ class Model
 
     /**
      * 原生查询
-     *
-     * @param string $sql
-     *            原生sql语句
-     * @param array $mWhereArgs
-     *            绑定的参数
+     * @param string $sql 原生sql语句
+     * @param array $mWhereArgs 绑定的参数
      * @return array
-     * @throws
      */
-    public function query($sql, $mWhereArgs = [])
+    public function query(string $sql, array $mWhereArgs = []): array
     {
         $data = [];
         $result = $this->preExec($sql, $mWhereArgs);
@@ -880,10 +798,9 @@ class Model
 
     /**
      * 去除隐藏字段
-     *
-     * @param mixed $data
+     * @param array $data
      */
-    private function useHidden(&$data)
+    private function useHidden(array &$data): void
     {
         if (!empty($this->mHidden)) {
             foreach ($this->mHidden as $v) {
@@ -895,15 +812,11 @@ class Model
     }
 
     /**
-     *
-     * @param string $sql
-     *            原生sql语句
-     * @param array $mWhereArgs
-     *            绑定的参数
-     * @return number
-     * @throws
+     * @param string $sql 原生sql语句
+     * @param array $mWhereArgs 绑定的参数
+     * @return int
      */
-    public function execute($sql, $mWhereArgs = [])
+    public function execute(string $sql, array $mWhereArgs = []): int
     {
         $isInsert = false;
         if (0 === stripos($sql, 'insert')) {
@@ -926,12 +839,11 @@ class Model
 
     /**
      * 统一执行sql语句前的执行
-     * @param $sql
+     * @param string $sql
      * @param array $mWhereArgs
-     * @return bool
-     * @throws
+     * @return PDOStatement|bool
      */
-    private function preExec($sql, $mWhereArgs = [])
+    private function preExec(string $sql, array $mWhereArgs = []): bool|PDOStatement
     {
         $sql = trim($sql);
         $this->connect();
@@ -948,14 +860,11 @@ class Model
 
     /**
      * 相等查询
-     *
-     * @param string $field
-     *            字段
-     * @param string $value
-     *            值
-     * @return Model
+     * @param string $field 字段
+     * @param string $value 值
+     * @return static
      */
-    public function eq($field, $value)
+    public function eq(string $field, string $value): static
     {
         $this->where($field, $value);
         return $this;
@@ -963,14 +872,11 @@ class Model
 
     /**
      * 不相等查询
-     *
-     * @param string $field
-     *            字段
-     * @param string $value
-     *            值
-     * @return Model
+     * @param string $field 字段
+     * @param string $value 值
+     * @return static
      */
-    public function neq($field, $value)
+    public function neq(string $field, string $value): static
     {
         $this->where($field, $value, '!=');
         return $this;
@@ -978,14 +884,11 @@ class Model
 
     /**
      * 大于查询
-     *
-     * @param string $field
-     *            字段
-     * @param string $value
-     *            值
-     * @return Model
+     * @param string $field 字段
+     * @param string $value 值
+     * @return static
      */
-    public function gt($field, $value)
+    public function gt(string $field, string $value): static
     {
         $this->where($field, $value, '>');
         return $this;
@@ -993,14 +896,11 @@ class Model
 
     /**
      * 大于或等于查询
-     *
-     * @param string $field
-     *            字段
-     * @param string $value
-     *            值
-     * @return Model
+     * @param string $field 字段
+     * @param string $value 值
+     * @return static
      */
-    public function egt($field, $value)
+    public function egt(string $field, string $value): static
     {
         $this->where($field, $value, '>=');
         return $this;
@@ -1008,14 +908,11 @@ class Model
 
     /**
      * 小于查询
-     *
-     * @param string $field
-     *            字段
-     * @param string $value
-     *            值
-     * @return Model
+     * @param string $field 字段
+     * @param string $value 值
+     * @return static
      */
-    public function lt($field, $value)
+    public function lt(string $field, string $value): static
     {
         $this->where($field, $value, '<');
         return $this;
@@ -1023,14 +920,11 @@ class Model
 
     /**
      * 小于或等于查询
-     *
-     * @param string $field
-     *            字段
-     * @param string $value
-     *            值
-     * @return Model
+     * @param string $field 字段
+     * @param string $value 值
+     * @return static
      */
-    public function elt($field, $value)
+    public function elt(string $field, string $value): static
     {
         $this->where($field, $value, '<=');
         return $this;
@@ -1038,14 +932,11 @@ class Model
 
     /**
      * 相似查询
-     *
-     * @param string $field
-     *            字段
-     * @param string $value
-     *            值
-     * @return Model
+     * @param string $field 字段
+     * @param string $value 值
+     * @return static
      */
-    public function like($field, $value)
+    public function like(string $field, string $value): static
     {
         $this->where($field, $value, 'like');
         return $this;
@@ -1053,14 +944,11 @@ class Model
 
     /**
      * 不相似查询
-     *
-     * @param string $field
-     *            字段
-     * @param string $value
-     *            值
-     * @return Model
+     * @param string $field 字段
+     * @param string $value 值
+     * @return static
      */
-    public function notLike($field, $value)
+    public function notLike(string $field, string $value): static
     {
         $this->where($field, $value, 'not like');
         return $this;
@@ -1068,16 +956,12 @@ class Model
 
     /**
      * 区间查询
-     *
-     * @param string $field
-     *            字段
-     * @param string $startValue
-     *            开始值
-     * @param string $endValue
-     *            结束值
-     * @return Model
+     * @param string $field 字段
+     * @param string $startValue 开始值
+     * @param string $endValue 结束值
+     * @return static
      */
-    public function between($field, $startValue, $endValue)
+    public function between(string $field, string $startValue, string $endValue): static
     {
         $this->where($this->formatField($field) . ' between "' . $startValue . '" and "' . $endValue . '"');
         return $this;
@@ -1085,16 +969,12 @@ class Model
 
     /**
      * 不在区间查询
-     *
-     * @param string $field
-     *            字段
-     * @param string $startValue
-     *            开始值
-     * @param string $endValue
-     *            结束值
-     * @return Model
+     * @param string $field 字段
+     * @param string $startValue 开始值
+     * @param string $endValue 结束值
+     * @return static
      */
-    public function notBetween($field, $startValue, $endValue)
+    public function notBetween(string $field, string $startValue, string $endValue): static
     {
         $this->where($this->formatField($field) . ' not between "' . $startValue . '" and "' . $endValue . '"');
         return $this;
@@ -1102,14 +982,11 @@ class Model
 
     /**
      * in查询
-     *
-     * @param string $field
-     *            字段
-     * @param string|array $value
-     *            值，逗号分割，或数组
-     * @return Model
+     * @param string $field 字段
+     * @param string|array $value 值，逗号分割，或数组
+     * @return static
      */
-    public function in($field, $value)
+    public function in(string $field, array|string $value): static
     {
         if (is_array($value)) {
             $value = implode(',', $value);
@@ -1120,14 +997,11 @@ class Model
 
     /**
      * not in查询
-     *
-     * @param string $field
-     *            字段
-     * @param string|array $value
-     *            值，逗号分割，或数组
-     * @return Model
+     * @param string $field 字段
+     * @param string|array $value 值，逗号分割，或数组
+     * @return static
      */
-    public function notIn($field, $value)
+    public function notIn(string $field, array|string $value): static
     {
         if (is_array($value)) {
             $value = implode(',', $value);
@@ -1138,14 +1012,11 @@ class Model
 
     /**
      * find_in_set查询
-     *
-     * @param string $field
-     *            字段
-     * @param string $value
-     *            值
-     * @return Model
+     * @param string $field 字段
+     * @param string $value 值
+     * @return static
      */
-    public function findInSet($field, $value)
+    public function findInSet(string $field, string $value): static
     {
         $this->where('find_in_set("' . $value . '",' . $this->formatField($field) . ')');
         return $this;
@@ -1153,13 +1024,10 @@ class Model
 
     /**
      * 过滤字段
-     *
-     * @param string|array $field
-     *            过滤字段
-     * @return Model
-     * @throws
+     * @param string|array|bool $field 过滤字段
+     * @return static
      */
-    public function allowField($field)
+    public function allowField(array|string|bool $field): static
     {
         if (is_array($field)) {
             $this->mAllowField = $field;
@@ -1169,7 +1037,7 @@ class Model
             foreach ($data as $v) {
                 $this->mAllowField[] = $v['Field'];
             }
-        } else {
+        } else if (is_string($field)) {
             $this->mAllowField = explode(',', $field);
         }
         return $this;
@@ -1177,14 +1045,11 @@ class Model
 
     /**
      * 添加数据
-     *
      * @param array $data
-     * @param bool $isReplace
-     *            是否替换
-     * @return number
-     * @throws
+     * @param bool $isReplace 是否替换
+     * @return int
      */
-    public function add($data, $isReplace = FALSE)
+    public function add(array $data, bool $isReplace = false): int
     {
         // 添加器
         $this->useAddAttr($data);
@@ -1225,7 +1090,7 @@ class Model
      * @param string $table
      * @return string
      */
-    private function formatTable($table)
+    private function formatTable(string $table): string
     {
         return $this->formatDatabae($table);
     }
@@ -1234,7 +1099,7 @@ class Model
      * 格式化字段数组
      * @param array|string $fields 字段数组
      */
-    private function formatFields(&$fields)
+    private function formatFields(array|string &$fields): void
     {
         if (is_array($fields)) {
             foreach ($fields as $k => $v) {
@@ -1248,34 +1113,29 @@ class Model
 
     /**
      * 添加数据
-     *
      * @param array $data
-     * @return number
-     * @throws
+     * @return int
      */
-    public function insert($data)
+    public function insert(array $data): int
     {
         return $this->add($data);
     }
 
     /**
      * 添加或更新数据
-     *
      * @param array $data
-     * @return number
-     * @throws
+     * @return int
      */
-    public function replace($data)
+    public function replace(array $data): int
     {
         return $this->add($data, true);
     }
 
     /**
      * 使用获取器
-     *
      * @param array $row
      */
-    private function useGetAttr(&$row)
+    private function useGetAttr(array &$row): void
     {
         if (empty($row)) {
             return;
@@ -1291,10 +1151,9 @@ class Model
 
     /**
      * 使用修改器
-     *
      * @param array $data
      */
-    private function useSetAttr(&$data)
+    private function useSetAttr(array &$data): void
     {
         if (!empty($this->mSetAttr) && !empty($data)) {
             foreach ($this->mSetAttr as $attr) {
@@ -1307,10 +1166,9 @@ class Model
 
     /**
      * 使用添加器
-     *
      * @param array $data
      */
-    private function useAddAttr(&$data)
+    private function useAddAttr(array &$data): void
     {
         if (!empty($this->mAddAttr) && !empty($data)) {
             foreach ($this->mAddAttr as $attr) {
@@ -1323,11 +1181,10 @@ class Model
 
     /**
      * 使用验证规则验证
-     *
      * @param array $data
-     * @return boolean
+     * @return bool
      */
-    private function useValidate(&$data)
+    private function useValidate(array &$data): bool
     {
         if (!$this->mValidate || empty($this->rule)) {
             return true;
@@ -1345,14 +1202,11 @@ class Model
 
     /**
      * 验证规则
-     *
-     * @param string $k
-     *            字段
-     * @param mixed $v
-     *            值
+     * @param string $k 字段
+     * @param mixed $v 值
      * @return bool
      */
-    private function checkFields($k, $v)
+    private function checkFields(string $k, mixed $v): bool
     {
         $rule = $this->rule[$k];
         $ruleArr = explode('|', $rule);
@@ -1461,7 +1315,7 @@ class Model
                         }
                         break;
                     case 'length':
-                        if (mb_strlen($v, 'utf-8') > $rArr[1]) {
+                        if (mb_strlen($v, 'utf-8') < $rArr[1] || mb_strlen($v, 'utf-8') > $rArr[2]) {
                             return false;
                         }
                         break;
@@ -1479,14 +1333,11 @@ class Model
 
     /**
      * 更新语句
-     *
      * @param array $data
-     * @param boolean $isBindArgs
-     *            是否使用绑定参数
-     * @return number
-     * @throws
+     * @param bool $isBindArgs 是否使用绑定参数
+     * @return int
      */
-    public function update($data, $isBindArgs = true)
+    public function update(array $data, bool $isBindArgs = true): int
     {
         // 添加器
         $this->useAddAttr($data);
@@ -1531,11 +1382,9 @@ class Model
 
     /**
      * 查找表中的主键字段
-     *
-     * @return mixed
-     * @throws
+     * @return string|bool
      */
-    private function getPkName()
+    private function getPkName(): bool|string
     {
         $data = $this->query('desc ' . $this->table);
         foreach ($data as $v) {
@@ -1548,13 +1397,10 @@ class Model
 
     /**
      * 删除数据
-     *
-     * @param integer|bool|array $id
-     *            主键id
-     * @return number
-     * @throws
+     * @param int|bool|array $id 主键id
+     * @return int
      */
-    public function delete($id = FALSE)
+    public function delete(int|bool|array $id = false): int
     {
         if ($id !== FALSE) {
             $pkName = $this->getPkName();
@@ -1577,7 +1423,7 @@ class Model
     /**
      * 开启事务
      */
-    public function startTrans()
+    public function startTrans(): void
     {
         $this->connect();
         if (!$this->dbh->inTransaction()) {
@@ -1588,7 +1434,7 @@ class Model
     /**
      * 提交事务
      */
-    public function commit()
+    public function commit(): void
     {
         $this->connect();
         if ($this->dbh->inTransaction()) {
@@ -1598,9 +1444,8 @@ class Model
 
     /**
      * 回滚事务
-     * @throws
      */
-    public function rollback()
+    public function rollback(): void
     {
         $this->connect();
         if ($this->dbh->inTransaction()) {
@@ -1610,15 +1455,11 @@ class Model
 
     /**
      * 更新字段值
-     *
-     * @param string $field
-     *            字段
-     * @param string $value
-     *            值
-     * @return number
-     * @throws
+     * @param string $field 字段
+     * @param string $value 值
+     * @return int
      */
-    public function setField($field, $value)
+    public function setField(string $field, string $value): int
     {
         return $this->update([
             $field => $value
@@ -1627,15 +1468,11 @@ class Model
 
     /**
      * 自增
-     *
-     * @param string $field
-     *            自增字段
-     * @param integer $num
-     *            增值
-     * @return number
-     * @throws
+     * @param string $field 自增字段
+     * @param int|float $num 增值
+     * @return int
      */
-    public function setInc($field, $num = 1)
+    public function setInc(string $field, int|float $num = 1): int
     {
         return $this->update([
             $field => $this->formatField($field) . '+' . $num
@@ -1644,15 +1481,11 @@ class Model
 
     /**
      * 自减
-     *
-     * @param string $field
-     *            自减字段
-     * @param integer $num
-     *            减值
-     * @return number
-     * @throws
+     * @param string $field 自减字段
+     * @param int|float $num 减值
+     * @return int
      */
-    public function setDec($field, $num = 1)
+    public function setDec(string $field, int|float $num = 1): int
     {
         return $this->update([
             $field => $this->formatField($field) . '-' . $num
@@ -1661,11 +1494,10 @@ class Model
 
     /**
      * 设置数据
-     *
      * @param array $data
-     * @return $this
+     * @return static
      */
-    public function data($data)
+    public function data(array $data): static
     {
         $this->mData = $data;
         return $this;
@@ -1673,11 +1505,9 @@ class Model
 
     /**
      * 添加数据
-     *
-     * @return boolean|number
-     * @throws
+     * @return bool|int
      */
-    public function save()
+    public function save(): bool|int
     {
         if (empty($this->mData)) {
             return false;
@@ -1687,13 +1517,10 @@ class Model
 
     /**
      * 添加多条数据
-     *
-     * @param array $datas
-     *            多条数据
-     * @return number[]
-     * @throws
+     * @param array $datas 多条数据
+     * @return array
      */
-    public function saveAll($datas)
+    public function saveAll(array $datas): array
     {
         $result = [];
         foreach ($datas as $data) {
@@ -1704,12 +1531,10 @@ class Model
 
     /**
      * 获取器设置
-     *
-     * @param array|string $fields
-     *            需要获取的字段数组
-     * @return $this
+     * @param array|string $fields 需要获取的字段数组
+     * @return static
      */
-    public function getAttr($fields)
+    public function getAttr(array|string $fields): static
     {
         if (!is_array($fields)) {
             $fields = explode(',', $fields);
@@ -1720,12 +1545,10 @@ class Model
 
     /**
      * 修改器设置
-     *
-     * @param array|string $fields
-     *            需要修改的字段数组
-     * @return $this
+     * @param array|string $fields 需要修改的字段数组
+     * @return static
      */
-    public function setAttr($fields)
+    public function setAttr(array|string $fields): static
     {
         if (!is_array($fields)) {
             $fields = explode(',', $fields);
@@ -1736,12 +1559,10 @@ class Model
 
     /**
      * 添加器设置
-     *
-     * @param array|string $fields
-     *            需要修改的字段数组
-     * @return $this
+     * @param array|string $fields 需要修改的字段数组
+     * @return static
      */
-    public function addAttr($fields)
+    public function addAttr(array|string $fields): static
     {
         if (!is_array($fields)) {
             $fields = explode(',', $fields);
@@ -1752,18 +1573,13 @@ class Model
 
     /**
      * 关联查找
-     *
-     * @param string $tableName
-     *            关联表名,其它库名，请使用 . 连接
-     * @param string $foreignKey
-     *            关联表外键
-     * @param string $primaryKey
-     *            本表主键
-     * @param string $field
-     *            关联表需要查询的字段
-     * @return mixed
+     * @param string $tableName 关联表名,其它库名，请使用 . 连接
+     * @param string $foreignKey 关联表外键
+     * @param string $primaryKey 本表主键
+     * @param string $field 关联表需要查询的字段
+     * @return static
      */
-    public function with($tableName, $foreignKey, $primaryKey, $field = '')
+    public function with(string $tableName, string $foreignKey, string $primaryKey, string $field = ''): static
     {
         if (!empty($field)) {
             if ($this->mField === '*') {
@@ -1776,17 +1592,12 @@ class Model
 
     /**
      * 获取分页数据
-     *
-     * @param integer $size
-     *            每页显示多少条
-     * @param int|bool $limitTotalPage
-     *            限制总页，false则不限制
-     * @param int|bool $limitPage
-     *            分页显示个数，false 不获取
+     * @param int $size 每页显示多少条
+     * @param int|bool $limitTotalPage 限制总页，false则不限制
+     * @param int|bool $limitPage 分页显示个数，false 不获取
      * @return array
-     * @throws
      */
-    public function paginate($size = 10, $limitTotalPage = false, $limitPage = 5)
+    public function paginate(int $size = 10, bool|int $limitTotalPage = false, int|bool $limitPage = 5): array
     {
         $whereData = $this->saveWhereData();
         $count = $this->count();
@@ -1796,19 +1607,13 @@ class Model
 
     /**
      * 根据总数获取分页数据
-     *
-     * @param integer $count
-     *            数据总数
-     * @param integer $size
-     *            每页显示多少条
-     * @param int|bool $limitTotalPage
-     *            限制总页，false则不限制
-     * @param int|bool $limitPage
-     *            分页显示个数，false 不获取
+     * @param int $count 数据总数
+     * @param int $size 每页显示多少条
+     * @param int|bool $limitTotalPage 限制总页，false则不限制
+     * @param int|bool $limitPage 分页显示个数，false 不获取
      * @return array
-     * @throws
      */
-    public function paginateByCount($count, $size = 10, $limitTotalPage = false, $limitPage = 5)
+    public function paginateByCount(int $count, int $size = 10, int|bool $limitTotalPage = false, int|bool $limitPage = 5): array
     {
         $result = Page::getInstance()->paginate($count, $size, $limitTotalPage, $limitPage);
         $result['data'] = $this->page($result['curPage'], $result['size'])->select();
@@ -1817,13 +1622,10 @@ class Model
 
     /**
      * 切换数据库
-     *
-     * @param string $database
-     *            数据库名
-     * @return $this
-     * @throws
+     * @param string $database 数据库名
+     * @return static
      */
-    public function changeDatabase($database)
+    public function changeDatabase(string $database): static
     {
         if (MyPdo::$database !== $database) {
             $this->execute('use ' . $this->formatDatabae($database) . ';');
@@ -1835,11 +1637,9 @@ class Model
 
     /**
      * 清空表数据
-     *
      * @param string $table
-     * @throws
      */
-    public function truncate($table = '')
+    public function truncate(string $table = ''): void
     {
         $table = $table ?: $this->table;
         if (!empty($table)) {
@@ -1849,11 +1649,10 @@ class Model
 
     /**
      * 隐藏字段
-     *
      * @param string|array $field
-     * @return $this
+     * @return static
      */
-    public function hidden($field)
+    public function hidden(array|string $field): static
     {
         if (!is_array($field)) {
             $field = explode(',', $field);
@@ -1864,10 +1663,9 @@ class Model
 
     /**
      * 设置类型
-     *
      * @param array $data
      */
-    private function setType(&$data)
+    private function setType(array &$data): void
     {
         if ($this->type !== null) {
             foreach ($data as $k => $v) {
@@ -1882,10 +1680,8 @@ class Model
                     case 'boolean':
                         $data[$k] = (bool)$v;
                         break;
-                    case 'array':
-                        $data[$k] = json_encode($v);
-                        break;
                     case 'object':
+                    case 'array':
                         $data[$k] = json_encode($v);
                         break;
                     case 'serialize':
@@ -1904,10 +1700,9 @@ class Model
 
     /**
      * 获取类型
-     *
      * @param array $data
      */
-    private function getType(&$data)
+    private function getType(array &$data): void
     {
         if ($this->type !== null) {
             foreach ($data as $k => $v) {
@@ -1945,9 +1740,9 @@ class Model
     /**
      * 设置数据库
      * @param string $database 数据库名
-     * @return Model
+     * @return static
      */
-    public function setDatabase($database)
+    public function setDatabase(string $database): static
     {
         return $this->name($database);
     }
@@ -1955,9 +1750,9 @@ class Model
     /**
      * 设置表
      * @param string $table 表名
-     * @return Model
+     * @return static
      */
-    public function setTable($table)
+    public function setTable(string $table): static
     {
         return $this->table($table);
     }
@@ -1965,9 +1760,9 @@ class Model
     /**
      * 设置列名大小写规则
      * @param int $case 0 不做任何修改，1 大写，2 小写
-     * @return $this
+     * @return static
      */
-    public function setFieldCase($case)
+    public function setFieldCase(int $case): static
     {
         $this->mPdoAttribute[PDO::ATTR_CASE] = $case;
         return $this;
@@ -1976,9 +1771,9 @@ class Model
     /**
      * 设置错误方式
      * @param int $error 0 仅设置错误代码,1 引发 E_WARNING 错误,2 抛出 exceptions 异常
-     * @return $this
+     * @return static
      */
-    public function setError($error)
+    public function setError(int $error): static
     {
         $this->mPdoAttribute[PDO::ATTR_ERRMODE] = $error;
         return $this;
@@ -1987,9 +1782,9 @@ class Model
     /**
      * 设置空字段处理
      * @param int $emptyNull 0 不转换, 1  将空字符串转换成 NULL, 2 将 NULL 转换成空字符串
-     * @return $this
+     * @return static
      */
-    public function setEmptyNull($emptyNull)
+    public function setEmptyNull(int $emptyNull): static
     {
         $this->mPdoAttribute[PDO::ATTR_ORACLE_NULLS] = $emptyNull;
         return $this;
@@ -1998,9 +1793,9 @@ class Model
     /**
      * 提取的时候将数值转换为字符串
      * @param bool $to true 转换，false 不转换
-     * @return $this
+     * @return static
      */
-    public function setIntFieldToStr($to)
+    public function setIntFieldToStr(bool $to): static
     {
         $this->mPdoAttribute[PDO::ATTR_STRINGIFY_FETCHES] = $to;
         return $this;
@@ -2009,9 +1804,9 @@ class Model
     /**
      * 指定超时的秒数。并非所有驱动都支持此选项，这意味着驱动和驱动之间可能会有差异
      * @param int $timeOut 单位：秒
-     * @return $this
+     * @return static
      */
-    public function setTimeout($timeOut)
+    public function setTimeout(int $timeOut): static
     {
         $this->mPdoAttribute[PDO::ATTR_TIMEOUT] = $timeOut;
         return $this;
@@ -2020,9 +1815,9 @@ class Model
     /**
      * 是否自动提交每个单独的语句
      * @param bool $autoCommit true 是，false 否
-     * @return $this
+     * @return static
      */
-    public function setAutoCommit($autoCommit)
+    public function setAutoCommit(bool $autoCommit): static
     {
         $this->mPdoAttribute[PDO::ATTR_AUTOCOMMIT] = $autoCommit;
         return $this;
@@ -2032,9 +1827,9 @@ class Model
      * 启用或禁用预处理语句的模拟
      * 有些驱动不支持或有限度地支持本地预处理。使用此设置强制PDO总是模拟预处理语句（如果为 TRUE ），或试着使用本地预处理语句（如果为 FALSE）。如果驱动不能成功预处理当前查询，它将总是回到模拟预处理语句上。
      * @param bool $emulate true 模拟，false 使用本地预处理语句
-     * @return $this
+     * @return static
      */
-    public function setEmulateSql($emulate)
+    public function setEmulateSql(bool $emulate): static
     {
         $this->mPdoAttribute[PDO::ATTR_EMULATE_PREPARES] = $emulate;
         return $this;
@@ -2043,9 +1838,9 @@ class Model
     /**
      * （在MySQL中可用）： 使用缓冲查询
      * @param bool $bufferQuery true 使用，false 不使用
-     * @return $this
+     * @return static
      */
-    public function setBufferQuery($bufferQuery)
+    public function setBufferQuery(bool $bufferQuery): static
     {
         $this->mPdoAttribute[PDO::MYSQL_ATTR_USE_BUFFERED_QUERY] = $bufferQuery;
         return $this;
@@ -2062,9 +1857,9 @@ class Model
      * 1 结合使用 PDO::FETCH_BOTH 和 PDO::FETCH_OBJ，创建供用来访问的对象变量名
      * 3 返回一个索引为以0开始的结果集列号的数组
      * 5 返回一个属性名对应结果集列名的匿名对象
-     * @return $this
+     * @return static
      */
-    public function setFetchMode($mode)
+    public function setFetchMode(int $mode): static
     {
         $this->mPdoAttribute[PDO::ATTR_DEFAULT_FETCH_MODE] = $mode;
         return $this;
@@ -2074,7 +1869,7 @@ class Model
      * 获取错误码
      * @return int
      */
-    public function getErrorCode()
+    public function getErrorCode(): int
     {
         return $this->mErrorCode;
     }
@@ -2083,7 +1878,7 @@ class Model
      * 获取错误信息
      * @return string
      */
-    public function getErrorInfo()
+    public function getErrorInfo(): string
     {
         $info = $this->mErrorInfo;
         if (empty($info)) {
@@ -2094,9 +1889,9 @@ class Model
 
     /**
      * 刷新权限
-     * @return number
+     * @return int
      */
-    public function flushPrivileges()
+    public function flushPrivileges(): int
     {
         return $this->execute('FLUSH PRIVILEGES');
     }
