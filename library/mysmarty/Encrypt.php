@@ -1,8 +1,4 @@
 <?php
-/**
- * Date: 2019/5/7
- * Time: 9:05
- */
 
 namespace library\mysmarty;
 
@@ -12,12 +8,9 @@ namespace library\mysmarty;
  */
 class Encrypt
 {
-    private static $obj;
-
-    private $cipher;
-
-    private $mode;
-
+    private static ?self $obj = null;
+    private string $cipher;
+    private string $mode;
 
     private function __construct()
     {
@@ -35,10 +28,10 @@ class Encrypt
 
     /**
      * 密码学方式
-     * @param mixed $cipher 有效的PHP MCrypt cypher常量
-     * @return $this
+     * @param string $cipher 有效的PHP MCrypt cypher常量
+     * @return static
      */
-    public function setCipher($cipher)
+    public function setCipher(string $cipher): static
     {
         $this->cipher = $cipher;
         return $this;
@@ -46,16 +39,19 @@ class Encrypt
 
     /**
      * 密码学方式
-     * @param mixed $mode 有效的PHP MCrypt模式常量
-     * @return $this
+     * @param string $mode 有效的PHP MCrypt模式常量
+     * @return static
      */
-    public function setMode($mode)
+    public function setMode(string $mode): static
     {
         $this->mode = $mode;
         return $this;
     }
 
-    public static function getInstance()
+    /**
+     * @return static
+     */
+    public static function getInstance(): static
     {
         if (self::$obj === null) {
             self::$obj = new self();
@@ -70,7 +66,7 @@ class Encrypt
      * @param string $key 自定义key
      * @return string
      */
-    public function encode($msg, $key = '')
+    public function encode(string $msg, string $key = ''): string
     {
         if (empty($key)) {
             $key = config('app.encryption_key');
@@ -86,7 +82,7 @@ class Encrypt
      * @param string $key
      * @return string
      */
-    public function decode($data, $key = '')
+    public function decode(string $data, string $key = ''): string
     {
         if (empty($key)) {
             $key = config('app.encryption_key');
@@ -100,7 +96,7 @@ class Encrypt
      * 获取密码学方式
      * @return string
      */
-    private function getMethod()
+    private function getMethod(): string
     {
         $method = '';
         if (!empty($this->cipher)) {
@@ -117,10 +113,10 @@ class Encrypt
 
     /**
      * 获取Vector (iv)
-     * @param mixed $method
+     * @param string $method
      * @return string
      */
-    private function getIv($method)
+    private function getIv(string $method): string
     {
         $ivlen = openssl_cipher_iv_length($method);
         return str_pad('', $ivlen, '1');
