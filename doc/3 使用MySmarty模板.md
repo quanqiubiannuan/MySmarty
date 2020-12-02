@@ -110,6 +110,45 @@ class Index extends Controller
 {$name}
 ```
 
+**变量修饰符**
+
+控制器
+
+```php
+<?php
+
+namespace application\home\controller;
+
+use library\mysmarty\Controller;
+
+class Index extends Controller
+{
+    public function test()
+    {
+        $this->assign('name','Lisi');
+        $this->display();
+    }
+}
+```
+
+模板
+
+```html
+{$name|strtolower}
+```
+
+修饰符用|分隔，多个依次调用，默认调用的修饰符方法第一个参数为当前变量的值
+
+```html
+{$time|formatToTime:'Y-m-d'}
+```
+
+修饰符的函数，第一个参数必须为变量的值，否则无法调用。
+
+修饰符的函数可以是自己编写的，但第一个参数必须是当前变量的值。
+
+多个参数用:分隔，第一个冒号后面的参数为 修饰符函数的 第二个参数，依次类推。
+
 **输出数组**
 
 控制器

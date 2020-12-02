@@ -127,19 +127,20 @@ class Template
         extract($this->data);
         echoHtmlHeader();
         require_once $compileFile;
+        $content = ob_get_contents();
+        // 是否格式化为一行
+        if (config('mysmarty.load_output_filter')) {
+            $content = formatHtml($content);
+            $content = formatJs($content);
+            $content = formatCss($content);
+            $content = myTrim($content);
+        }
         if ($this->caching) {
-            $content = ob_get_contents();
-            // 是否格式化为一行
-            if (config('mysmarty.load_output_filter')) {
-                $content = formatHtml($content);
-                $content = formatJs($content);
-                $content = formatCss($content);
-                $content = myTrim($content);
-            }
             $cacheClass = 'library\mysmarty\cache\\' . ucfirst($this->cachingType) . 'Cache';
             (new $cacheClass())->write($this->cachingKey, $content, config('mysmarty.cache_life_time', 3600));
         }
-        ob_end_flush();
+        ob_end_clean();
+        echo $content;
         exit();
     }
 
