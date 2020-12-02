@@ -11,9 +11,11 @@ class Ckeditor
     private static ?self $obj = null;
     // 包含有code标签的数据
     private array $codeData = [];
+    private string $codeKey = '##code##';
     // 包含有pre标签的数据
     private array $preData = [];
-    private string $allowTags = '<p><img><h1><h2><h3><h4><h5><h6><strong><i><a><ul><li><ol><blockquote><table><thead><tbody><tr><th><td><br>';
+    private string $preKey = '##pre##';
+    private string $allowTags = '<p><img><h1><h2><h3><h4><h5><h6><strong><i><a><ul><li><ol><blockquote><table><thead><tbody><tr><th><td><br><pre><code>';
 
     private function __construct()
     {
@@ -77,12 +79,24 @@ class Ckeditor
                 $content = preg_replace('/' . preg_quote($v, '/') . ' [^>]*>/iUs', $v . '>', $content);
             }
         }
-        $content = str_ireplace('<a ', '<a rel="nofollow" target="_blank" ', $content);
         //多个换行替换为一个换行
         $content = preg_replace('/(<br[^>]*>){2,}/i', '<br>', $content);
         $content = str_ireplace('<p></p>', '', $content);
         // 把code、pre标签的内容提取出来，提取出来的内容要转义
-
+        if (preg_match_all('/<code[^>]*>(.*)<\/code>/Uis', $content, $mat)) {
+            foreach ($mat[1] as $k => $v) {
+                $key = $this->codeKey . $k;
+                $this->codeData[$key] = htmlspecialchars(htmlspecialchars_decode($v));
+                $content = str_ireplace($v, $key, $content);
+            }
+        }
+        if (preg_match_all('/<pre>(.*)<\/pre>/Uis', $content, $mat)) {
+            foreach ($mat[1] as $k => $v) {
+                $key = $this->preKey . $k;
+                $this->preData[$key] = htmlspecialchars_decode($v);
+                $content = str_ireplace($v, $key, $content);
+            }
+        }
         return myTrim(strip_tags($content, $this->allowTags));
     }
 
@@ -232,6 +246,23 @@ class Ckeditor
                     }
                 }
             }
+        }
+        // 处理pre,code标签
+        // code标签不转义
+        $codeData = [];
+        foreach ($this->preData as $k => $v) {
+            $v = preg_replace_callback('/<code[^>]*>(.*)<\/code>/iUs', function ($mat) use (&$codeData) {
+                $key = md5($mat[1]);
+                $codeData[$key] = $mat[0];
+                return $key;
+            }, $v);
+            $finalStr = str_ireplace($k, htmlspecialchars($v), $finalStr);
+        }
+        foreach ($codeData as $k => $v) {
+            $finalStr = str_ireplace($k, $v, $finalStr);
+        }
+        foreach ($this->codeData as $k => $v) {
+            $finalStr = str_ireplace($k, $v, $finalStr);
         }
         return $finalStr;
     }
