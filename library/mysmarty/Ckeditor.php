@@ -65,7 +65,7 @@ class Ckeditor
                 continue;
             }
             if ($v === '<a') {
-                $content = preg_replace('/<a [^>]*(href=[\'"][^\'"]+[\'"])[^>]*>/iU', '<a $1>', $content);
+                $content = preg_replace('/<a [^>]*(href=[\'"][^\'"]+[\'"])[^>]*>/iU', '<a $1 target="_blank" rel="nofollow">', $content);
             } else if ($v === '<img') {
                 $content = $this->replaceImg($content);
             } else if ($v === '<code') {
