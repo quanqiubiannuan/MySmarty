@@ -23,7 +23,7 @@ class Template
     // 右分隔符
     private string $rightDelimiter = '}';
     // 函数合法开始标签
-    private array $funStartRegTags = ['include', 'foreach', 'if', 'elseif', 'else', 'php', 'config_load', 'url', 'href', 'captcha'];
+    private array $funStartRegTags = ['include', 'foreach', 'if', 'elseif', 'else', 'php', 'config_load', 'url', 'href', 'captcha', 'css', 'js'];
     // 函数合法结束标签
     private array $funEndRegTags = ['foreach', 'if', 'php'];
     // 替换标签
@@ -275,6 +275,85 @@ class Template
                     $paramData = $this->paramToArr($matchs[2], true);
                     $src = getAbsoluteUrl() . '/' . trim($paramData['src'], '/');
                     $funCode .= '<img src="' . $src . '" alt="验证码" style="cursor: pointer;" title="点击图片切换验证码" onclick="this.src=\'' . $src . '?i=\'+Math.random()+\'\'" />';
+                    break;
+                case 'css':
+                    $paramData = $this->paramToArr($matchs[2], true);
+                    $css = '';
+                    $format = $paramData['format'] ?? 1;
+                    $href = $paramData['href'];
+                    $hrefs = explode(',', $href);
+                    if (!$format) {
+                        foreach ($hrefs as $h) {
+                            if (!preg_match('/^http/', $h)) {
+                                $h = getAbsoluteUrl() . '/' . trim($h, '/');
+                            }
+                            $css .= '<link rel="stylesheet" href="' . $h . '">';
+                        }
+                    } else {
+                        $dir = PUBLIC_DIR . '/runtime';
+                        $md5 = md5($href) . '.css';
+                        $file = $dir . '/' . $md5;
+                        if (config('app.debug', false) || !file_exists($file)) {
+                            $cssData = '';
+                            foreach ($hrefs as $v) {
+                                if (!preg_match('/^http/', $v)) {
+                                    $v = '/' . trim($v, '/');
+                                    if (!file_exists(PUBLIC_DIR . $v)) {
+                                        continue;
+                                    }
+                                    $tmp = file_get_contents(PUBLIC_DIR . $v);
+                                } else {
+                                    $tmp = file_get_contents($v);
+                                }
+                                $cssData .= formatCss($tmp);
+                            }
+                            createDir($dir);
+                            file_put_contents($file, $cssData);
+                        }
+                        $url = getAbsoluteUrl() . '/runtime/' . $md5;
+                        $css = '<link rel="stylesheet" href="' . $url . '">';
+                    }
+                    $funCode .= $css;
+                    break;
+                case 'js':
+                    $paramData = $this->paramToArr($matchs[2], true);
+                    $js = '';
+                    $format = $paramData['format'] ?? 1;
+                    $href = $paramData['href'];
+                    $hrefs = explode(',', $href);
+                    if (!$format) {
+                        foreach ($hrefs as $h) {
+                            if (!preg_match('/^http/', $h)) {
+                                $h = '/' . trim($h, '/');
+                                $h = getAbsoluteUrl() . $h;
+                            }
+                            $js .= '<script src="' . $h . '"></script>';
+                        }
+                    } else {
+                        $dir = PUBLIC_DIR . '/runtime';
+                        $md5 = md5($href) . '.js';
+                        $file = $dir . '/' . $md5;
+                        if (config('app.debug', false) || !file_exists($file)) {
+                            $jsData = '';
+                            foreach ($hrefs as $v) {
+                                if (!preg_match('/^http/', $v)) {
+                                    $v = '/' . trim($v, '/');
+                                    if (!file_exists(PUBLIC_DIR . $v)) {
+                                        continue;
+                                    }
+                                    $tmp = file_get_contents(PUBLIC_DIR . $v);
+                                } else {
+                                    $tmp = file_get_contents($v);
+                                }
+                                $jsData .= formatJs($tmp);
+                            }
+                            createDir($dir);
+                            file_put_contents($file, $jsData);
+                        }
+                        $url = getAbsoluteUrl() . '/runtime/' . $md5;
+                        $js = '<script src="' . $url . '"></script>';
+                    }
+                    $funCode .= $js;
                     break;
             }
             return $funCode;

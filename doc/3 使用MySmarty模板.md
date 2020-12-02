@@ -370,6 +370,24 @@ pass=foobar
 </html>
 ```
 
+**格式化css/js文件**
+
+将多个css文件或多个js文件合并成一个文件
+
+```html
+{css href='a.css,b.css' format='1'}
+```
+
+href 多个public文件夹下的css文件，逗号分隔
+
+format 是否格式化，0 不合并，1 合并为一个文件
+
+js同理
+
+```html
+{js href='a.js,b.js' format='1'}
+```
+
 **其它模板语法**
 
 ```html

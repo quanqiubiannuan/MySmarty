@@ -368,7 +368,7 @@ function formatJs(string $js): string
     $js = preg_replace('/([^:\'"\\\=])\/\/.*([\n]|[\r\n])?/i', '$1', $js);
     // 替换换行
     $js = preg_replace('/([\n]|[\r\n])/', '', $js);
-    $js = preg_replace('/[\t]{1,}/', ' ', $js);
+    $js = preg_replace('/[\t]+/', ' ', $js);
     // 替换两个空格及以上空格 为一个
     $js = preg_replace('/[ ]{2,}/', ' ', $js);
     $js = trim($js);
@@ -386,7 +386,7 @@ function formatCss(string $css): string
     $css = preg_replace('/\/\*.*\*\//Uis', '', $css);
     // 替换换行
     $css = preg_replace('/([\n]|[\r\n])/', '', $css);
-    $css = preg_replace('/[\t]{1,}/', ' ', $css);
+    $css = preg_replace('/[\t]+/', ' ', $css);
     // 替换两个空格及以上空格 为一个
     $css = preg_replace('/[ ]{2,}/', ' ', $css);
     return $css;
