@@ -2,37 +2,37 @@
 
 namespace library\mysmarty;
 
+use GdImage;
+
 /**
  * 图像处理类
- *
-
- *
  */
 class Image
 {
 
-    private $image;
+    private string $image;
 
-    private $width;
+    private int $width;
 
-    private $height;
+    private int $height;
 
-    private $mine;
+    private string $mine;
 
-    private $type;
+    private int $type;
 
-    private $font = 20;
+    private int $font = 20;
 
-    private $postion = array(
-        0,
-        0
-    );
+    private array $postion = [0, 0];
 
-    private $positionType = 0;
+    private int $positionType = 0;
 
-    private $textcolor;
+    private array $textcolor;
 
-    private function __construct($image)
+    /**
+     * 图片构造器
+     * @param string $image 图片位置
+     */
+    private function __construct(string $image)
     {
         $info = getimagesize($image);
         $this->width = $info[0];
@@ -48,48 +48,37 @@ class Image
 
     /**
      * 获取图片资源
-     *
-     * @return NULL|resource
+     * @return GdImage|bool
      */
-    private function getIm()
+    private function getIm(): GdImage|bool
     {
-        $im = null;
-        switch ($this->type) {
-            case 1:
-                $im = imagecreatefromgif($this->image);
-                break;
-            case 2:
-                $im = imagecreatefromjpeg($this->image);
-                break;
-            case 3:
-                $im = imagecreatefrompng($this->image);
-                break;
-        }
+        $im = false;
+        $im = match ($this->type) {
+            1 => imagecreatefromgif($this->image),
+            2 => imagecreatefromjpeg($this->image),
+            3 => imagecreatefrompng($this->image),
+        };
         return $im;
     }
 
     /**
      * 创建图片资源
-     *
-     * @param int $width
-     *            宽度
-     * @param int $height
-     *            高度的
-     * @return resource
+     * @param int $width 宽度
+     * @param int $height 高度
+     * @return GdImage|bool
      */
-    private function createIm($width, $height)
+    private function createIm(int $width, int $height): GdImage|bool
     {
         return imagecreatetruecolor($width, $height);
     }
 
     /**
      * 保存资源
-     *
-     * @param resource $im
+     * @param GdImage $im
      * @param string $filename
      * @return string
      */
-    private function saveImage($im, $filename)
+    private function saveImage(GdImage $im, string $filename): string
     {
         if (preg_match('/\.gif/i', $filename)) {
             imagegif($im, $filename);
@@ -107,9 +96,9 @@ class Image
      * @param int $width 缩放到指定宽度
      * @param int $height 缩放到指定高度
      * @param string $filename 缩放图片存放位置
-     * @return bool
+     * @return string|bool
      */
-    public function zoom($width, $height, $filename)
+    public function zoom(int $width, int $height, string $filename): bool|string
     {
         $dst_image = $this->createIm($width, $height);
         $src_image = $this->getIm();
@@ -121,11 +110,11 @@ class Image
 
     /**
      * 按照图片宽度等比缩放
-     * @param integer $width 缩放到指定宽度
+     * @param int $width 缩放到指定宽度
      * @param string $filename 缩放图片存放位置
-     * @return bool
+     * @return bool|string
      */
-    public function zoomWidth($width, $filename)
+    public function zoomWidth(int $width, string $filename): bool|string
     {
         $bili = $width / $this->width;
         $height = $bili * $this->height;
@@ -134,11 +123,11 @@ class Image
 
     /**
      * 按照图片高度等比缩放
-     * @param integer $height 缩放到指定高度
+     * @param int $height 缩放到指定高度
      * @param string $filename 缩放图片存放位置
-     * @return bool
+     * @return bool|string
      */
-    public function zoomHeight($height, $filename)
+    public function zoomHeight(int $height, string $filename): bool|string
     {
         $bili = $height / $this->height;
         $width = $bili * $this->width;
@@ -147,13 +136,12 @@ class Image
 
     /**
      * 截取一部分图像
-     *
      * @param int $width
      * @param int $height
      * @param string $filename
      * @return string|boolean
      */
-    public function cut($width, $height, $filename)
+    public function cut(int $width, int $height, string $filename): bool|string
     {
         $dst_image = $this->createIm($width, $height);
         $src_image = $this->getIm();
@@ -165,11 +153,10 @@ class Image
 
     /**
      * 创建对象
-     *
      * @param string $image 原始图片文件位置
-     * @return Image
+     * @return static
      */
-    public static function image($image)
+    public static function image(string $image): static
     {
         return new self($image);
     }
@@ -177,20 +164,19 @@ class Image
     /**
      * 获取单一实例
      * @param string $image 原始图片文件位置
-     * @return Image
+     * @return static
      */
-    public static function getInstance($image)
+    public static function getInstance(string $image): static
     {
         return self::image($image);
     }
 
     /**
      * 设置字体
-     *
      * @param int $font
-     * @return Image
+     * @return static
      */
-    public function font($font)
+    public function font(int $font): static
     {
         $this->font = $font;
         return $this;
@@ -198,47 +184,42 @@ class Image
 
     /**
      * 设置文字大小
-     * @param integer $font
-     * @return Image
+     * @param int $font
+     * @return static
      */
-    public function setFont($font)
+    public function setFont(int $font): static
     {
         return $this->font($font);
     }
 
     /**
      * 设置开始位置
-     *
      * @param int $x
      * @param int $y
-     * @return Image
+     * @return static
      */
-    public function position($x, $y)
+    public function position(int $x, int $y): static
     {
-        $this->postion = array(
-            $x,
-            $y
-        );
+        $this->postion = [$x, $y];
         return $this;
     }
 
     /**
      * 设置水印位置
-     * @param integer $x
-     * @param integer $y
-     * @return Image
+     * @param int $x
+     * @param int $y
+     * @return static
      */
-    public function setPosition($x, $y)
+    public function setPosition(int $x, int $y): static
     {
         return $this->position($x, $y);
     }
 
     /**
      * 左上位置
-     *
-     * @return Image
+     * @return static
      */
-    public function positionTopLeft()
+    public function positionTopLeft(): static
     {
         $this->positionType = 1;
         return $this;
@@ -246,10 +227,9 @@ class Image
 
     /**
      * 右上位置
-     *
-     * @return Image
+     * @return static
      */
-    public function positionTopRight()
+    public function positionTopRight(): static
     {
         $this->positionType = 2;
         return $this;
@@ -257,10 +237,9 @@ class Image
 
     /**
      * 左下位置
-     *
-     * @return Image
+     * @return static
      */
-    public function positionBottomLeft()
+    public function positionBottomLeft(): static
     {
         $this->positionType = 3;
         return $this;
@@ -268,10 +247,9 @@ class Image
 
     /**
      * 右下位置
-     *
-     * @return Image
+     * @return static
      */
-    public function positionBottomRight()
+    public function positionBottomRight(): static
     {
         $this->positionType = 4;
         return $this;
@@ -279,10 +257,9 @@ class Image
 
     /**
      * 中间位置
-     *
-     * @return Image
+     * @return static
      */
-    public function positionCenter()
+    public function positionCenter(): static
     {
         $this->positionType = 5;
         return $this;
@@ -290,93 +267,85 @@ class Image
 
     /**
      * 设置颜色
-     *
-     * @param int $r
-     *            0-255
-     * @param int $g
-     *            0-255
-     * @param int $b
-     *            0-255
-     * @return Image
+     * @param int $r 0-255
+     * @param int $g 0-255
+     * @param int $b 0-255
+     * @return static
      */
-    public function color($r, $g, $b)
+    public function color(int $r, int $g, int $b): static
     {
-        $this->textcolor = array(
-            $r,
-            $g,
-            $b
-        );
+        $this->textcolor = [$r, $g, $b];
         return $this;
     }
 
     /**
      * 设置水印文字为红色
-     * @return Image
+     * @return static
      */
-    public function setRedColor()
+    public function setRedColor(): static
     {
         return $this->color(255, 0, 0);
     }
 
     /**
      * 设置水印文字为黑色
-     * @return Image
+     * @return static
      */
-    public function setBlackColor()
+    public function setBlackColor(): static
     {
         return $this->color(0, 0, 0);
     }
 
     /**
      * 设置水印文字为橙色
-     * @return Image
+     * @return static
      */
-    public function setOrangeColor()
+    public function setOrangeColor(): static
     {
         return $this->color(255, 165, 0);
     }
 
     /**
      * 设置水印文字为Aliceblue
-     * @return Image
+     * @return static
      */
-    public function setAliceblueColor()
+    public function setAliceblueColor(): static
     {
         return $this->color(240, 248, 255);
     }
 
     /**
      * 设置水印文字为蓝色
-     * @return Image
+     * @return static
      */
-    public function setBlueColor()
+    public function setBlueColor(): static
     {
         return $this->color(0, 0, 255);
     }
 
     /**
      * 设置水印文字为绿色
-     * @return Image
+     * @return static
      */
-    public function setGreenColor()
+    public function setGreenColor(): static
     {
         return $this->color(0, 128, 0);
     }
 
     /**
      * 设置水印文字为黄色
-     * @return Image
+     * @return static
      */
-    public function setYellowColor()
+    public function setYellowColor(): static
     {
         return $this->color(255, 255, 0);
     }
 
     /**
      * 设置水印文字为粉色
-     * @return Image
+     * @return static
      */
-    public function setPinkColor()
+    public function setPinkColor(): static
     {
         return $this->color(255, 192, 203);
     }
@@ -385,14 +354,11 @@ class Image
      * 设置水印
      *
      * @param string $string 水印文字或水印图片位置
-     * @param string $filename
-     *            保存文件
-     * @param string $fontfile
-     *            字体文件名称，需要放在 \extend\fonts 目录
+     * @param string $filename 保存文件
+     * @param string $fontfile 字体文件名称，需要放在 \extend\fonts 目录
      * @return string|bool
-     * @throws
      */
-    public function water($string, $filename = '', $fontfile = 'zkklt.ttf')
+    public function water(string $string, string $filename = '', string $fontfile = 'zkklt.ttf'): bool|string
     {
         $font_file = ROOT_DIR . '/extend/fonts/' . $fontfile;
         $src_image = $this->getIm();
