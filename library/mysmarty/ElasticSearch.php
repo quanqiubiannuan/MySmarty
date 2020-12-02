@@ -4,52 +4,44 @@ namespace library\mysmarty;
 
 /**
  * 全文搜索
- *
-
- *
  */
 class ElasticSearch
 {
-
-    private static $protocol = CONFIG['database']['elasticsearch']['protocol'];
-
-    private static $ip = CONFIG['database']['elasticsearch']['ip'];
-
-    private static $port = CONFIG['database']['elasticsearch']['port'];
-
+    // 协议
+    private static string $protocol = CONFIG['database']['elasticsearch']['protocol'];
+    // ip
+    private static string $ip = CONFIG['database']['elasticsearch']['ip'];
+    // 端口
+    private static int $port = CONFIG['database']['elasticsearch']['port'];
     // 数据库，索引
-    private static $database = CONFIG['database']['elasticsearch']['database'];
-
+    private static string $database = CONFIG['database']['elasticsearch']['database'];
     // 表，文档
-    private static $table = CONFIG['database']['elasticsearch']['table'];
-
+    private static string $table = CONFIG['database']['elasticsearch']['table'];
     // 表的自增主键 字段名
-    private static $pk = 'id';
-
+    private static string $pk = 'id';
     // 适当的 HTTP方法,GET`、 `POST`、 `PUT`、 `HEAD 或者 `DELETE`
-    private static $verb = 'GET';
+    private static string $verb = 'GET';
+    private static ?self $obj = null;
 
-    private static $obj = null;
+    private static array $mWhere = [];
 
-    private static $mWhere = [];
+    private static int $mSize = 10;
 
-    private static $mSize = 10;
+    private static int $mFrom = 0;
 
-    private static $mFrom = 0;
+    private static string $mTimeout = '3s';
 
-    private static $mTimeout = '3s';
+    private static bool|string $mDatabase = false;
 
-    private static $mDatabase = false;
+    private static bool|string $mTable = false;
 
-    private static $mTable = false;
+    private static array $mSort = [];
 
-    private static $mSort = [];
+    private static string $mField = '';
 
-    private static $mField = '';
+    private static array $mProperties = [];
 
-    private static $mProperties = [];
-
-    private static $mJsonType = JSON_UNESCAPED_UNICODE;
+    private static int $mJsonType = JSON_UNESCAPED_UNICODE;
 
     private function __construct()
     {
@@ -61,10 +53,9 @@ class ElasticSearch
 
     /**
      * 获取对象实例
-     *
-     * @return ElasticSearch
+     * @return static
      */
-    public static function getInstance()
+    public static function getInstance(): static
     {
         if (self::$obj === null) {
             self::$obj = new self();
@@ -74,14 +65,11 @@ class ElasticSearch
 
     /**
      * 发送数据
-     *
-     * @param string $path
-     *            请求路径
-     * @param array $data
-     *            请求数据,json格式
-     * @return mixed
+     * @param string $path 请求路径
+     * @param array $data 请求数据,json格式
+     * @return array
      */
-    public function exec($path, $data = [])
+    public function exec(string $path, array $data = []): array
     {
         $ch = curl_init($this->getUrl($path));
         curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -107,24 +95,20 @@ class ElasticSearch
 
     /**
      * 获取完整的请求url
-     *
-     * @param string $path
-     *            请求path
+     * @param string $path 请求path
      * @return string
      */
-    private function getUrl($path = '')
+    private function getUrl(string $path = ''): string
     {
         return self::$protocol . '://' . self::$ip . ':' . self::$port . $path;
     }
 
     /**
      * 修改请求方式
-     *
-     * @param string $verb
-     *            get,post,put,...
-     * @return ElasticSearch
+     * @param string $verb get,post,put,...
+     * @return static
      */
-    public function setVerb($verb)
+    public function setVerb(string $verb): static
     {
         self::$verb = strtoupper($verb);
         return $this;
@@ -132,77 +116,65 @@ class ElasticSearch
 
     /**
      * 以GET方式执行
-     *
      * @param string $path
-     * @param array $data
-     *            请求数据,json格式
-     * @return mixed
+     * @param array $data 请求数据,json格式
+     * @return array
      */
-    public function get($path, $data = [])
+    public function get(string $path, array $data = []): array
     {
         return $this->setVerb('GET')->exec($path, $data);
     }
 
     /**
      * 以POST方式执行
-     *
      * @param string $path
-     * @param array $data
-     *            请求数据,json格式
-     * @return mixed
+     * @param array $data 请求数据,json格式
+     * @return array
      */
-    public function post($path, $data = [])
+    public function post(string $path, array $data = []): array
     {
         return $this->setVerb('POST')->exec($path, $data);
     }
 
     /**
      * 以PUT方式执行
-     *
      * @param string $path
-     * @param array $data
-     *            请求数据,json格式
-     * @return mixed
+     * @param array $data 请求数据,json格式
+     * @return array
      */
-    public function put($path, $data = [])
+    public function put(string $path, array $data = []): array
     {
         return $this->setVerb('PUT')->exec($path, $data);
     }
 
     /**
      * 以DELETE方式执行
-     *
      * @param string $path
-     * @param array $data
-     *            请求数据,json格式
-     * @return mixed
+     * @param array $data 请求数据,json格式
+     * @return array
      */
-    public function delete($path, $data = [])
+    public function delete(string $path, array $data = []): array
     {
         return $this->setVerb('DELETE')->exec($path, $data);
     }
 
     /**
      * 以HEAD方式执行
-     *
      * @param string $path
-     * @param array $data
-     *            请求数据,json格式
-     * @return mixed
+     * @param array $data 请求数据,json格式
+     * @return array
      */
-    public function head($path, $data = [])
+    public function head(string $path, array $data = []): array
     {
         return $this->setVerb('HEAD')->exec($path, $data);
     }
 
     /**
      * 切换数据库，索引
-     *
-     * @param string $database
-     *            数据库，索引
-     * @return ElasticSearch
+     * @param string $database 数据库，索引
+     * @return static
      */
-    public function name($database)
+    public function name(string $database): static
     {
         self::$database = $database;
         return $this;
@@ -210,12 +182,10 @@ class ElasticSearch
 
     /**
      * 切换表，文档
-     *
-     * @param string $table
-     *            表，文档
-     * @return ElasticSearch
+     * @param string $table 表，文档
+     * @return static
      */
-    public function table($table)
+    public function table(string $table): static
     {
         self::$table = $table;
         return $this;
@@ -223,11 +193,10 @@ class ElasticSearch
 
     /**
      * 添加数据
-     *
      * @param array $data
-     * @return mixed 0 添加失败，1 添加成功，2 更新成功
+     * @return int 0 添加失败，1 添加成功，2 更新成功
      */
-    public function insert($data)
+    public function insert(array $data): int
     {
         $path = $this->generatePathById($this->getPkValue($data));
         if (substr($path, -1) === '/') {
@@ -248,12 +217,10 @@ class ElasticSearch
 
     /**
      * 根据id生成path
-     *
-     * @param string|int $id
-     *            主键id
+     * @param string $id 主键id
      * @return string
      */
-    private function generatePathById($id)
+    private function generatePathById(string $id): string
     {
         $path = '/' . self::$database . '/' . self::$table . '/';
         if (!empty($id)) {
@@ -264,12 +231,11 @@ class ElasticSearch
 
     /**
      * 生成搜索path
-     *
      * @param string|bool $database
      * @param string|bool $table
      * @return string
      */
-    private function generatePathBySearch($database = false, $table = false)
+    private function generatePathBySearch(string|bool $database = false, string|bool $table = false): string
     {
         $path = $this->getPath($database, $table);
         $path .= '/_search?size=' . self::$mSize . '&from=' . self::$mFrom . '&timeout=' . self::$mTimeout;
@@ -278,12 +244,11 @@ class ElasticSearch
 
     /**
      * 生成验证path
-     *
      * @param string|bool $database
      * @param string|bool $table
      * @return string
      */
-    private function generatePathByValidate($database = false, $table = false)
+    private function generatePathByValidate(string|bool $database = false, string|bool $table = false): string
     {
         $path = $this->getPath($database, $table);
         $path .= '/_validate/query';
@@ -292,12 +257,11 @@ class ElasticSearch
 
     /**
      * 生成清空表path
-     *
      * @param string|bool $database
      * @param string|bool $table
      * @return string
      */
-    private function generatePathByTruncate($database = false, $table = false)
+    private function generatePathByTruncate(string|bool $database = false, string|bool $table = false): string
     {
         $path = $this->getPath($database, $table);
         $path .= '/_delete_by_query?conflicts=proceed';
@@ -306,12 +270,11 @@ class ElasticSearch
 
     /**
      * 生成path路径
-     *
      * @param string|bool $database
      * @param string|bool $table
      * @return string
      */
-    private function getPath($database = false, $table = false)
+    private function getPath(string|bool $database = false, string|bool $table = false): string
     {
         if ($database === false) {
             $database = self::$database;
@@ -331,11 +294,10 @@ class ElasticSearch
 
     /**
      * 返回数组中的主键值
-     *
      * @param array $data
-     * @return number
+     * @return int
      */
-    private function getPkValue($data)
+    private function getPkValue(array $data): int
     {
         $id = 0;
         $pk = self::$pk;
@@ -347,10 +309,9 @@ class ElasticSearch
 
     /**
      * 查找数据
-     *
-     * @return mixed|array
+     * @return array
      */
-    public function find()
+    public function find(): array
     {
         $this->limit(0, 1);
         $data = $this->select();
@@ -379,15 +340,13 @@ class ElasticSearch
 
     /**
      * where条件
-     *
-     * @param
-     *            $field
+     * @param string $field
      * @param string $value
      * @param string $op
      * @param string $connector
-     * @return $this
+     * @return static
      */
-    public function where($field, $value, $op = '=', $connector = 'and')
+    public function where(string $field, string $value, string $op = '=', string $connector = 'and'): static
     {
         self::$mWhere[] = [
             $field,
@@ -400,10 +359,9 @@ class ElasticSearch
 
     /**
      * 处理条件
-     *
      * @return array
      */
-    private function dealWhere()
+    private function dealWhere(): array
     {
         $search = [];
         $must = []; // ==
@@ -525,12 +483,10 @@ class ElasticSearch
     }
 
     /**
-     *
      * 获取数据，去除掉无用数据
-     *
      * @return array
      */
-    public function select()
+    public function select(): array
     {
         $result = $this->rawSelect();
         $data = [];
@@ -548,10 +504,9 @@ class ElasticSearch
 
     /**
      * 获取原生数据
-     *
-     * @return mixed
+     * @return array
      */
-    public function rawSelect()
+    public function rawSelect(): array
     {
         $data = $this->dealWhere();
         $path = $this->generatePathBySearch(self::$mDatabase, self::$mTable);
@@ -561,10 +516,9 @@ class ElasticSearch
 
     /**
      * 获取原生验证结果
-     *
-     * @return mixed
+     * @return array
      */
-    public function rawValidate()
+    public function rawValidate(): array
     {
         $path = $this->generatePathByValidate(self::$mDatabase, self::$mTable);
         $data = $this->dealWhere();
@@ -574,10 +528,9 @@ class ElasticSearch
 
     /**
      * 验证请求数据是否正确
-     *
-     * @return mixed
+     * @return bool
      */
-    public function validate()
+    public function validate(): bool
     {
         $result = $this->rawValidate();
         return $result['valid'];
@@ -585,14 +538,11 @@ class ElasticSearch
 
     /**
      * 限制条件
-     *
-     * @param int $from
-     *            从第几条开始
-     * @param int $size
-     *            取多少条数据
-     * @return $this
+     * @param int $from 从第几条开始
+     * @param int $size 取多少条数据
+     * @return static
      */
-    public function limit($from, $size = 10)
+    public function limit(int $from, int $size = 10): static
     {
         self::$mFrom = $from;
         self::$mSize = $size;
@@ -601,14 +551,11 @@ class ElasticSearch
 
     /**
      * 分页查询
-     *
-     * @param int $page
-     *            第几页
-     * @param int $size
-     *            每页多少条数据
-     * @return $this
+     * @param int $page 第几页
+     * @param int $size 每页多少条数据
+     * @return static
      */
-    public function page($page, $size = 10)
+    public function page(int $page, int $size = 10): static
     {
         $from = ($page - 1) * $size;
         return $this->limit($from, $size);
@@ -616,12 +563,10 @@ class ElasticSearch
 
     /**
      * 设置请求超时时间
-     *
-     * @param int $timeout
-     *            单位秒
-     * @return $this
+     * @param int $timeout 单位秒
+     * @return static
      */
-    public function setTimeOut($timeout)
+    public function setTimeOut(int $timeout): static
     {
         self::$mTimeout = ($timeout * 1000) . 'ms';
         return $this;
@@ -629,12 +574,10 @@ class ElasticSearch
 
     /**
      * 设置主键名称
-     *
-     * @param string $pk
-     *            主键名称，如id
-     * @return ElasticSearch
+     * @param string $pk 主键名称，如id
+     * @return static
      */
-    public function setPk($pk)
+    public function setPk(string $pk): static
     {
         self::$pk = $pk;
         return $this;
@@ -642,28 +585,11 @@ class ElasticSearch
 
     /**
      * 设置搜索库
-     *
-     * @param string|bool $database
-     *            索引，数据库名,多个以逗号分隔
-     * @param string|bool $table
-     *            类型，数据库表，多个以逗号分隔
-     *            /_search
-     *            在所有的索引中搜索所有的类型
-     *            /gb/_search
-     *            在 gb 索引中搜索所有的类型
-     *            /gb,us/_search
-     *            在 gb 和 us 索引中搜索所有的文档
-     *            /g星号,u星号/_search
-     *            在任何以 g 或者 u 开头的索引中搜索所有的类型
-     *            /gb/user/_search
-     *            在 gb 索引中搜索 user 类型
-     *            /gb,us/user,tweet/_search
-     *            在 gb 和 us 索引中搜索 user 和 tweet 类型
-     *            /_all/user,tweet/_search
-     *            在所有的索引中搜索 user 和 tweet 类型
-     * @return $this
+     * @param string|bool $database 索引，数据库名,多个以逗号分隔
+     * @param string|bool $table 类型，数据库表，多个以逗号分隔
+     * @return static
      */
-    public function search($database = false, $table = false)
+    public function search(string|bool $database = false, string|bool $table = false): static
     {
         self::$mTable = $table;
         self::$mDatabase = $database;
@@ -672,14 +598,11 @@ class ElasticSearch
 
     /**
      * 排序
-     *
-     * @param string $field
-     *            排序字段
-     * @param string $order
-     *            排序规则，desc 降序,asc 升序
-     * @return $this
+     * @param string $field 排序字段
+     * @param string $order 排序规则，desc 降序,asc 升序
+     * @return static
      */
-    public function order($field, $order = 'desc')
+    public function order(string $field, string $order = 'desc'): static
     {
         self::$mSort[] = [
             $field => [
@@ -691,12 +614,10 @@ class ElasticSearch
 
     /**
      * 设置查询字段
-     *
-     * @param string $field
-     *            多个字段逗号分隔
-     * @return $this
+     * @param string $field 多个字段逗号分隔
+     * @return static
      */
-    public function field($field)
+    public function field(string $field): static
     {
         self::$mField = $field;
         return $this;
@@ -708,24 +629,20 @@ class ElasticSearch
      * green 所有的主分片和副本分片都正常运行
      * yellow 所有的主分片都正常运行，但不是所有的副本分片都正常运行
      * red 有主分片没能正常运行
-     *
-     * @return mixed
+     * @return array
      */
-    public function getHealth()
+    public function getHealth(): array
     {
         return $this->get('/_cluster/health');
     }
 
     /**
      * 创建索引
-     *
-     * @param int $shards
-     *            主分片数目
-     * @param int $replicas
-     *            副本分片数目
+     * @param int $shards 主分片数目
+     * @param int $replicas 副本分片数目
      * @return bool
      */
-    public function createDataBase($shards = 1, $replicas = 0)
+    public function createDataBase(int $shards = 1, int $replicas = 0): bool
     {
         $result = $this->put('/' . self::$database, [
             'settings' => [
@@ -738,11 +655,10 @@ class ElasticSearch
 
     /**
      * 设置数据库，索引
-     *
      * @param string $database
-     * @return $this
+     * @return static
      */
-    public function setDataBase($database)
+    public function setDataBase(string $database): static
     {
         self::$database = $database;
         return $this;
@@ -750,11 +666,10 @@ class ElasticSearch
 
     /**
      * 设置表，文档
-     *
      * @param string $table
-     * @return $this
+     * @return static
      */
-    public function setTable($table)
+    public function setTable(string $table): static
     {
         self::$table = $table;
         return $this;
@@ -762,11 +677,10 @@ class ElasticSearch
 
     /**
      * 更新副本分区数目
-     *
      * @param int $replicas
      * @return bool
      */
-    public function updateReplicas($replicas)
+    public function updateReplicas(int $replicas): bool
     {
         $result = $this->put('/' . self::$database . '/_settings', [
             'number_of_replicas' => $replicas
@@ -776,11 +690,10 @@ class ElasticSearch
 
     /**
      * 检查主键id的文档是否存在
-     *
      * @param int $id
      * @return bool
      */
-    public function checkId($id)
+    public function checkId(int $id): bool
     {
         $url = $this->getUrl($this->generatePathById($id));
         stream_context_set_default(array(
@@ -797,11 +710,10 @@ class ElasticSearch
 
     /**
      * 更细文档
-     *
      * @param array $data
      * @return bool
      */
-    public function update($data)
+    public function update(array $data): bool
     {
         $id = $this->getPkValueByWhere();
         if (empty($id)) {
@@ -816,10 +728,9 @@ class ElasticSearch
 
     /**
      * 删除数据
-     *
      * @return bool
      */
-    public function del()
+    public function del(): bool
     {
         $ids = $this->getPkValueByWhere();
         if (empty($ids)) {
@@ -837,14 +748,11 @@ class ElasticSearch
 
     /**
      * 自增
-     *
-     * @param int $field
-     *            自增字段
-     * @param int $num
-     *            自增值
+     * @param int $field 自增字段
+     * @param int $num 自增值
      * @return bool
      */
-    public function setInc($field, $num = 1)
+    public function setInc(int $field, int $num = 1): bool
     {
         $id = $this->getPkValueByWhere();
         if (empty($id)) {
@@ -862,10 +770,9 @@ class ElasticSearch
 
     /**
      * 根据where条件找到主键id的值
-     *
      * @return bool|array
      */
-    private function getPkValueByWhere()
+    private function getPkValueByWhere(): bool|array
     {
         $data = $this->rawSelect();
         if (empty($data['hits']['hits'])) {
@@ -880,24 +787,20 @@ class ElasticSearch
 
     /**
      * 自减
-     *
-     * @param int $field
-     *            自减字段
-     * @param int $num
-     *            自减值
+     * @param int $field 自减字段
+     * @param int $num 自减值
      * @return bool
      */
-    public function setDec($field, $num = 1)
+    public function setDec(int $field, int $num = 1): bool
     {
         return $this->setInc($field, $num * (-1));
     }
 
     /**
      * 获取映射
-     *
-     * @return mixed
+     * @return array
      */
-    public function getMapping()
+    public function getMapping(): array
     {
         $path = '/' . self::$database . '/_mapping/' . self::$table;
         return $this->get($path);
@@ -905,14 +808,11 @@ class ElasticSearch
 
     /**
      * 分析器
-     *
-     * @param string $text
-     *            文字
-     * @param string $analyzer
-     *            分词器
-     * @return mixed
+     * @param string $text 文字
+     * @param string $analyzer 分词器
+     * @return array
      */
-    public function getAnalyze($text, $analyzer = 'standard')
+    public function getAnalyze(string $text, string $analyzer = 'standard'): array
     {
         $path = '/_analyze';
         $data = [
@@ -924,10 +824,9 @@ class ElasticSearch
 
     /**
      * 删除数据库，索引
-     *
      * @return bool
      */
-    public function dropDataBase()
+    public function dropDataBase(): bool
     {
         $result = $this->delete('/' . self::$database);
         return !isset($result['error']);
@@ -938,7 +837,7 @@ class ElasticSearch
      * @param bool $enabled
      * @return bool
      */
-    public function createDataBaseByMapping($enabled = TRUE)
+    public function createDataBaseByMapping($enabled = true): bool
     {
         if (empty(self::$mProperties)) {
             return $this->createDataBase();
@@ -960,22 +859,15 @@ class ElasticSearch
 
     /**
      * 生成property
-     *
-     * @param string $field
-     *            字段
-     * @param string $type
-     *            类型，字符串: text,keyword，整数 :long, integer, short, byte, double, float, half_float, scaled_float，浮点数: float, double，布尔型: boolean，日期: date
-     * @param string $analyzer
-     *            分析器，standard，whitespace，simple，english
-     * @param string $search_analyzer
-     *            搜索分词器
-     * @param string $index
-     *            怎样索引字符串，analyzed 首先分析字符串，然后索引它。换句话说，以全文索引这个域。not_analyzed 索引这个域，所以它能够被搜索，但索引的是精确值。不会对它进行分析。no 不索引这个域。这个域不会被搜索到
-     * @param string $format
-     *            strict_date_optional_time，epoch_millis
-     * @return $this
+     * @param string $field 字段
+     * @param string $type 类型，字符串: text,keyword，整数 :long, integer, short, byte, double, float, half_float, scaled_float，浮点数: float, double，布尔型: boolean，日期: date
+     * @param string $analyzer 分析器，standard，whitespace，simple，english
+     * @param string $search_analyzer 搜索分词器
+     * @param string $index 怎样索引字符串，analyzed 首先分析字符串，然后索引它。换句话说，以全文索引这个域。not_analyzed 索引这个域，所以它能够被搜索，但索引的是精确值。不会对它进行分析。no 不索引这个域。这个域不会被搜索到
+     * @param string $format strict_date_optional_time，epoch_millis
+     * @return static
      */
-    public function setProperty($field, $type = 'text', $analyzer = '', $search_analyzer = '', $index = '', $format = '')
+    public function setProperty(string $field, string $type = 'text', string $analyzer = '', string $search_analyzer = '', string $index = '', string $format = ''): static
     {
         $tmp = [
             'type' => $type
@@ -998,12 +890,10 @@ class ElasticSearch
 
     /**
      * 改变json编码方式
-     *
-     * @param int $type
-     *            默认JSON_UNESCAPED_UNICODE
-     * @return $this
+     * @param int $type 默认JSON_UNESCAPED_UNICODE
+     * @return static
      */
-    public function changeJsonType($type)
+    public function changeJsonType(int $type): static
     {
         self::$mJsonType = $type;
         return $this;
@@ -1011,14 +901,11 @@ class ElasticSearch
 
     /**
      * 单个词搜索
-     *
-     * @param string $field
-     *            搜索字段
-     * @param string|array $value
-     *            数组或空格或逗号分隔的字符串
-     * @return ElasticSearch
+     * @param string $field 搜索字段
+     * @param string|array $value 数组或空格或逗号分隔的字符串
+     * @return static
      */
-    public function match($field, $value)
+    public function match(string $field, array|string $value): static
     {
         if (is_array($value)) {
             $value = implode(',', $value);
@@ -1028,14 +915,11 @@ class ElasticSearch
 
     /**
      * 短语匹配
-     *
-     * @param string $field
-     *            搜索字段
-     * @param string|array $value
-     *            数组或空格分隔的字符串
-     * @return ElasticSearch
+     * @param string $field 搜索字段
+     * @param string|array $value 数组或空格分隔的字符串
+     * @return static
      */
-    public function matchPhrase($field, $value)
+    public function matchPhrase(string $field, array|string $value): static
     {
         if (is_array($value)) {
             $value = implode(' ', $value);
@@ -1045,35 +929,32 @@ class ElasticSearch
 
     /**
      * 前缀查询
-     *
      * @param string $field
      * @param string $value
-     * @return ElasticSearch
+     * @return static
      */
-    public function prefix($field, $value)
+    public function prefix(string $field, string $value): static
     {
         return $this->where($field, $value, 'prefix');
     }
 
     /**
      * 正则表达式查询
-     *
      * @param string $field
      * @param string $value
-     * @return ElasticSearch
+     * @return static
      */
-    public function wildcard($field, $value)
+    public function wildcard(string $field, string $value): static
     {
         return $this->where($field, $value, 'wildcard');
     }
 
     /**
      * 设置json编码数据格式
-     *
      * @param int $type
-     * @return $this
+     * @return static
      */
-    public function setMJsonType($type)
+    public function setMJsonType(int $type): static
     {
         self::$mJsonType = $type;
         return $this;
@@ -1081,12 +962,11 @@ class ElasticSearch
 
     /**
      * 清空文档，表数据
-     *
      * @param string|bool $database
      * @param string|bool $table
      * @return bool
      */
-    public function truncate($database = FALSE, $table = FALSE)
+    public function truncate(string|bool $database = false, string|bool $table = false): bool
     {
         $path = $this->generatePathByTruncate($database, $table);
         $data = [
@@ -1100,9 +980,9 @@ class ElasticSearch
 
     /**
      * 获取最后一个文档的id
-     * @return int
+     * @return int|string
      */
-    public function getLastInsID()
+    public function getLastInsID(): int|string
     {
         $result = $this->order('id', 'desc')->find();
         if (!empty($result) && isset($result['id'])) {
@@ -1115,7 +995,7 @@ class ElasticSearch
      * 统计文档的总个数
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         $result = $this->rawSelect();
         if (!empty($result) && isset($result['hits']['total'])) {
@@ -1127,10 +1007,10 @@ class ElasticSearch
     /**
      * 精确查询
      * @param string $field
-     * @param mixed $value
-     * @return ElasticSearch
+     * @param string $value
+     * @return static
      */
-    public function term($field, $value)
+    public function term(string $field, string $value): static
     {
         return $this->where($field, $value, '=');
     }
