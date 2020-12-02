@@ -81,7 +81,7 @@ class Ckeditor
         //多个换行替换为一个换行
         $content = preg_replace('/(<br[^>]*>){2,}/i', '<br>', $content);
         $content = str_ireplace('<p></p>', '', $content);
-        // 把code、pre标签的内容提取出来
+        // 把code、pre标签的内容提取出来，提取出来的内容要转义
 
         return myTrim(strip_tags($content, $this->allowTags));
     }
