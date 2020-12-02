@@ -9,7 +9,11 @@ namespace library\mysmarty;
 class Ckeditor
 {
     private static ?self $obj = null;
-    private string $allowTags = '<p><img><h1><h2><h3><h4><h5><h6><strong><i><a><ul><li><ol><blockquote><table><thead><tbody><tr><th><td><pre><code><br>';
+    // 包含有code标签的数据
+    private array $codeData = [];
+    // 包含有pre标签的数据
+    private array $preData = [];
+    private string $allowTags = '<p><img><h1><h2><h3><h4><h5><h6><strong><i><a><ul><li><ol><blockquote><table><thead><tbody><tr><th><td><br>';
 
     private function __construct()
     {
@@ -51,7 +55,6 @@ class Ckeditor
      */
     private function stripTags(string $content): string
     {
-        $content = str_ireplace('<p></p>', '', $content);
         $content = preg_replace('/<p>([ 　]|&nbsp;)+<\/p>/iUu', '', $content);
         $content = str_ireplace('figure', 'p', $content);
         $content = preg_replace('/<figcaption>.*<\/figcaption>/iU', '', $content);
@@ -77,6 +80,9 @@ class Ckeditor
         $content = str_ireplace('<a ', '<a rel="nofollow" target="_blank" ', $content);
         //多个换行替换为一个换行
         $content = preg_replace('/(<br[^>]*>){2,}/i', '<br>', $content);
+        $content = str_ireplace('<p></p>', '', $content);
+        // 把code、pre标签的内容提取出来
+
         return myTrim(strip_tags($content, $this->allowTags));
     }
 
