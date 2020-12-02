@@ -191,8 +191,6 @@ class Index extends Controller
 
 <body>
 {$sunglasses|emoji}
-
-{emoji name=$sunglasses}
 </body>
 </html>
 ```
@@ -205,8 +203,6 @@ class Index extends Controller
 </head>
 
 <body>
-😎
-
 😎
 </body>
 </html>

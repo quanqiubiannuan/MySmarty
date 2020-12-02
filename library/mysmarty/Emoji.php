@@ -1,14 +1,10 @@
 <?php
-/**
- * Date: 2019/5/21
- * Time: 14:58
- */
 
 namespace library\mysmarty;
 
 class Emoji
 {
-    private static $data = [
+    private static array $data = [
         'birthday' => "\u{1F382}",
         'running' => "\u{1F3C3}",
         'house' => "\u{1F3E0}",
@@ -81,9 +77,9 @@ class Emoji
     /**
      * 根据表情名输出表情
      * @param string $name
-     * @return string
+     * @return void
      */
-    public static function echoByName(string $name): string
+    public static function echoByName(string $name): void
     {
         if (isset(self::$data[$name])) {
             echo self::$data[$name];
@@ -96,7 +92,7 @@ class Emoji
      * 返回所有表情名
      * @return array
      */
-    public static function getAllName()
+    public static function getAllName(): array
     {
         return array_keys(self::$data);
     }
