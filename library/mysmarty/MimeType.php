@@ -10,7 +10,7 @@ class MimeType
 {
     /**
      * 文件类型映射
-     * @var array|string[]
+     * @var array
      */
     public static array $data = [
         "text/html" => "html",
@@ -100,7 +100,7 @@ class MimeType
      * @param string $defValue 默认值
      * @return string
      */
-    public static function getExt(string $fileType, $defValue = '')
+    public static function getExt(string $fileType, string $defValue = ''): string
     {
         $fileType = strtolower($fileType);
         if (isset(self::$data[$fileType])) {
