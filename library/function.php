@@ -414,10 +414,8 @@ function formatHtml(string $html): string
     $html = preg_replace('/[\t]+/', ' ', $html);
     // 替换两个空格及以上空格 为一个
     $html = preg_replace('/[ ]{2,}/', ' ', $html);
-    if (!empty($preData)) {
-        foreach ($preData as $k => $v) {
-            $html = str_ireplace($k, $v, $html);
-        }
+    foreach ($preData as $k => $v) {
+        $html = str_ireplace($k, $v, $html);
     }
     return myTrim($html);
 }
