@@ -1667,33 +1667,31 @@ class Model
      */
     private function setType(array &$data): void
     {
-        if ($this->type !== null) {
-            foreach ($data as $k => $v) {
-                $type = $this->type[$k] ?? '';
-                switch ($type) {
-                    case 'integer':
-                        $data[$k] = (int)$v;
-                        break;
-                    case 'float':
-                        $data[$k] = (float)$v;
-                        break;
-                    case 'boolean':
-                        $data[$k] = (bool)$v;
-                        break;
-                    case 'object':
-                    case 'array':
-                        $data[$k] = json_encode($v);
-                        break;
-                    case 'serialize':
-                        $data[$k] = serialize($v);
-                        break;
-                    case 'timestamp':
-                        $data[$k] = strtotime($v);
-                        break;
-                    case 'datetime':
-                        $data[$k] = date('Y-m-d H:i:s', $v);
-                        break;
-                }
+        foreach ($data as $k => $v) {
+            $type = $this->type[$k] ?? '';
+            switch ($type) {
+                case 'integer':
+                    $data[$k] = (int)$v;
+                    break;
+                case 'float':
+                    $data[$k] = (float)$v;
+                    break;
+                case 'boolean':
+                    $data[$k] = (bool)$v;
+                    break;
+                case 'object':
+                case 'array':
+                    $data[$k] = json_encode($v);
+                    break;
+                case 'serialize':
+                    $data[$k] = serialize($v);
+                    break;
+                case 'timestamp':
+                    $data[$k] = strtotime($v);
+                    break;
+                case 'datetime':
+                    $data[$k] = date('Y-m-d H:i:s', $v);
+                    break;
             }
         }
     }
@@ -1704,35 +1702,33 @@ class Model
      */
     private function getType(array &$data): void
     {
-        if ($this->type !== null) {
-            foreach ($data as $k => $v) {
-                $type = $this->type[$k] ?? '';
-                switch ($type) {
-                    case 'integer':
-                        $data[$k] = (int)$v;
-                        break;
-                    case 'float':
-                        $data[$k] = (float)$v;
-                        break;
-                    case 'boolean':
-                        $data[$k] = (bool)$v;
-                        break;
-                    case 'array':
-                        $data[$k] = json_decode($v, true);
-                        break;
-                    case 'object':
-                        $data[$k] = json_decode($v, false);
-                        break;
-                    case 'serialize':
-                        $data[$k] = unserialize($v, ['allowed_classes' => true]);
-                        break;
-                    case 'timestamp':
-                        $data[$k] = date('Y-m-d H:i:s', $v);
-                        break;
-                    case 'datetime':
-                        $data[$k] = strtotime($v);
-                        break;
-                }
+        foreach ($data as $k => $v) {
+            $type = $this->type[$k] ?? '';
+            switch ($type) {
+                case 'integer':
+                    $data[$k] = (int)$v;
+                    break;
+                case 'float':
+                    $data[$k] = (float)$v;
+                    break;
+                case 'boolean':
+                    $data[$k] = (bool)$v;
+                    break;
+                case 'array':
+                    $data[$k] = json_decode($v, true);
+                    break;
+                case 'object':
+                    $data[$k] = json_decode($v, false);
+                    break;
+                case 'serialize':
+                    $data[$k] = unserialize($v, ['allowed_classes' => true]);
+                    break;
+                case 'timestamp':
+                    $data[$k] = date('Y-m-d H:i:s', $v);
+                    break;
+                case 'datetime':
+                    $data[$k] = strtotime($v);
+                    break;
             }
         }
     }
