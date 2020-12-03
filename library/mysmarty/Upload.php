@@ -4,20 +4,13 @@ namespace library\mysmarty;
 
 /**
  * 文件上传类
- *
-
- *
  */
 class Upload
 {
-
-    private static $obj = null;
-
-    private $limitType = [];
-
-    private $limitSize = '';
-
-    private $limitExt = '';
+    private static ?self $obj = null;
+    private array $limitType = [];
+    private string $limitSize = '';
+    private string $limitExt = '';
 
     private function __construct()
     {
@@ -27,7 +20,10 @@ class Upload
     {
     }
 
-    public static function getInstance()
+    /**
+     * @return static
+     */
+    public static function getInstance(): static
     {
         if (self::$obj === null) {
             self::$obj = new self();
@@ -38,12 +34,10 @@ class Upload
 
     /**
      * 移动文件
-     *
-     * @param string $name
-     *            表单提交文件名字段
+     * @param string $name 表单提交文件名字段
      * @return boolean|array|string 成功返回路径，失败返回false
      */
-    public function move($name)
+    public function move(string $name): bool|array|string
     {
         $files = $_FILES[$name] ?? '';
         if (empty($files)) {
@@ -69,12 +63,10 @@ class Upload
 
     /**
      * 设置上传文件类型
-     *
-     * @param array|string $type
-     *            如：['image/png']
-     * @return $this
+     * @param array|string $type 如：['image/png']
+     * @return static
      */
-    public function setLimitType($type)
+    public function setLimitType(array|string $type): static
     {
         if (!is_array($type)) {
             $type = explode(',', $type);
@@ -85,12 +77,10 @@ class Upload
 
     /**
      * 设置上传文件大小
-     *
-     * @param int $size
-     *            字节， 1kb = 1024b
-     * @return Upload
+     * @param int $size 字节， 1kb = 1024b
+     * @return static
      */
-    public function setLimitSize($size)
+    public function setLimitSize(int $size): static
     {
         $this->limitSize = $size;
         return $this;
@@ -98,12 +88,10 @@ class Upload
 
     /**
      * 设置上传文件后缀，不包括.
-     *
-     * @param string $ext
-     *            如：png
-     * @return Upload
+     * @param string $ext 如：png
+     * @return static
      */
-    public function setLimitExt($ext)
+    public function setLimitExt(string $ext): static
     {
         $this->limitExt = $ext;
         return $this;
@@ -113,24 +101,20 @@ class Upload
      * @param array $file
      * @return bool|string
      */
-    private function myMove($file)
+    private function myMove(array $file): bool|string
     {
         if ($file['error'] !== 0) {
             return false;
         }
-
         if (!is_uploaded_file($file['tmp_name'])) {
             return false;
         }
-
         if (!empty($this->limitType) && !in_array($file['type'], $this->limitType, true)) {
             return false;
         }
-
         if (!empty($this->limitSize) && $file['size'] > $this->limitSize) {
             return false;
         }
-
         $ext = MimeType::getExt($file['type']);
         if (empty($ext)) {
             $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
@@ -138,7 +122,6 @@ class Upload
                 return false;
             }
         }
-
         if (!empty($this->limitExt) && $ext !== $this->limitExt) {
             return false;
         }
@@ -156,10 +139,13 @@ class Upload
         return false;
     }
 
-    private function initVariable()
+    /**
+     * 初始化变量
+     */
+    private function initVariable(): void
     {
         $this->limitExt = '';
         $this->limitSize = '';
-        $this->limitType = '';
+        $this->limitType = [];
     }
 }

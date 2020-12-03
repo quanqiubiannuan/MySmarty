@@ -11,7 +11,7 @@ use library\mysmarty\Validate;
 
 class User extends Validate
 {
-    protected $rule = [
+    protected array $rule = [
         'username@用户名' => 'trim|includeName:abc|required',
         'age@年龄' => 'int|between:10,40',
     ];
