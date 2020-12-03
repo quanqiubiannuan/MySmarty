@@ -1594,15 +1594,16 @@ class Model
      * @param int $size 每页显示多少条
      * @param int|bool $limitTotalPage 限制总页，false则不限制
      * @param int|bool $limitPage 分页显示个数，false 不获取
+     * @param string $varPage
      * @return array
      */
     #[ArrayShape(['curPage' => "int", 'count' => "int", 'totalPage' => "int", 'size' => "int", 'pageData' => "array", 'data' => "array"])]
-    public function paginate(int $size = 10, bool|int $limitTotalPage = false, int|bool $limitPage = 5): array
+    public function paginate(int $size = 10, bool|int $limitTotalPage = false, int|bool $limitPage = 5, string $varPage = 'page'): array
     {
         $whereData = $this->saveWhereData();
         $count = $this->count();
         $this->recoverWhereData($whereData);
-        return $this->paginateByCount($count, $size, $limitTotalPage, $limitPage);
+        return $this->paginateByCount($count, $size, $limitTotalPage, $limitPage, $varPage);
     }
 
     /**
@@ -1611,12 +1612,13 @@ class Model
      * @param int $size 每页显示多少条
      * @param int|bool $limitTotalPage 限制总页，false则不限制
      * @param int|bool $limitPage 分页显示个数，false 不获取
+     * @param string $varPage
      * @return array
      */
     #[ArrayShape(['curPage' => "int", 'count' => "int", 'totalPage' => "int", 'size' => "int", 'pageData' => "array", 'data' => "array"])]
-    public function paginateByCount(int $count, int $size = 10, int|bool $limitTotalPage = false, int|bool $limitPage = 5): array
+    public function paginateByCount(int $count, int $size = 10, int|bool $limitTotalPage = false, int|bool $limitPage = 5, string $varPage = 'page'): array
     {
-        $result = Page::getInstance()->paginate($count, $size, $limitTotalPage, $limitPage);
+        $result = Page::getInstance()->paginate($count, $size, $limitTotalPage, $limitPage, $varPage);
         $result['data'] = $this->page($result['curPage'], $result['size'])->select();
         return $result;
     }

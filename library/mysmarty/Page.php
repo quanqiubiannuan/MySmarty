@@ -37,12 +37,13 @@ class Page
      * @param int $size 每页显示多少条
      * @param int|bool $limitTotalPage 限制总页，false则不限制
      * @param int|bool $limitPage 分页显示个数，false 不获取
+     * @param string $varPage 分页变量。默认为page
      * @return array
      */
     #[ArrayShape(['curPage' => "int", 'count' => "int", 'totalPage' => "int", 'size' => "int", 'pageData' => "array"])]
-    public function paginate(int $count, int $size = 10, int|bool $limitTotalPage = false, int|bool $limitPage = 5): array
+    public function paginate(int $count, int $size = 10, int|bool $limitTotalPage = false, int|bool $limitPage = 5, string $varPage = 'page'): array
     {
-        $curPage = getInt('page');
+        $curPage = getInt($varPage);
         if ($curPage < 1) {
             $curPage = 1;
         }
