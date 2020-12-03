@@ -1140,11 +1140,9 @@ class Model
         if (empty($row)) {
             return;
         }
-        if (!empty($this->mGetAttr)) {
-            foreach ($this->mGetAttr as $attr) {
-                if (array_key_exists($attr, $row) && method_exists($this, 'get' . formatController($attr) . 'Attr')) {
-                    $row[$attr] = $this->{'get' . formatController($attr) . 'Attr'}($row[$attr]);
-                }
+        foreach ($this->mGetAttr as $attr) {
+            if (array_key_exists($attr, $row) && method_exists($this, 'get' . formatController($attr) . 'Attr')) {
+                $row[$attr] = $this->{'get' . formatController($attr) . 'Attr'}($row[$attr]);
             }
         }
     }
