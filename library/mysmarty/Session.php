@@ -4,24 +4,15 @@ namespace library\mysmarty;
 
 /**
  * session操作类
- *
-
- *
  */
 class Session
 {
-
-    private $lifetime;
-
-    private $path;
-
-    private $domain;
-
-    private $secure;
-
-    private $httponly;
-
-    private static $obj;
+    private int $lifetime = 0;
+    private string $path = '';
+    private string $domain = '';
+    private bool $secure = false;
+    private bool $httponly = false;
+    private static ?self $obj = null;
 
     private function __construct()
     {
@@ -31,7 +22,10 @@ class Session
     {
     }
 
-    public static function getInstance()
+    /**
+     * @return static
+     */
+    public static function getInstance(): static
     {
         if (self::$obj === null) {
             self::$obj = new self();
@@ -40,57 +34,51 @@ class Session
     }
 
     /**
-     *
-     * @return mixed
+     * @return int
      */
-    public function getLifetime()
+    public function getLifetime(): int
     {
         return $this->lifetime;
     }
 
     /**
-     *
-     * @return mixed
+     * @return string
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
 
     /**
-     *
-     * @return mixed
+     * @return string
      */
-    public function getDomain()
+    public function getDomain(): string
     {
         return $this->domain;
     }
 
     /**
-     *
-     * @return mixed
+     * @return bool
      */
-    public function getSecure()
+    public function getSecure(): bool
     {
         return $this->secure;
     }
 
     /**
-     *
-     * @return mixed
+     * @return bool
      */
-    public function getHttponly()
+    public function getHttponly(): bool
     {
         return $this->httponly;
     }
 
     /**
      * Cookie 的 生命周期，以秒为单位。
-     *
-     * @param string $lifetime
-     * @return $this
+     * @param int $lifetime
+     * @return static
      */
-    public function setLifetime($lifetime)
+    public function setLifetime(int $lifetime): static
     {
         $this->lifetime = $lifetime;
         return $this;
@@ -98,11 +86,10 @@ class Session
 
     /**
      * 此 cookie 的有效 路径。 on the domain where 设置为“/”表示对于本域上所有的路径此 cookie 都可用。
-     *
      * @param string $path
-     * @return $this
+     * @return static
      */
-    public function setPath($path)
+    public function setPath(string $path): static
     {
         $this->path = $path;
         return $this;
@@ -110,11 +97,10 @@ class Session
 
     /**
      * Cookie 的作用 域。 例如：“www.php.net”。 如果要让 cookie 在所有的子域中都可用，此参数必须以点（.）开头，例如：“.php.net”。
-     *
      * @param string $domain
-     * @return $this
+     * @return static
      */
-    public function setDomain($domain)
+    public function setDomain(string $domain): static
     {
         $this->domain = $domain;
         return $this;
@@ -122,11 +108,10 @@ class Session
 
     /**
      * 设置为 TRUE 表示 cookie 仅在使用 安全 链接时可用。
-     *
      * @param bool $secure
-     * @return $this
+     * @return static
      */
-    public function setSecure($secure)
+    public function setSecure(bool $secure): static
     {
         $this->secure = $secure;
         return $this;
@@ -134,11 +119,10 @@ class Session
 
     /**
      * 设置为 TRUE 表示 PHP 发送 cookie 的时候会使用 httponly 标记。
-     *
      * @param bool $httponly
-     * @return $this
+     * @return static
      */
-    public function setHttponly($httponly)
+    public function setHttponly(bool $httponly): static
     {
         $this->httponly = $httponly;
         return $this;
@@ -147,7 +131,7 @@ class Session
     /**
      * 开启session
      */
-    public function startSession()
+    public function startSession(): void
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             $lifetime = $this->lifetime ?: config('session.lifetime', 3600);
@@ -162,11 +146,10 @@ class Session
 
     /**
      * 设置
-     *
      * @param string $name
      * @param string $value
      */
-    public function set($name, $value)
+    public function set(string $name, string $value): void
     {
         $this->startSession();
         $_SESSION[$name] = $value;
@@ -174,12 +157,11 @@ class Session
 
     /**
      * 获取
-     *
      * @param string $name
      * @param string $defValue
      * @return string
      */
-    public function get($name, $defValue = '')
+    public function get(string $name, string $defValue = ''): string
     {
         $this->startSession();
         if (isset($_SESSION[$name])) {
@@ -190,10 +172,9 @@ class Session
 
     /**
      * 删除
-     *
      * @param string $name
      */
-    public function delete($name)
+    public function delete(string $name): void
     {
         $this->startSession();
         if (isset($_SESSION[$name])) {
@@ -204,7 +185,7 @@ class Session
     /**
      * 清空
      */
-    public function clear()
+    public function clear(): void
     {
         $_SESSION = [];
     }

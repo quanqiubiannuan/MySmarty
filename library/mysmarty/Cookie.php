@@ -6,15 +6,10 @@ class Cookie
 {
 
     private int $expire;
-
     private string $path;
-
     private string $domain;
-
     private bool $secure;
-
     private bool $httponly;
-
     private static ?self $obj = null;
 
     private function __construct()
