@@ -2,7 +2,7 @@
 /**
  * 自定义命令
  * key 命令名
- * value 路由（模块/控制器/方法 参数一 参数二 ...）
+ * value 路由
  * 示例，控制台执行 php mysmarty test
  * 'test' => 'home/index/test'
  * 控制器请勿继承SmartyController
