@@ -243,9 +243,9 @@ class Model
     /**
      * 获取当前mysql对象
      * @param string $config 配置数据库名
-     * @return PDO|null
+     * @return static|null
      */
-    private static function getCurrentObj(string $config): PDO|null
+    private static function getCurrentObj(string $config): static|null
     {
         if (!empty(self::$obj[$config])) {
             return self::$obj[$config];
