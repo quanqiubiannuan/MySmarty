@@ -2,43 +2,24 @@
 
 namespace library\mysmarty;
 
-use Exception;
-
 /**
  * 发送电子邮件类
- *
-
- *
  */
 class Smtp
 {
+    private string $hostname = CONFIG['mail']['smtp']['hostname'];
+    private int $port = CONFIG['mail']['smtp']['port'];
+    private int $timeout = CONFIG['mail']['smtp']['timeout'];
+    private int $readTimeout = CONFIG['mail']['smtp']['readTimeout'];
+    private string $sendEmailUser = CONFIG['mail']['smtp']['sendEmailUser'];
+    private string $sendEmailPass = CONFIG['mail']['smtp']['sendEmailPass'];
+    private string $showEmail = CONFIG['mail']['smtp']['showEmail'];
+    private bool $useSSl = CONFIG['mail']['smtp']['useSSl'];
+    private static ?self $obj = null;
+    private mixed $handle = false;
 
     /**
-     * 成员属性不可以是带运算符的表达式、变量、方法或函数的调用，可以是常量。
-     * 说明，为什么用config函数赋值报错
-     */
-    private $hostname = CONFIG['mail']['smtp']['hostname'];
-
-    private $port = CONFIG['mail']['smtp']['port'];
-
-    private $timeout = CONFIG['mail']['smtp']['timeout'];
-
-    private $readTimeout = CONFIG['mail']['smtp']['readTimeout'];
-
-    private $sendEmailUser = CONFIG['mail']['smtp']['sendEmailUser'];
-
-    private $sendEmailPass = CONFIG['mail']['smtp']['sendEmailPass'];
-
-    private $showEmail = CONFIG['mail']['smtp']['showEmail'];
-
-    private $useSSl = CONFIG['mail']['smtp']['useSSl'];
-
-    private static $obj = null;
-
-    private $handle = null;
-
-    /**
-     * Smtp constructor.
+     * 邮件发送.
      * @throws
      */
     private function __construct()
@@ -50,7 +31,10 @@ class Smtp
     {
     }
 
-    public static function getInstance()
+    /**
+     * @return static
+     */
+    public static function getInstance(): static
     {
         if (self::$obj === null) {
             self::$obj = new self();
@@ -61,11 +45,11 @@ class Smtp
     /**
      * 连接
      */
-    private function connect()
+    private function connect(): void
     {
         $this->handle = fsockopen($this->hostname, $this->port, $errno, $errstr, $this->timeout);
         if ($errno !== 0) {
-            throw new \RuntimeException('连接失败！');
+            exit('连接失败！');
         }
         stream_set_timeout($this->handle, $this->readTimeout);
         stream_set_blocking($this->handle, 1);
@@ -87,13 +71,11 @@ class Smtp
 
     /**
      * 执行
-     *
      * @param string $command
-     * @param bool $get
-     *            是否获取执行结果
-     * @return string
+     * @param bool $get 是否获取执行结果
+     * @return bool|string
      */
-    private function exec($command, $get = true)
+    private function exec(string $command, bool $get = true): bool|string
     {
         fwrite($this->handle, $command . "\r\n");
         if ($get) {
@@ -104,20 +86,18 @@ class Smtp
 
     /**
      * 获取执行的结果
-     *
      * @return string
      */
-    private function get()
+    private function get(): string
     {
         return trim(fgets($this->handle));
     }
 
     /**
      * 与邮箱通信检测
-     *
-     * @return boolean
+     * @return bool
      */
-    private function helo()
+    private function helo(): bool
     {
         $result = $this->exec('HELO localhsot');
         $code = $this->getCode($result);
@@ -129,21 +109,19 @@ class Smtp
 
     /**
      * 获取返回字符串的状态码
-     *
      * @param string $result
-     * @return string
+     * @return int
      */
-    private function getCode($result)
+    private function getCode(string $result): int
     {
         return (int)mb_substr($result, 0, 3);
     }
 
     /**
      * 验证
-     *
-     * @return boolean
+     * @return bool
      */
-    private function auth()
+    private function auth(): bool
     {
         if (empty($this->sendEmailUser)) {
             return true;
@@ -161,10 +139,9 @@ class Smtp
 
     /**
      * 设置发送者邮箱
-     *
-     * @return boolean
+     * @return bool
      */
-    private function setMailFromEmail()
+    private function setMailFromEmail(): bool
     {
         $result = $this->exec('MAIL FROM:<' . $this->sendEmailUser . '>');
         $code = $this->getCode($result);
@@ -176,12 +153,10 @@ class Smtp
 
     /**
      * 设置接收者邮箱
-     *
-     * @param string $email
-     *            接收者邮箱账号
-     * @return boolean
+     * @param string $email 接收者邮箱账号
+     * @return bool
      */
-    private function setRcptTo($email)
+    private function setRcptTo(string $email): bool
     {
         if (!is_array($email)) {
             $email = [
@@ -203,11 +178,10 @@ class Smtp
 
     /**
      * 获取文件类型
-     *
      * @param string $file
-     * @return string|boolean
+     * @return string
      */
-    private function getFileMiMeType($file)
+    private function getFileMiMeType(string $file): string
     {
         $mime = mime_content_type($file);
         if (false === strpos($mime, 'image')) {
@@ -218,24 +192,17 @@ class Smtp
 
     /**
      * 设置邮件头
-     *
-     * @param string|array $email
-     *            邮箱账号
-     * @param string $subject
-     *            标题
-     * @param string $content
-     *            内容
+     * @param string|array $email 邮箱账号
+     * @param string $subject 标题
+     * @param string $content 内容
      * @param string $attachment 附件
-     * @param boolean $isHtml
-     *            是否为html邮件
-     * @return boolean
-     * @throws
+     * @param bool $isHtml 是否为html邮件
+     * @return bool
      */
-    private function setEmailHeader($email, $subject = '', $content = '', $attachment = '', $isHtml = true)
+    private function setEmailHeader(array|string $email, string $subject = '', string $content = '', string $attachment = '', bool $isHtml = true): bool
     {
         $commands = '';
         list ($msec, $sec) = explode(' ', microtime());
-
         if (!is_array($email)) {
             $email = [
                 [
@@ -251,7 +218,6 @@ class Smtp
         $commands .= 'Subject: ' . $subject . "\r\n";
         $commands .= 'Date: ' . date('r') . "\r\n" . 'X-Mailer:By Redhat (PHP/7.1.3)' . "\r\n";
         $commands .= 'Message-ID: <' . date('YmdHis', $sec) . '.' . ($msec * 1000000) . '.' . $this->sendEmailUser . '>' . "\r\n";
-
         if (!empty($attachment)) {
             // 有附件
             $commands .= 'Content-Type: multipart/mixed;' . "\r\n";
@@ -283,7 +249,7 @@ class Smtp
             }
             foreach ($attachment as $file) {
                 if (!file_exists($file)) {
-                    throw new Exception($file . ' 不存在');
+                    exit($file . ' 不存在');
                 }
                 $commands .= "\r\n" . '--' . $separator . "\r\n";
                 $commands .= 'Content-Type: ' . $this->getFileMiMeType($file) . '; name="' . basename($file) . '"' . "\r\n";
@@ -311,7 +277,6 @@ class Smtp
 
     /**
      * 原始发送邮件方法
-     *
      * @param string|array $email
      *            (type 字段，To 普通方式，CC，抄送，BCC，秘密抄送)
      *            接收者邮箱
@@ -329,58 +294,43 @@ class Smtp
      *            'type' => 'To'
      *            ]
      *            ];
-     * @param string $subject
-     *            标题
-     * @param string $content
-     *            内容
+     * @param string $subject 标题
+     * @param string $content 内容
      * @param string $attachment
-     * @param boolean $isHtml
-     *            是否为html邮件
-     * @return boolean
-     * @throws
+     * @param bool $isHtml 是否为html邮件
+     * @return bool
      */
-    public function rawSend($email, $subject, $content, $attachment = '', $isHtml = true)
+    public function rawSend(array|string $email, string $subject, string $content, string $attachment = '', bool $isHtml = true): bool
     {
         if (!$this->helo()) {
-            throw new \RuntimeException('与邮箱服务器通信失败');
+            exit('与邮箱服务器通信失败');
         }
         if (!$this->auth()) {
-            throw new \RuntimeException('邮箱账号密码验证失败');
+            exit('邮箱账号密码验证失败');
         }
-
         if (!$this->setMailFromEmail()) {
-            throw new \RuntimeException('设置发送邮箱账号失败');
+            exit('设置发送邮箱账号失败');
         }
-
         if (!$this->setRcptTo($email)) {
-            throw new \RuntimeException('设置接收邮箱失败');
+            exit('设置接收邮箱失败');
         }
-
         if (!$this->setEmailHeader($email, $subject, $content, $attachment, $isHtml)) {
-            throw new \RuntimeException('发送邮件失败');
+            exit('发送邮件失败');
         }
         return true;
     }
 
     /**
      * 发送邮件
-     *
-     * @param string|array $email
-     *            接收者邮箱，字符串或数组格式的邮箱
-     * @param string $subject
-     *            标题
-     * @param string $content
-     *            内容
-     * @param string|array $attachment
-     *            邮件附件，字符串或数组
-     * @param bool $isHtml
-     *            是否为html格式邮件
-     * @param string $type
-     *            发送类型， To 普通方式，CC，抄送，BCC，秘密抄送
-     * @return boolean
-     * @throws
+     * @param string|array $email 接收者邮箱，字符串或数组格式的邮箱
+     * @param string $subject 标题
+     * @param string $content 内容
+     * @param string $attachment 邮件附件，字符串或数组
+     * @param bool $isHtml 是否为html格式邮件
+     * @param string $type 发送类型， To 普通方式，CC，抄送，BCC，秘密抄送
+     * @return bool
      */
-    public function send($email, $subject, $content, $attachment = '', $isHtml = true, $type = 'To')
+    public function send(array|string $email, string $subject, string $content, string $attachment = '', bool $isHtml = true, $type = 'To'): bool
     {
         $tmp = [];
         if (!is_array($email)) {
