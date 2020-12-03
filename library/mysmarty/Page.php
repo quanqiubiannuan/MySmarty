@@ -1,13 +1,16 @@
 <?php
 
 namespace library\mysmarty;
+
+use JetBrains\PhpStorm\ArrayShape;
+
 /**
  * 分页类
  * @package library\mysmarty
  */
 class Page
 {
-    private static $obj;
+    private static ?self $obj = null;
 
     private function __construct()
     {
@@ -17,7 +20,10 @@ class Page
     {
     }
 
-    public static function getInstance()
+    /**
+     * @return static
+     */
+    public static function getInstance(): static
     {
         if (self::$obj === null) {
             self::$obj = new self();
@@ -27,19 +33,14 @@ class Page
 
     /**
      * 获取分页数据
-     *
      * @param int $count 数据总数
-     *
-     * @param integer $size
-     *            每页显示多少条
-     * @param int|bool $limitTotalPage
-     *            限制总页，false则不限制
-     * @param int|bool $limitPage
-     *            分页显示个数，false 不获取
+     * @param int $size 每页显示多少条
+     * @param int|bool $limitTotalPage 限制总页，false则不限制
+     * @param int|bool $limitPage 分页显示个数，false 不获取
      * @return array
-     * @throws
      */
-    public function paginate($count, $size = 10, $limitTotalPage = false, $limitPage = 5)
+    #[ArrayShape(['curPage' => "int", 'count' => "int", 'totalPage' => "int", 'size' => "int", 'pageData' => "array"])]
+    public function paginate(int $count, int $size = 10, int|bool $limitTotalPage = false, int|bool $limitPage = 5): array
     {
         $curPage = getInt('page');
         if ($curPage < 1) {

@@ -3,6 +3,7 @@
 namespace library\mysmarty;
 
 use Exception;
+use JetBrains\PhpStorm\ArrayShape;
 use PDO;
 use PDOStatement;
 use RuntimeException;
@@ -1595,6 +1596,7 @@ class Model
      * @param int|bool $limitPage 分页显示个数，false 不获取
      * @return array
      */
+    #[ArrayShape(['curPage' => "int", 'count' => "int", 'totalPage' => "int", 'size' => "int", 'pageData' => "array", 'data' => "array"])]
     public function paginate(int $size = 10, bool|int $limitTotalPage = false, int|bool $limitPage = 5): array
     {
         $whereData = $this->saveWhereData();
@@ -1611,6 +1613,7 @@ class Model
      * @param int|bool $limitPage 分页显示个数，false 不获取
      * @return array
      */
+    #[ArrayShape(['curPage' => "int", 'count' => "int", 'totalPage' => "int", 'size' => "int", 'pageData' => "array", 'data' => "array"])]
     public function paginateByCount(int $count, int $size = 10, int|bool $limitTotalPage = false, int|bool $limitPage = 5): array
     {
         $result = Page::getInstance()->paginate($count, $size, $limitTotalPage, $limitPage);
