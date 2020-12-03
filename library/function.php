@@ -779,11 +779,11 @@ function formatAction(string $action): string
 /**
  * 输出json数据
  * @param int $status
- * @param array $data
+ * @param array|string $data
  * @param string $msg
  * @param int $type
  */
-function echoJson(int $status = 1, array $data = [], string $msg = '', int $type = JSON_UNESCAPED_UNICODE): void
+function echoJson(int $status = 1, array|string $data = [], string $msg = '', int $type = JSON_UNESCAPED_UNICODE): void
 {
     json([
         'data' => $data,
