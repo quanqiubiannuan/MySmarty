@@ -2,44 +2,31 @@
 
 namespace library\mysmarty;
 
+use CURLFile;
+
 /**
  * 采集优化类
  */
 class Query
 {
-
-    private $url = [];
-
-    private $outputHeader = 0;
-
-    private $followLocation = 1;
-
-    private $returnTransfer = 1;
-
-    private $timeOut = 20;
-
-    private $userAgent = '';
-
-    private $cookieFile = '';
-
-    private $postFields = [];
-
-    private $header = [];
-
-    private $ip = '';
-
-    private $referer = '';
-
-    private $verifypeer = FALSE;
-
-    private $sleepTime = 0;
-
-    private $srcCharset = '';
-
-    private $matchReg = [];
-
-    private $proxyIp = '';
-    private $proxyType = 0;
+    private array $url = [];
+    private int $outputHeader = 0;
+    private int $followLocation = 1;
+    private int $returnTransfer = 1;
+    private int $timeOut = 20;
+    private string $userAgent = '';
+    private string $cookieFile = '';
+    private array|string $postFields = [];
+    private array $header = [];
+    private string $ip = '';
+    private string $referer = '';
+    private bool $verifypeer = false;
+    private int $sleepTime = 0;
+    private string $srcCharset = '';
+    private array $matchReg = [];
+    private string $proxyIp = '';
+    private int $proxyType = 0;
+    private static ?self $obj = null;
 
     /**
      * 初始化变量
@@ -64,12 +51,10 @@ class Query
         $this->proxyType = 0;
     }
 
-    private function initMatchReg()
+    private function initMatchReg(): void
     {
         $this->matchReg = [];
     }
-
-    private static $obj;
 
     private function __construct()
     {
@@ -79,7 +64,11 @@ class Query
     {
     }
 
-    public static function getInstance()
+    /**
+     * 获取静态操作对象
+     * @return static
+     */
+    public static function getInstance(): static
     {
         if (is_null(self::$obj)) {
             self::$obj = new self();
@@ -89,27 +78,21 @@ class Query
 
     /**
      * 设置请求url
-     *
-     * @param string $url
-     *            一个网址
-     * @return Query
+     * @param string $url 一个网址
+     * @return static
      */
-    public function setUrl($url)
+    public function setUrl(string $url): static
     {
-        $this->url = [
-            $url
-        ];
+        $this->url = [$url];
         return $this;
     }
 
     /**
      * 设置多个url
-     *
-     * @param string|array $urls
-     *            逗号分隔的url或数组
-     * @return Query
+     * @param string|array $urls 逗号分隔的url或数组
+     * @return static
      */
-    public function setUrls($urls)
+    public function setUrls(array|string $urls): static
     {
         if (!is_array($urls)) {
             $urls = explode(',', $urls);
@@ -120,12 +103,10 @@ class Query
 
     /**
      * 启用时会将头文件的信息作为数据流输出
-     *
-     * @param int $outputHeader
-     *            0 不输出 ，1 输出
-     * @return Query
+     * @param int $outputHeader 0 不输出 ，1 输出
+     * @return static
      */
-    public function setOutputHeader($outputHeader)
+    public function setOutputHeader(int $outputHeader): static
     {
         $this->outputHeader = $outputHeader;
         return $this;
@@ -133,12 +114,10 @@ class Query
 
     /**
      * TRUE 时将会根据服务器返回 HTTP 头中的 "Location: " 重定向。（注意：这是递归的，"Location: " 发送几次就重定向几次，除非设置了 CURLOPT_MAXREDIRS，限制最大重定向次数。）。
-     *
-     * @param int $followLocation
-     *            0 不重定向，1 重定向
-     * @return Query
+     * @param int $followLocation 0 不重定向，1 重定向
+     * @return static
      */
-    public function setFollowLocation($followLocation)
+    public function setFollowLocation(int $followLocation): static
     {
         $this->followLocation = $followLocation;
         return $this;
@@ -146,12 +125,10 @@ class Query
 
     /**
      * 返回原生的（Raw）内容
-     *
-     * @param int $returnTransfer
-     *            0 不返回，1 返回
-     * @return Query
+     * @param int $returnTransfer 0 不返回，1 返回
+     * @return static
      */
-    public function setReturnTransfer($returnTransfer)
+    public function setReturnTransfer(int $returnTransfer): static
     {
         $this->returnTransfer = $returnTransfer;
         return $this;
@@ -159,12 +136,10 @@ class Query
 
     /**
      * 允许 cURL 函数执行的最长秒数
-     *
-     * @param int $timeOut
-     *            多少秒
-     * @return Query
+     * @param int $timeOut 多少秒
+     * @return static
      */
-    public function setTimeOut($timeOut)
+    public function setTimeOut(int $timeOut): static
     {
         $this->timeOut = $timeOut;
         return $this;
@@ -172,23 +147,21 @@ class Query
 
     /**
      * 设置原网页网页编码
-     *
      * @param string $srcCharset
+     * @return static
      */
-    public function setSrcCharset($srcCharset)
+    public function setSrcCharset(string $srcCharset): static
     {
         $this->srcCharset = $srcCharset;
+        return $this;
     }
 
     /**
      * 在HTTP请求中包含一个"Category-Agent: "头的字符串。
-     *
-     * @param string|integer $userAgent
-     *            浏览器标识。
-     *
-     * @return Query
+     * @param string $userAgent 浏览器标识。
+     * @return static
      */
-    public function setUserAgent($userAgent)
+    public function setUserAgent(string $userAgent): static
     {
         $this->userAgent = $userAgent;
         return $this;
@@ -196,12 +169,10 @@ class Query
 
     /**
      * 包含 cookie 数据的文件名，cookie 文件的格式可以是 Netscape 格式，或者只是纯 HTTP 头部风格，存入文件。如果文件名是空的，不会加载 cookie，但 cookie 的处理仍旧启用。
-     *
-     * @param string $cookieFile
-     *            cookie存放位置
-     * @return Query
+     * @param string $cookieFile cookie存放位置
+     * @return static
      */
-    public function setCookieFile($cookieFile)
+    public function setCookieFile(string $cookieFile): static
     {
         $this->cookieFile = $cookieFile;
         return $this;
@@ -209,12 +180,10 @@ class Query
 
     /**
      * 全部数据使用HTTP协议中的 "POST" 操作来发送
-     *
-     * @param string|array $postFields
-     *            可以是 urlencoded 后的字符串，类似'para1=val1&para2=val2&...'，也可以使用一个以字段名为键值，字段数据为值的数组。
-     * @return Query
+     * @param string|array $postFields 可以是 urlencoded 后的字符串，类似'para1=val1&para2=val2&...'，也可以使用一个以字段名为键值，字段数据为值的数组。
+     * @return static
      */
-    public function setPostFields($postFields)
+    public function setPostFields(array|string $postFields): static
     {
         $this->postFields = $postFields;
         return $this;
@@ -222,11 +191,10 @@ class Query
 
     /**
      * 设置 HTTP 头字段的数组。格式： array('Content-type: text/plain', 'Content-length: 100')
-     *
      * @param array $header
      * @return $this
      */
-    public function setHeader($header)
+    public function setHeader(array $header): static
     {
         $this->header = $header;
         return $this;
@@ -234,11 +202,10 @@ class Query
 
     /**
      * 设置请求模拟ip
-     *
      * @param string $ip
      * @return $this
      */
-    public function setIp($ip)
+    public function setIp(string $ip): static
     {
         $this->ip = $ip;
         return $this;
@@ -246,22 +213,20 @@ class Query
 
     /**
      * 设置随机请求模拟ip
-     *
-     * @return Query
+     * @return static
      */
-    public function setRandIp()
+    public function setRandIp(): static
     {
-        $this->ip = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
+        $this->ip = mt_rand(0, 255) . '.' . mt_rand(0, 255) . '.' . mt_rand(0, 255) . '.' . mt_rand(0, 255);
         return $this;
     }
 
     /**
      * 在HTTP请求头中"Referer: "的内容。
-     *
      * @param string $referer
-     * @return Query
+     * @return static
      */
-    public function setReferer($referer)
+    public function setReferer(string $referer): static
     {
         $this->referer = $referer;
         return $this;
@@ -269,11 +234,10 @@ class Query
 
     /**
      * FALSE 禁止 cURL 验证对等证书（peer's certificate）
-     *
      * @param bool $verifypeer
-     * @return Query
+     * @return static
      */
-    public function setVerifypeer($verifypeer)
+    public function setVerifypeer(bool $verifypeer): static
     {
         $this->verifypeer = $verifypeer;
         return $this;
@@ -281,12 +245,10 @@ class Query
 
     /**
      * 设置在并发请求的休眠时间
-     *
-     * @param int $sleepTime
-     *            单位，毫秒
+     * @param int $sleepTime 单位，毫秒
      * @return $this
      */
-    public function setSleepTime($sleepTime)
+    public function setSleepTime(int $sleepTime): static
     {
         $this->sleepTime = $sleepTime;
         return $this;
@@ -294,10 +256,9 @@ class Query
 
     /**
      * 获取原始数据
-     *
-     * @return string[]
+     * @return array
      */
-    public function getRawData()
+    public function getRawData(): array
     {
         $urls = array_unique($this->url);
         // 执行句柄数组对象
@@ -330,7 +291,7 @@ class Query
                             $v = '@' . realpath(ltrim($v, '@'));
                             if (version_compare(PHP_VERSION, '5.5.0') >= 0) {
                                 // php 版本 > 5.5,使用CURLFile传文件
-                                $cfile = new \CURLFile(ltrim($v, '@'));
+                                $cfile = new CURLFile(ltrim($v, '@'));
                                 $this->postFields[$k2] = $cfile;
                             } else {
                                 $this->postFields[$k2] = $v;
@@ -392,10 +353,9 @@ class Query
 
     /**
      * 获取第一个结果
-     *
      * @return string
      */
-    public function getOne()
+    public function getOne(): string
     {
         $data = $this->getRawData();
         if (isset($data[0])) {
@@ -406,28 +366,22 @@ class Query
 
     /**
      * 获取所有结果
-     *
-     * @return string[]
+     * @return array
      */
-    public function getAll()
+    public function getAll(): array
     {
         return $this->getRawData();
     }
 
     /**
      * 添加匹配规则
-     *
-     * @param string $regName
-     *            定义一个获取名
-     * @param string $reg
-     *            正则表达式
-     * @param integer $getIndex
-     *            获取匹配的第几个
-     * @param string|bool $isGetAll
-     *            是否获取所有的匹配（使用preg_match_all）
+     * @param string $regName 定义一个获取名
+     * @param string $reg 正则表达式
+     * @param int $getIndex 获取匹配的第几个
+     * @param bool $isGetAll 是否获取所有的匹配（使用preg_match_all）
      * @return $this
      */
-    public function matchReg($regName, $reg, $getIndex = 1, $isGetAll = FALSE)
+    public function matchReg(string $regName, string $reg, int $getIndex = 1, bool $isGetAll = false): static
     {
         $this->matchReg[] = [
             'regName' => $regName,
@@ -440,14 +394,12 @@ class Query
 
     /**
      * 匹配正则表达式的数据结果
-     *
-     * @return string[]
-     * @throws \Exception
+     * @return array
      */
-    public function matchAll()
+    public function matchAll(): array
     {
         if (empty($this->matchReg)) {
-            throw new \Exception('没有matchReg');
+            return [];
         }
         $data = $this->getAll();
         $result = [];
@@ -475,11 +427,9 @@ class Query
 
     /**
      * 匹配一个网页的数据
-     *
      * @return array|string
-     * @throws \Exception
      */
-    public function matchOne()
+    public function matchOne(): array|string
     {
         $data = $this->matchAll();
         if (isset($data[0])) {
@@ -490,9 +440,9 @@ class Query
 
     /**
      * 发送请求
-     * @return string|string[]
+     * @return string|array
      */
-    public function send()
+    public function send(): array|string
     {
         if (count($this->url) > 1) {
             return $this->getAll();
@@ -503,9 +453,9 @@ class Query
     /**
      * 发送body请求
      * @param array|string $body 发送的数据,json格式，数组会自动转为json格式
-     * @return string|string[]
+     * @return string|array
      */
-    public function sendBody($body)
+    public function sendBody(array|string $body): array|string
     {
         if (is_array($body)) {
             $body = json_encode($body);
@@ -519,7 +469,7 @@ class Query
      * 设置谷歌浏览器useragent
      * @return $this
      */
-    public function setPcUserAgent()
+    public function setPcUserAgent(): static
     {
         return $this->setUserAgent('Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.108 Safari/537.36');
     }
@@ -528,7 +478,7 @@ class Query
      * 设置手机浏览器useragent
      * @return $this
      */
-    public function setMobileUserAgent()
+    public function setMobileUserAgent(): static
     {
         return $this->setUserAgent('Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.108 Mobile Safari/537.36');
     }
@@ -539,7 +489,7 @@ class Query
      * @param int $proxyType 代理类型，0 http,2 https
      * @return $this
      */
-    public function setProxyIp($ip, $proxyType = 0)
+    public function setProxyIp(array|string $ip, int $proxyType = 0): static
     {
         if (is_array($ip)) {
             shuffle($ip);
