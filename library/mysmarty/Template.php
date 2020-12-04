@@ -149,12 +149,13 @@ class Template
         if (!$this->caching) {
             return;
         }
-        // 如 FileCache 类中的 showCache方法，没有缓存 返回false
+        // 如 FileCache 类中的 read 方法，没有缓存 返回false
         $cacheClass = 'library\mysmarty\cache\\' . ucfirst($this->cachingType) . 'Cache';
         $cacheData = (new $cacheClass())->read($this->cachingKey);
         if (false !== $cacheData) {
             echoHtmlHeader();
-            exit($cacheData);
+            echo $cacheData;
+            exit();
         }
     }
 
