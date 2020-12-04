@@ -381,7 +381,7 @@ pass=foobar
 {block name=content}内容{/block}
 ```
 
-支持多级继承
+支持多级继承，但不支持 block 标签嵌套！
 
 **原样输出**
 
