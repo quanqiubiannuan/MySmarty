@@ -28,8 +28,8 @@ class Start
         define('RUNTIME_DIR', ROOT_DIR . '/runtime');
         define('LIBRARY_DIR', ROOT_DIR . '/library');
         define('CONFIG_DIR', ROOT_DIR . '/config');
-        define('CONFIG_FILE', RUNTIME_DIR . '/cache/config.php');
-        define('ROUTE_FILE', RUNTIME_DIR . '/cache/route.php');
+        define('CONFIG_FILE', RUNTIME_DIR . '/cache/' . MODULE . '/config.php');
+        define('ROUTE_FILE', RUNTIME_DIR . '/cache/' . MODULE . '/route.php');
         // 自动加载
         spl_autoload_register(function ($class) {
             require_once ROOT_DIR . '/' . str_ireplace('\\', '/', $class) . '.php';
