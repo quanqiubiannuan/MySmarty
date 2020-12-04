@@ -1117,9 +1117,9 @@ function getSession(string $name): mixed
  * 设置session
  *
  * @param string $name
- * @param string $value
+ * @param mixed $value
  */
-function setSession(string $name, string $value): void
+function setSession(string $name, mixed $value): void
 {
     Session::getInstance()->set($name, $value);
 }

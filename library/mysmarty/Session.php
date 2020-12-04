@@ -147,9 +147,9 @@ class Session
     /**
      * 设置
      * @param string $name
-     * @param string $value
+     * @param mixed $value
      */
-    public function set(string $name, string $value): void
+    public function set(string $name, mixed $value): void
     {
         $this->startSession();
         $_SESSION[$name] = $value;
@@ -158,10 +158,10 @@ class Session
     /**
      * 获取
      * @param string $name
-     * @param string $defValue
+     * @param mixed $defValue
      * @return string
      */
-    public function get(string $name, string $defValue = ''): string
+    public function get(string $name, mixed $defValue = ''): mixed
     {
         $this->startSession();
         if (isset($_SESSION[$name])) {
