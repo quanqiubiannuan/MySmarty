@@ -1397,7 +1397,7 @@ function getPath(): string
  */
 function getCacheKey(): string
 {
-    return md5($_SERVER['QUERY_STRING'] ?? $_SERVER['REQUEST_URI']);
+    return md5(MODULE . ($_SERVER['QUERY_STRING'] ?? $_SERVER['REQUEST_URI']));
 }
 
 /**
