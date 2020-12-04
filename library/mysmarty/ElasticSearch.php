@@ -89,7 +89,7 @@ class ElasticSearch
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $res = curl_exec($ch);
         curl_close($ch);
-        $res = json_decode($res, true);
+        $res = json_decode($res, true) ?: [];
         return $res;
     }
 
