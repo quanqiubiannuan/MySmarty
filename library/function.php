@@ -409,6 +409,8 @@ function formatHtml(string $html): string
         }
     }
     $html = preg_replace('/<!--.*-->/Us', '', $html);
+    $html = preg_replace('/\/\*.*\*\//Uis', '', $html);
+    $html = preg_replace('/([^:\'"\\\=])\/\/.*([\n]|[\r\n])?/i', '$1', $html);
     // 替换换行
     $html = preg_replace('/([\n]|[\r\n])/', '', $html);
     $html = preg_replace('/[\t]+/', ' ', $html);
