@@ -45,7 +45,9 @@ class Controller
         // 缓存配置
         $cache = $this->myCache ? config('mysmarty.cache', 0) : 0;
         if ($cache > 0) {
-            $this->mySmarty->setCaching($cache);
+            $this->mySmarty->setCaching(true);
+        } else {
+            $this->mySmarty->setCaching(false);
         }
     }
 

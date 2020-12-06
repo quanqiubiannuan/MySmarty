@@ -408,9 +408,19 @@ function formatHtml(string $html): string
             $html = str_ireplace($v, $key, $html);
         }
     }
+    // 页面中的代码注释
     $html = preg_replace('/<!--.*-->/Us', '', $html);
-    $html = preg_replace('/\/\*.*\*\//Uis', '', $html);
-    $html = preg_replace('/([^:\'"\\\=])\/\/.*([\n]|[\r\n])?/i', '$1', $html);
+    // 页面中匹配到js代码
+    $reg = '/<script[^>]*>(.+)<\/script>/iUs';
+    $html = preg_replace_callback($reg, function ($matchs) {
+        $js = preg_replace('/\/\*.*\*\//Uis', '', $matchs[0]);
+        return preg_replace('/([^:\'"\\\=])\/\/.*([\n]|[\r\n])?/i', '$1', $js);
+    }, $html);
+    // 页面中匹配到css代码
+    $reg = '/<style[^>]*>(.+)<\/style>/iUs';
+    $html = preg_replace_callback($reg, function ($matchs) {
+        return preg_replace('/\/\*.*\*\//Uis', '', $matchs[0]);
+    }, $html);
     // 替换换行
     $html = preg_replace('/([\n]|[\r\n])/', '', $html);
     $html = preg_replace('/[\t]+/', ' ', $html);
