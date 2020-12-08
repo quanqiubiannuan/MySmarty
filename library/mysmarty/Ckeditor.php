@@ -82,18 +82,18 @@ class Ckeditor
         //多个换行替换为一个换行
         $content = preg_replace('/(<br[^>]*>){2,}/i', '<br>', $content);
         $content = str_ireplace('<p></p>', '', $content);
-        // 把code、pre标签的内容提取出来，提取出来的内容要转义
+        // 把code、pre标签的内容提取出来
         if (preg_match_all('/<code[^>]*>(.*)<\/code>/Uis', $content, $mat)) {
             foreach ($mat[1] as $k => $v) {
                 $key = $this->codeKey . $k;
-                $this->codeData[$key] = htmlspecialchars(htmlspecialchars_decode($v));
+                $this->codeData[$key] = $v;
                 $content = str_ireplace($v, $key, $content);
             }
         }
         if (preg_match_all('/<pre>(.*)<\/pre>/Uis', $content, $mat)) {
             foreach ($mat[1] as $k => $v) {
                 $key = $this->preKey . $k;
-                $this->preData[$key] = htmlspecialchars_decode($v);
+                $this->preData[$key] = $v;
                 $content = str_ireplace($v, $key, $content);
             }
         }
@@ -256,7 +256,7 @@ class Ckeditor
                 $codeData[$key] = $mat[0];
                 return $key;
             }, $v);
-            $finalStr = str_ireplace($k, htmlspecialchars($v), $finalStr);
+            $finalStr = str_ireplace($k, $v, $finalStr);
         }
         foreach ($codeData as $k => $v) {
             $finalStr = str_ireplace($k, $v, $finalStr);
@@ -309,7 +309,6 @@ class Ckeditor
      */
     private function repPvalue(string $pv, bool $downloadImg = true): string
     {
-        $pv = htmlspecialchars_decode($pv);
         $pv = str_ireplace('<p>', '', $pv);
         $pv = str_ireplace('</p>', '', $pv);
         $pv = preg_replace('/&[\w]+;/iU', '', $pv);
