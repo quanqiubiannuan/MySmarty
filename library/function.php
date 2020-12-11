@@ -302,7 +302,6 @@ function getMemFreeRate(): int
 
 /**
  * 设置缓存
- *
  * @param string $name 键
  * @param string $value 值
  * @param int $expire 过期时间
@@ -345,7 +344,6 @@ function getUserAgent(): string
 
 /**
  * 获取server值
- *
  * @param string $name
  * @param string $defValue
  * @return string
@@ -357,7 +355,6 @@ function getServerValue(string $name, string $defValue = ''): string
 
 /**
  * 格式化js
- *
  * @param string $js
  * @return string
  */
@@ -377,7 +374,6 @@ function formatJs(string $js): string
 
 /**
  * 格式化css
- *
  * @param string $css
  * @return string
  */
@@ -474,7 +470,6 @@ function config(string $name, mixed $defValue = ''): mixed
 
 /**
  * 500服务端错误
- *
  * @param string $msg 错误信息
  * @param int $code
  */
@@ -496,7 +491,6 @@ function notFound(): void
 
 /**
  * 重定向
- *
  * @param string $url 跳转网址
  * @param int $code 状态码
  */
@@ -712,7 +706,6 @@ function isValidIp(string $ip, string $type = ''): bool
 
 /**
  * 生成url
- *
  * @param string $path url path部分
  * @return string
  */
@@ -879,7 +872,6 @@ function exceptionHandler(Throwable $exception): void
 
 /**
  * 错误处理
- *
  * @param int $errno
  * @param string $errstr
  * @param string $errfile
@@ -1116,7 +1108,6 @@ function getFixedUrl(string $url): string
 
 /**
  * 获取session值
- *
  * @param string $name
  * @return mixed
  */
@@ -1127,7 +1118,6 @@ function getSession(string $name): mixed
 
 /**
  * 设置session
- *
  * @param string $name
  * @param mixed $value
  */
