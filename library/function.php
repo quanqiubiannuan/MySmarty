@@ -172,10 +172,8 @@ function downloadImg(string $imgSrc): string|bool
     }
     $pathDir = '/upload/' . date('Ymd');
     $dir = ROOT_DIR . '/public' . $pathDir;
-    if (!file_exists($dir)) {
-        if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
-            return false;
-        }
+    if (!createDir($dir)) {
+        return false;
     }
     $filename = md5(time() . $imgSrc) . '.' . $hz;
     $data = Query::getInstance()->setPcUserAgent()
@@ -1312,8 +1310,8 @@ function createDirByFile(string $file): bool
     if (file_exists($file)) {
         return true;
     }
-    $path = pathinfo($file);
-    return createDir($path['dirname']);
+    $dirname = pathinfo($file, PATHINFO_DIRNAME);
+    return createDir($dirname);
 }
 
 /**
