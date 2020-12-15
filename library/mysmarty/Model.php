@@ -82,7 +82,7 @@ class Model
 
     private array $mPdoAttribute = [];
 
-    private int $mErrorCode = 0;
+    private string $mErrorCode = '';
 
     private array $mErrorInfo = [];
 
@@ -1866,9 +1866,9 @@ class Model
 
     /**
      * 获取错误码
-     * @return int
+     * @return string
      */
-    public function getErrorCode(): int
+    public function getErrorCode(): string
     {
         return $this->mErrorCode;
     }
