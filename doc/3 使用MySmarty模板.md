@@ -74,7 +74,7 @@ $this->view();
 指定自定义模板文件
 
 ```php
-$this->display('index/test.html');
+$this->display('index/home.html');
 ```
 
 使用view方法，不需要指定模板文件后缀名

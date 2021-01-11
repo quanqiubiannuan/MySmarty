@@ -6,7 +6,7 @@ define('MODULE', 'home');
 //定义默认控制器
 define('CONTROLLER', 'Index');
 //定义默认方法
-define('ACTION', 'test');
+define('ACTION', 'home');
 
 use library\mysmarty\Start;
 

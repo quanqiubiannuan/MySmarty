@@ -6,8 +6,8 @@ use library\mysmarty\Controller;
 
 class Index extends Controller
 {
-    public function test()
+    public function home()
     {
-
+        $this->display();
     }
 }
