@@ -19,7 +19,7 @@ class Start
      */
     public static function initCommon(): void
     {
-        define('MYSMARTY_VERSION', '1.0.0');
+        define('MYSMARTY_VERSION', '1.0.1');
         define('APPLICATION_DIR', ROOT_DIR . '/application');
         define('EXTEND_DIR', ROOT_DIR . '/extend');
         define('PUBLIC_DIR', ROOT_DIR . '/public');
