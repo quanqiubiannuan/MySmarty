@@ -1686,3 +1686,16 @@ function getHref(): string
     }
     return getAbsoluteUrl();
 }
+
+/**
+ * 判断指定的文件是否为真实的图片文件
+ * @param string $filePath 文件路径
+ * @return bool
+ */
+function isImage(string $filePath): bool
+{
+    if (file_exists($filePath)) {
+        return getimagesize($filePath) !== false;
+    }
+    return false;
+}

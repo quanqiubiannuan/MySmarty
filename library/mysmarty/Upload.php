@@ -112,6 +112,12 @@ class Upload
         if (!empty($this->limitType) && !in_array($file['type'], $this->limitType, true)) {
             return false;
         }
+        // 检测图片文件的合法性
+        if (str_starts_with($file['type'], 'image')) {
+            if (!isImage($file['tmp_name'])) {
+                return false;
+            }
+        }
         if (!empty($this->limitSize) && $file['size'] > $this->limitSize) {
             return false;
         }
