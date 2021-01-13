@@ -1423,49 +1423,19 @@ function isRequestJson(): bool
  */
 function generateConfig(): void
 {
-    if (!file_exists(CONFIG_FILE) || hasFileUpdate(1)) {
+    if (!file_exists(CONFIG_FILE)) {
         // 重新生成
         Config::initAllConfig();
     } else {
-        // 不需要生成
-        define('CONFIG', json_decode(file_get_contents(CONFIG_FILE), true));
+        $config = json_decode(file_get_contents(CONFIG_FILE), true);
+        if ($config['app']['debug']) {
+            // 重新生成
+            Config::initAllConfig();
+        } else {
+            // 不需要生成
+            define('CONFIG', $config);
+        }
     }
-}
-
-/**
- * 检查文件是否有修改
- * @param int $type 类型：1 配置文件是否有修改，2 控制器文件是否有修改
- * @return bool
- */
-function hasFileUpdate(int $type): bool
-{
-    switch ($type) {
-        case 1:
-            $checkFileTime = filemtime(CONFIG_FILE);
-            $files = scandir(CONFIG_DIR);
-            foreach ($files as $file) {
-                if (str_ends_with($file, '.php')) {
-                    if (filemtime(CONFIG_DIR . '/' . $file) >= $checkFileTime) {
-                        return true;
-                    }
-                }
-            }
-            $dir = APPLICATION_DIR . '/' . MODULE . '/config';
-            if (file_exists($dir)) {
-                $files = scandir($dir);
-                foreach ($files as $file) {
-                    if (str_ends_with($file, '.php')) {
-                        if (filemtime($dir . '/' . $file) >= $checkFileTime) {
-                            return true;
-                        }
-                    }
-                }
-            }
-            break;
-        case 2:
-            return checkeFileUpdate(APPLICATION_DIR . '/' . MODULE . '/controller');
-    }
-    return false;
 }
 
 /**
@@ -1473,7 +1443,7 @@ function hasFileUpdate(int $type): bool
  */
 function generateRoute(): void
 {
-    if (!file_exists(ROUTE_FILE) || hasFileUpdate(2)) {
+    if (!file_exists(ROUTE_FILE) || \config('app.debug')) {
         // 重新生成
         $controllerDir = APPLICATION_DIR . '/' . MODULE . '/controller';
         $classData = getNamespaceClass($controllerDir);
