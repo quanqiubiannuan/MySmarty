@@ -175,6 +175,7 @@ class Model
             $class = substr(static::class, strrpos(static::class, '\\') + 1);
             $this->table = toDivideName($class);
         }
+        $this->setError(0);
     }
 
     private function __clone()
