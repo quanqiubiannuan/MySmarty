@@ -18,7 +18,7 @@ return [
         // mysql 默认数据库
         'database' => 'test',
         // mysql 字符编码
-        'charset' => 'utf8'
+        'charset' => 'utf8mb4'
     ],
     'redis' => [
         // 主机ip
