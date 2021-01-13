@@ -286,15 +286,20 @@ class Query
                 // 判断文件
                 if (is_array($this->postFields)) {
                     foreach ($this->postFields as $k2 => $v) {
-                        if (preg_match('/^@/i', $v)) {
-                            // 文件
-                            $v = '@' . realpath(ltrim($v, '@'));
-                            if (version_compare(PHP_VERSION, '5.5.0') >= 0) {
-                                // php 版本 > 5.5,使用CURLFile传文件
-                                $cfile = new CURLFile(ltrim($v, '@'));
-                                $this->postFields[$k2] = $cfile;
-                            } else {
-                                $this->postFields[$k2] = $v;
+                        if (is_array($v)) {
+                            $v = json_encode($v, JSON_UNESCAPED_UNICODE);
+                            $this->postFields[$k2] = $v;
+                        } else {
+                            if (preg_match('/^@/i', $v)) {
+                                // 文件
+                                $v = '@' . realpath(ltrim($v, '@'));
+                                if (version_compare(PHP_VERSION, '5.5.0') >= 0) {
+                                    // php 版本 > 5.5,使用CURLFile传文件
+                                    $cfile = new CURLFile(ltrim($v, '@'));
+                                    $this->postFields[$k2] = $cfile;
+                                } else {
+                                    $this->postFields[$k2] = $v;
+                                }
                             }
                         }
                     }
@@ -458,7 +463,7 @@ class Query
     public function sendBody(array|string $body): array|string
     {
         if (is_array($body)) {
-            $body = json_encode($body);
+            $body = json_encode($body, JSON_UNESCAPED_UNICODE);
         }
         return $this->setHeader(array_merge($this->header, ['Content-Type: text/json; charset=utf-8', 'Content-Length:' . strlen($body)]))
             ->setPostFields($body)
