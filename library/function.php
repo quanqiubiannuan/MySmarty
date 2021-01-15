@@ -1381,7 +1381,7 @@ function emoji(string $str): void
 function getPath(): string
 {
     if (!defined('URI_PATH')) {
-        $pathinfo = $_GET[config('query_str', 's')] ?? '';
+        $pathinfo = $_GET[config('app.query_str', 's')] ?? '';
         unset($_GET[config('app.query_str', 's')], $_REQUEST[config('app.query_str', 's')]);
         if (preg_match('/\.php/i', $pathinfo)) {
             $pathinfo = str_ireplace(ltrim($_SERVER['PHP_SELF'], '/'), '', $pathinfo);
