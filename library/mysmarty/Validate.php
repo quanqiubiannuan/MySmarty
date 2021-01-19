@@ -1,85 +1,91 @@
 <?php
-/**
- * Date: 2019/5/7
- * Time: 10:34
- */
 
 namespace library\mysmarty;
 
+/**
+ * 验证类
+ * @package library\mysmarty
+ */
 class Validate
 {
-    //验证规则
+    // 验证规则
     protected array $rule = [];
+    // 当前错误
     protected string $error = '';
+    // 字段中文对应
     private array $labels = [];
-    protected string $validateField = '';
+    // 验证场景
+    protected array $scene;
+    // 当前场景
+    private string $currentScene;
+    // 当前验证的字段
+    private string $validateField;
 
     /**
-     * 初始化变量
+     * 验证场景
+     * @param string $scene 场景
      * @return static
      */
-    final public function init(): static
+    final public function scene(string $scene): static
     {
-        $this->rule = [];
-        $this->error = '';
-        $this->labels = [];
-        $this->validateField = '';
+        $this->currentScene = $scene;
         return $this;
     }
 
     /**
-     * 验证规则
-     * @param string $field 需要验证的表单字段名称，多个逗号分隔
+     * 验证数据
+     * @param array $data 待验证的数据
      * @return bool
      */
-    final public function run(string $field = ''): bool
+    final public function check(array $data): bool
     {
         if (empty($this->rule)) {
             return true;
         }
         $allRule = [];
         $allLabel = [];
+        // 待验证的字段列表
+        $validateFields = [];
+        if (!empty($this->currentScene)) {
+            $validateFields = $this->scene[$this->currentScene] ?? [];
+            if (empty($validateFields)) {
+                $this->setError('验证场景不存在');
+                return false;
+            }
+            if (is_string($validateFields)) {
+                $validateFields = explode(',', $validateFields);
+            }
+        }
         foreach ($this->rule as $k => $v) {
             $pos = strpos($k, '@');
             if ($pos !== false) {
                 $k1 = substr($k, 0, $pos);
                 $allLabel[$k1] = substr($k, $pos + 1);
+            } else {
+                $k1 = $k;
+            }
+            if (!empty($validateFields) && !in_array($k1, $validateFields)) {
+                continue;
             }
             $allRule[$k1] = $v;
         }
         $this->labels = $allLabel;
-        if (empty($field)) {
-            $fieldArr = array_merge(array_keys($_GET), array_keys($_POST), array_keys($_FILES));
-        } else {
-            $fieldArr = explode(',', $field);
-        }
-        if (empty($fieldArr)) {
-            return true;
-        }
-        foreach ($fieldArr as $f) {
-            if (!isset($allRule[$f])) {
-                continue;
+        foreach ($allRule as $f => $rule) {
+            $label = $this->getLabel($f);
+            if (!isset($data[$f])) {
+                $this->setError($label . '不存在');
+                return false;
             }
             $this->validateField = $f;
-            $rule = $allRule[$f];
             $ruleArr = explode('|', $rule);
             foreach ($ruleArr as $r) {
+                $r = myTrim($r);
                 if (empty($r)) {
                     continue;
                 }
                 $rArr = explode(':', $r);
                 $rParam = $rArr[1] ?? '';
-                $label = $this->getLabel($f);
-                if (isset($_GET[$f])) {
-                    $result = call_user_func_array([$this, $rArr[0]], [&$_GET[$f], $label, $rParam]);
-                } else if (isset($_POST[$f])) {
-                    $result = call_user_func_array([$this, $rArr[0]], [&$_POST[$f], $label, $rParam]);
-                } else if (isset($_FILES[$f])) {
-                    $result = call_user_func_array([$this, $rArr[0]], [&$_FILES[$f], $label, $rParam]);
-                } else {
-                    $this->setError('不支持非GET、POST、FILES方式的传输');
-                    $result = false;
-                }
+                $result = call_user_func_array([$this, $rArr[0]], [&$data[$f], $label, $rParam]);
                 if (!$result) {
                     return false;
                 }
@@ -94,7 +100,7 @@ class Validate
      * @param string $label 字段的标签
      * @return bool
      */
-    final private function required(mixed &$data, string $label): bool
+    private function required(mixed &$data, string $label): bool
     {
         if (empty($data)) {
             $this->setError($label . '不能为空');
@@ -141,7 +147,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function between(mixed &$data, string $label, string $param): bool
+    private function between(mixed &$data, string $label, string $param): bool
     {
         $paramArr = explode(',', $param);
         if ($data < $paramArr[0]) {
@@ -162,7 +168,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function number(mixed &$data, string $label, string $param): bool
+    private function number(mixed &$data, string $label, string $param): bool
     {
         if (!preg_match('/^[\d][\d\.]+$/U', $data)) {
             $this->setError($label . '不是一个数字');
@@ -178,7 +184,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function integer(mixed &$data, string $label, string $param): bool
+    private function integer(mixed &$data, string $label, string $param): bool
     {
         if (!filter_var($data, FILTER_VALIDATE_INT)) {
             $this->setError($label . '不是一个整数');
@@ -194,7 +200,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function float(mixed &$data, string $label, string $param): bool
+    private function float(mixed &$data, string $label, string $param): bool
     {
         if (!filter_var($data, FILTER_VALIDATE_FLOAT)) {
             $this->setError($label . '不是一个浮点数');
@@ -210,7 +216,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function boolean(mixed &$data, string $label, string $param): bool
+    private function boolean(mixed &$data, string $label, string $param): bool
     {
         if (!filter_var($data, FILTER_VALIDATE_BOOLEAN)) {
             $this->setError($label . '不是一个布尔值');
@@ -226,7 +232,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function email(mixed &$data, string $label, string $param): bool
+    private function email(mixed &$data, string $label, string $param): bool
     {
         if (!isEmail($data)) {
             $this->setError($label . '不是一个有效的邮箱账号');
@@ -242,7 +248,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function array(mixed &$data, string $label, string $param): bool
+    private function array(mixed &$data, string $label, string $param): bool
     {
         if (!is_array($data)) {
             $this->setError($label . '不是数组');
@@ -258,7 +264,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function date(mixed &$data, string $label, string $param): bool
+    private function date(mixed &$data, string $label, string $param): bool
     {
         if (!strtotime($data)) {
             $this->setError($label . '不是一个有效的时间');
@@ -274,7 +280,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function alpha(mixed &$data, string $label, string $param): bool
+    private function alpha(mixed &$data, string $label, string $param): bool
     {
         if (!preg_match('/^[a-z]+$/i', $data)) {
             $this->setError($label . '不是一个有效的字母');
@@ -291,7 +297,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function alphaNum(mixed &$data, string $label, string $param): bool
+    private function alphaNum(mixed &$data, string $label, string $param): bool
     {
         if (!preg_match('/^[a-z0-9]+$/i', $data)) {
             $this->setError($label . '不是一个有效的字母或数字');
@@ -307,7 +313,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function alphaDash(mixed &$data, string $label, string $param): bool
+    private function alphaDash(mixed &$data, string $label, string $param): bool
     {
         if (!preg_match('/^[a-z0-9_-]+$/i', $data)) {
             $this->setError($label . '不是一个有效的字母或数字或下划线或破折号');
@@ -323,7 +329,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function chs(mixed &$data, string $label, string $param): bool
+    private function chs(mixed &$data, string $label, string $param): bool
     {
         if (!is_string($data) || !isZh($data)) {
             $this->setError($label . '不是汉字');
@@ -339,7 +345,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function chsAlpha(mixed &$data, string $label, string $param): bool
+    private function chsAlpha(mixed &$data, string $label, string $param): bool
     {
         if (!preg_match('/^[\x{4e00}-\x{9fa5}a-z]+$/iu', $data)) {
             $this->setError($label . '不是汉字');
@@ -355,7 +361,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function chsAlphaNum(mixed &$data, string $label, string $param): bool
+    private function chsAlphaNum(mixed &$data, string $label, string $param): bool
     {
         if (!preg_match('/^[\x{4e00}-\x{9fa5}a-z0-9]+$/iu', $data)) {
             $this->setError($label . '不是汉字');
@@ -371,7 +377,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function chsDash(mixed &$data, string $label, string $param): bool
+    private function chsDash(mixed &$data, string $label, string $param): bool
     {
         if (!preg_match('/^[\x{4e00}-\x{9fa5}a-z0-9_-]+$/iu', $data)) {
             $this->setError($label . '不是汉字');
@@ -387,7 +393,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function activeUrl(mixed &$data, string $label, string $param): bool
+    private function activeUrl(mixed &$data, string $label, string $param): bool
     {
         if (!checkdnsrr($data)) {
             $this->setError($label . '不是有效的域名或IP');
@@ -403,7 +409,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function url(mixed &$data, string $label, string $param): bool
+    private function url(mixed &$data, string $label, string $param): bool
     {
         if (!isUrl($data)) {
             $this->setError($label . '不是有效的URL地址');
@@ -419,7 +425,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function ip(mixed &$data, string $label, string $param): bool
+    private function ip(mixed &$data, string $label, string $param): bool
     {
         if (!isIp($data)) {
             $this->setError($label . '不是有效的IP地址');
@@ -435,7 +441,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function dateFormat(mixed &$data, string $label, string $param): bool
+    private function dateFormat(mixed &$data, string $label, string $param): bool
     {
         $time = strtotime($data);
         if (!$time || strtotime(date($param, strtotime($data))) !== $time) {
@@ -452,7 +458,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function in(mixed &$data, string $label, string $param): bool
+    private function in(mixed &$data, string $label, string $param): bool
     {
         $inArr = explode(',', $param);
         if (!in_array($data, $inArr, true)) {
@@ -469,7 +475,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function notIn(mixed &$data, string $label, string $param): bool
+    private function notIn(mixed &$data, string $label, string $param): bool
     {
         $inArr = explode(',', $param);
         if (in_array($data, $inArr, true)) {
@@ -486,7 +492,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function notBetween(mixed &$data, string $label, string $param): bool
+    private function notBetween(mixed &$data, string $label, string $param): bool
     {
         $paramArr = explode(',', $param);
         if ($data >= $paramArr[0] && $data <= $paramArr[1]) {
@@ -503,7 +509,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function length(mixed &$data, string $label, string $param): bool
+    private function length(mixed &$data, string $label, string $param): bool
     {
         $paramArr = explode(',', $param);
         $error = false;
@@ -543,7 +549,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function max(mixed &$data, string $label, string $param): bool
+    private function max(mixed &$data, string $label, string $param): bool
     {
         if ((int)$data > $param) {
             $this->setError($label . '超出限制值');
@@ -559,7 +565,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function min(mixed &$data, string $label, string $param): bool
+    private function min(mixed &$data, string $label, string $param): bool
     {
         if ((int)$data < $param) {
             $this->setError($label . '小于限制值');
@@ -575,7 +581,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function after(mixed &$data, string $label, string $param): bool
+    private function after(mixed &$data, string $label, string $param): bool
     {
         if (strtotime($data) <= strtotime($param)) {
             $this->setError($label . '不在' . $param . '之后');
@@ -591,7 +597,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function before(mixed &$data, string $label, string $param): bool
+    private function before(mixed &$data, string $label, string $param): bool
     {
         if (strtotime($data) >= strtotime($param)) {
             $this->setError($label . '不在' . $param . '之前');
@@ -607,7 +613,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function confirm(mixed &$data, string $label, string $param): bool
+    private function confirm(mixed &$data, string $label, string $param): bool
     {
         if (!isset($_REQUEST[$param]) || $_REQUEST[$param] !== $data) {
             $this->setError($label . '与' . $this->getLabel($param) . '输入不一致');
@@ -623,7 +629,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function different(mixed &$data, string $label, string $param): bool
+    private function different(mixed &$data, string $label, string $param): bool
     {
         if (isset($_REQUEST[$param]) && $_REQUEST[$param] === $data) {
             $this->setError($label . '与' . $this->getLabel($param) . '输入一致');
@@ -640,7 +646,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function eq(mixed &$data, string $label, string $param): bool
+    private function eq(mixed &$data, string $label, string $param): bool
     {
         if ($param !== $data) {
             $this->setError($label . '与' . $param . '不相等');
@@ -656,7 +662,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function egt(mixed &$data, string $label, string $param): bool
+    private function egt(mixed &$data, string $label, string $param): bool
     {
         if ($data < $param) {
             $this->setError($label . '小于' . $param);
@@ -672,7 +678,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function gt(mixed &$data, string $label, string $param): bool
+    private function gt(mixed &$data, string $label, string $param): bool
     {
         if ($data <= $param) {
             $this->setError($label . '小于或等于' . $param);
@@ -688,7 +694,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function elt(mixed &$data, string $label, string $param): bool
+    private function elt(mixed &$data, string $label, string $param): bool
     {
         if ($data > $param) {
             $this->setError($label . '大于' . $param);
@@ -704,7 +710,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function lt(mixed &$data, string $label, string $param): bool
+    private function lt(mixed &$data, string $label, string $param): bool
     {
         if ($data >= $param) {
             $this->setError($label . '大于或等于' . $param);
@@ -720,7 +726,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function file(mixed &$data, string $label, string $param): bool
+    private function file(mixed &$data, string $label, string $param): bool
     {
         if (!isset($_FILES[$this->validateField])) {
             $this->setError($label . '不是一个文件');
@@ -736,7 +742,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function image(mixed &$data, string $label, string $param): bool
+    private function image(mixed &$data, string $label, string $param): bool
     {
         if (!isset($_FILES[$this->validateField])) {
             $this->setError($label . '不是一个文件');
@@ -766,7 +772,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function fileExt(mixed &$data, string $label, string $param): bool
+    private function fileExt(mixed &$data, string $label, string $param): bool
     {
         if (!isset($_FILES[$this->validateField])) {
             $this->setError($label . '不是一个文件');
@@ -808,7 +814,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function fileMime(mixed &$data, string $label, string $param): bool
+    private function fileMime(mixed &$data, string $label, string $param): bool
     {
         if (!isset($_FILES[$this->validateField])) {
             $this->setError($label . '不是一个文件');
@@ -863,7 +869,7 @@ class Validate
      * @param string $param 规则的参数
      * @return bool
      */
-    final private function fileSize(mixed &$data, string $label, string $param): bool
+    private function fileSize(mixed &$data, string $label, string $param): bool
     {
         if (!isset($_FILES[$this->validateField])) {
             $this->setError($label . '不是一个文件');
