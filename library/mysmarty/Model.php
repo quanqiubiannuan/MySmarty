@@ -86,8 +86,6 @@ class Model
 
     private array $mErrorInfo = [];
 
-    private static bool $mIsStaticCall = false;
-
     /**
      * 初始化查询变量
      */
@@ -109,7 +107,6 @@ class Model
         $this->mValidate = false;
         $this->mHidden = [];
         $this->mPdoAttribute = [];
-        self::$mIsStaticCall = false;
     }
 
     /**
@@ -171,7 +168,7 @@ class Model
          *  $database
          */
         $this->database = $this->database ?: CONFIG['database'][$config]['database'];
-        if (!self::$mIsStaticCall && empty($this->table)) {
+        if (empty($this->table)) {
             $class = substr(static::class, strrpos(static::class, '\\') + 1);
             $this->table = toDivideName($class);
         }
@@ -235,7 +232,6 @@ class Model
     {
         $obj = self::getCurrentObj($config);
         if ($obj === null) {
-            self::$mIsStaticCall = true;
             $obj = new self($config);
             self::$obj[$config] = $obj;
         }
