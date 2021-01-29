@@ -239,11 +239,10 @@ class Ckeditor
                 $v = myTrim($v);
                 if (!empty($v)) {
                     $finalStr .= $this->getPBrValue($v);
-                } else {
-                    if (isset($pArr[$curK])) {
-                        $finalStr .= $this->getPBrValue($pArr[$curK]);
-                        $curK++;
-                    }
+                }
+                if (isset($pArr[$curK])) {
+                    $finalStr .= $this->getPBrValue($pArr[$curK]);
+                    $curK++;
                 }
             }
         }
@@ -284,7 +283,12 @@ class Ckeditor
                     continue;
                 } else {
                     $v = preg_replace('/<([^>]+)>[\s ]+<\/\1>/iUsu', '', $v);
-                    $str .= '<p>' . $v . '</p>';
+                    if (preg_match('/^<[^>]+>$/i', $v)) {
+                        // 标签内容，原样返回
+                        $str .= $v;
+                    } else {
+                        $str .= '<p>' . $v . '</p>';
+                    }
                 }
             }
         }
