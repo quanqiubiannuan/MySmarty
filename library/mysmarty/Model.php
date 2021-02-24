@@ -483,7 +483,7 @@ class Model
     public function join(string $table, string $condition, string $type = 'left join'): static
     {
         $this->mJoin[] = [
-            $table,
+            $this->formatTable($table),
             $condition,
             $type
         ];
@@ -625,7 +625,7 @@ class Model
         if ($field === '*') {
             return '*';
         }
-        if (false !== strpos($field, '.')) {
+        if (str_contains($field, '.')) {
             $fieldArr = explode('.', $field);
             foreach ($fieldArr as $k => $v) {
                 if ($v === '*') {
@@ -1090,7 +1090,7 @@ class Model
      */
     private function formatTable(string $table): string
     {
-        return $this->formatDatabae($table);
+        return $this->formatField($table);
     }
 
     /**
