@@ -72,6 +72,10 @@ class Ckeditor
                 $content = $this->replaceImg($content);
             } else if ($v === '<code') {
                 $content = $this->replaceCode($content);
+            } else if ($v === '<th') {
+                $content = $this->replaceThTd($content);
+            } else if ($v === '<td') {
+                $content = $this->replaceThTd($content);
             } else if ($v === '<pre') {
                 $content = preg_replace('/<pre[^>]*>/iU', '<p><pre>', $content);
                 $content = preg_replace('/<\/pre>/iU', '</pre></p>', $content);
@@ -111,16 +115,16 @@ class Ckeditor
         if (preg_match_all($reg, $content, $mat)) {
             foreach ($mat[0] as $k => $v) {
                 $repImg = '<img';
-                $src = $this->getImgAttr($v, 'src');
+                $src = $this->getTagAttr($v, 'src');
                 if (empty($src)) {
                     continue;
                 }
                 $repImg .= ' src="' . $src . '"';
-                $height = $this->getImgAttr($v, 'height');
+                $height = $this->getTagAttr($v, 'height');
                 if (!empty($height)) {
                     $repImg .= ' height="' . $height . '"';
                 }
-                $width = $this->getImgAttr($v, 'width');
+                $width = $this->getTagAttr($v, 'width');
                 if (!empty($width)) {
                     $repImg .= ' width="' . $width . '"';
                 }
@@ -128,6 +132,36 @@ class Ckeditor
                 $content = str_ireplace($v, $repImg, $content);
             }
         }
+        return $content;
+    }
+
+    /**
+     * 替换表格中的合并属性
+     * @param string $content 内容
+     * @return string
+     */
+    private function replaceThTd(string $content): string
+    {
+        $reg = '/<(th|td)[^>]*>/iU';
+        if (preg_match_all($reg, $content, $mat)) {
+            foreach ($mat[0] as $k => $v) {
+                $repStr = '<' . $mat[1][$k];
+                $colspan = $this->getTagAttr($v, 'colspan');
+                if (!empty($colspan)) {
+                    $repStr .= ' colspan="' . $colspan . '"';
+                }
+                $rowspan = $this->getTagAttr($v, 'rowspan');
+                if (!empty($rowspan)) {
+                    $repStr .= ' rowspan="' . $rowspan . '"';
+                }
+                $repStr .= '>';
+                $content = str_ireplace($v, $repStr, $content);
+            }
+        }
+        // 将th、td内的标签内容去掉
+        $content = preg_replace_callback('/<(td|th)[^>]*>(.*)<\/\1>/isU', function ($mat) {
+            return str_ireplace($mat[2], strip_tags($mat[2], '<img><br>'), $mat[0]);
+        }, $content);
         return $content;
     }
 
@@ -142,7 +176,7 @@ class Ckeditor
         if (preg_match_all($reg, $content, $mat)) {
             foreach ($mat[0] as $k => $v) {
                 $repCode = '<code';
-                $class = $this->getCodeAttr($v, 'class');
+                $class = $this->getTagAttr($v, 'class');
                 if (!empty($class)) {
                     $repCode .= ' class="' . $class . '"';
                 }
@@ -154,30 +188,15 @@ class Ckeditor
     }
 
     /**
-     * 获取图片的属性标签值
-     * @param string $img img标签代码
-     * @param string $attr img属性值
+     * 获取标签的属性值
+     * @param string $tag 标签字段值
+     * @param string $attr 获取的属性名
      * @return string
      */
-    private function getImgAttr(string $img, string $attr): string
+    private function getTagAttr(string $tag, string $attr): string
     {
-        $reg = '/<img [^>]*' . $attr . '=[\'"]([^\'"]+)[\'"][^>]*>/iU';
-        if (preg_match($reg, $img, $mat)) {
-            return myTrim($mat[1]);
-        }
-        return '';
-    }
-
-    /**
-     * 获取code标签的属性标签值
-     * @param string $code img标签代码
-     * @param string $attr img属性值
-     * @return string
-     */
-    private function getCodeAttr(string $code, string $attr): string
-    {
-        $reg = '/<code [^>]*' . $attr . '=[\'"]([^\'"]+)[\'"][^>]*>/iU';
-        if (preg_match($reg, $code, $mat)) {
+        $reg = '/<[a-z0-9]+[^>]*' . $attr . '=[\'"]([^\'"]+)[\'"][^>]*>/iU';
+        if (preg_match($reg, $tag, $mat)) {
             return myTrim($mat[1]);
         }
         return '';
@@ -283,12 +302,7 @@ class Ckeditor
                     continue;
                 } else {
                     $v = preg_replace('/<([^>]+)>[\s ]+<\/\1>/iUsu', '', $v);
-                    if (preg_match('/^<[^>]+>$/i', $v)) {
-                        // 标签内容，原样返回
-                        $str .= $v;
-                    } else {
-                        $str .= '<p>' . $v . '</p>';
-                    }
+                    $str .= '<p>' . $v . '</p>';
                 }
             }
         }
